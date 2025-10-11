@@ -1,0 +1,23 @@
+# Encrypt Terraform state files
+*.tfstate filter=git-crypt diff=git-crypt
+*.tfstate.backup filter=git-crypt diff=git-crypt
+.terraform/terraform.tfstate filter=git-crypt diff=git-crypt
+
+# Encrypt sensitive variable files
+terraform.tfvars filter=git-crypt diff=git-crypt
+*.tfvars filter=git-crypt diff=git-crypt
+secrets.auto.tfvars filter=git-crypt diff=git-crypt
+
+# Encrypt any secrets
+**/secrets/** filter=git-crypt diff=git-crypt
+**/secret*.yaml filter=git-crypt diff=git-crypt
+**/.secret*.yaml filter=git-crypt diff=git-crypt
+**/*-sealed*.yaml filter=git-crypt diff=git-crypt
+*.key filter=git-crypt diff=git-crypt
+*.pem filter=git-crypt diff=git-crypt
+
+# Don't encrypt these
+*.md !filter !diff
+README.md !filter !diff
+.gitattributes !filter !diff
+.gitignore !filter !diff
