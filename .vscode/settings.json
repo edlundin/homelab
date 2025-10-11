@@ -1,4 +1,32 @@
 {
-	"cSpell.words": [],
+	"cSpell.words": [
+		"authkey",
+		"cloudinit",
+		"debian",
+		"diskimages",
+		"distros",
+		"genericcloud",
+		"iothread",
+		"iscsid",
+		"karakeep",
+		"keyctl",
+		"kube",
+		"kubeconfig",
+		"KUBECONFIG",
+		"neovim",
+		"pipefail",
+		"proxmox",
+		"pwauth",
+		"qcow",
+		"Qdrant",
+		"runcmd",
+		"searxng",
+		"tailscale",
+		"traefik",
+		"virtio",
+		"vmbr",
+		"vztmpl",
+		"wirebos"
+	],
 	"ansible.python.interpreterPath": "/opt/homebrew/bin/python3.13"
 }
