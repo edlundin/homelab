@@ -81,7 +81,7 @@ metadata:
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: admin@oisd.io
+    email: edvard.lundin@pm.me
     privateKeySecretRef:
       name: letsencrypt-prod
     solvers:
@@ -94,6 +94,10 @@ spec:
           dnsNames:
             - "oisd.io"
             - "*.oisd.io"
+            - "bos.oisd.io"
+            - "*.bos.oisd.io"
+            - "s3.oisd.io"
+            - "*.s3.oisd.io"
 
 ---
 # ClusterIssuer for Let's Encrypt staging (for testing)
@@ -104,7 +108,7 @@ metadata:
 spec:
   acme:
     server: https://acme-staging-v02.api.letsencrypt.org/directory
-    email: admin@oisd.io
+    email: edvard.lundin@pm.me
     privateKeySecretRef:
       name: letsencrypt-staging
     solvers:
@@ -117,13 +121,17 @@ spec:
           dnsNames:
             - "oisd.io"
             - "*.oisd.io"
+            - "bos.oisd.io"
+            - "*.bos.oisd.io"
+            - "s3.oisd.io"
+            - "*.s3.oisd.io"
 
 ---
 # Certificate for wildcard oisd.io domain
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: wildcard-oisd-io
+  name: wildcard-oisd-io-cert
   namespace: traefik
 spec:
   secretName: wildcard-tls-oisd
@@ -139,7 +147,7 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: wildcard-bos-oisd-io
+  name: wildcard-bos-oisd-io-cert
   namespace: traefik
 spec:
   secretName: wildcard-tls-bos-oisd
@@ -149,3 +157,19 @@ spec:
   dnsNames:
     - "bos.oisd.io"
     - "*.bos.oisd.io"
+
+---
+# Certificate for wildcard s3.oisd.io domain
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-s3-oisd-io-cert
+  namespace: traefik
+spec:
+  secretName: wildcard-tls-s3-oisd
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - "s3.oisd.io"
+    - "*.s3.oisd.io"
