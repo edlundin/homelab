@@ -34,6 +34,9 @@ spec:
             traefik.ingress.kubernetes.io/router.entrypoints: websecure
             traefik.ingress.kubernetes.io/router.tls.certresolver: cloudflare
             traefik.ingress.kubernetes.io/router.middlewares: longhorn-auth@kubernetescrd
+            
+        preUpgradeChecker:
+            jobEnabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
