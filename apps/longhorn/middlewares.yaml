@@ -1,0 +1,10 @@
+---
+# Basic Auth middleware for Longhorn UI
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: longhorn-auth
+  namespace: longhorn-system
+spec:
+  basicAuth:
+    secret: longhorn-auth-secret

@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://charts.longhorn.io
+    targetRevision: 1.10.0
+    chart: longhorn
+    helm:
+      values: |
+        persistence:
+          defaultClass: true
+          defaultClassReplicaCount: 1
+          reclaimPolicy: Retain
+
+        defaultSettings:
+          backupTarget: s3://homelab-backups@garage/
+          backupTargetCredentialSecret: longhorn-backup-secret
+          
+        ingress:
+          enabled: true
+          ingressClassName: traefik
+          host: longhorn.oisd.io
+          tls: true
+          tlsSecret: wildcard-tls-oisd
+          annotations:
+            traefik.ingress.kubernetes.io/router.entrypoints: websecure
+            traefik.ingress.kubernetes.io/router.tls.certresolver: cloudflare
+            traefik.ingress.kubernetes.io/router.middlewares: longhorn-auth@kubernetescrd
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: longhorn-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
