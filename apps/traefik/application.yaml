@@ -10,9 +10,86 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/edlundin/homelab.git
-    targetRevision: HEAD
-    path: apps/traefik
+    repoURL: https://traefik.github.io/charts
+    targetRevision: 32.1.0
+    chart: traefik
+    helm:
+      values: |
+        # Deployment configuration
+        deployment:
+          replicas: 1
+
+        # Service configuration
+        service:
+          type: LoadBalancer
+
+        # Entry points
+        ports:
+          web:
+            port: 80
+            redirectTo:
+              port: websecure
+              scheme: https
+          websecure:
+            port: 443
+            tls:
+              enabled: true
+
+        # Providers
+        providers:
+          kubernetesIngress:
+            publishedService:
+              enabled: true
+          kubernetesCRD:
+            enabled: true
+            allowCrossNamespace: true
+
+        # IngressClass
+        ingressClass:
+          enabled: true
+          isDefaultClass: true
+
+        # Dashboard
+        api:
+          dashboard: true
+
+        # Health checks
+        ping: {}
+
+        # Metrics
+        metrics:
+          prometheus:
+            buckets:
+              - 0.1
+              - 0.3
+              - 1.2
+              - 5.0
+
+        # Logs
+        logs:
+          general:
+            level: INFO
+          access:
+            enabled: true
+
+        # Resources
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+
+        # Security context
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 65534
+          runAsGroup: 65534
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik
@@ -23,6 +100,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - SkipDryRunOnMissingResource=true
+      - Replace=true # Replace existing resources for Helm upgrade
     retry:
       limit: 5
       backoff:
