@@ -624,6 +624,8 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
         ssh_authorized_keys: [${join(",", [for k in var.ssh_public_keys : k])}]
     
     ssh_pwauth: false
+    ssh_deletekeys: false
+    ssh_genkeytypes: []
 
     # Ensure PermitRootLogin is yes (key-only) and disable password authentication
     # Different distros may already default to key-only if no password is set.
