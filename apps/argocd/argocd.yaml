@@ -1,0 +1,137 @@
+---
+# ArgoCD Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+
+---
+# ArgoCD Installation
+# This applies the standard ArgoCD installation manifests
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-install
+  namespace: argocd
+data:
+  install.sh: |
+    #!/bin/bash
+    set -e
+
+    echo "Installing ArgoCD..."
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+    echo "Waiting for ArgoCD server to be ready..."
+    kubectl wait --for=condition=available --timeout=600s deployment/argocd-server -n argocd
+
+    echo "Patching ArgoCD server service to NodePort..."
+    kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
+
+    echo "ArgoCD installation completed!"
+
+---
+# Job to install ArgoCD
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: argocd-installer
+  namespace: argocd
+spec:
+  template:
+    spec:
+      serviceAccountName: argocd-installer
+      restartPolicy: OnFailure
+      containers:
+        - name: installer
+          image: bitnami/kubectl:latest
+          command: ["/bin/bash", "/scripts/install.sh"]
+          volumeMounts:
+            - name: install-script
+              mountPath: /scripts
+      volumes:
+        - name: install-script
+          configMap:
+            name: argocd-install
+            defaultMode: 0755
+
+---
+# Service Account for ArgoCD installer
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argocd-installer
+  namespace: argocd
+
+---
+# ClusterRole for ArgoCD installer
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argocd-installer
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+
+---
+# ClusterRoleBinding for ArgoCD installer
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argocd-installer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: argocd-installer
+subjects:
+  - kind: ServiceAccount
+    name: argocd-installer
+    namespace: argocd
+
+---
+# ArgoCD Server Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-server
+  namespace: argocd
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: cloudflare
+    traefik.ingress.kubernetes.io/router.middlewares: argocd-headers@kubernetescrd
+    # ArgoCD server needs special backend protocol
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: argocd.oisd.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 443
+  tls:
+    - hosts:
+        - argocd.oisd.io
+      secretName: wildcard-tls-oisd
+
+---
+# Middleware for ArgoCD headers
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: argocd-headers
+  namespace: argocd
+spec:
+  headers:
+    customRequestHeaders:
+      X-Forwarded-Proto: "https"
+    customResponseHeaders:
+      X-Content-Type-Options: "nosniff"
+      X-Frame-Options: "SAMEORIGIN"
+      X-XSS-Protection: "1; mode=block"
+      Referrer-Policy: "strict-origin-when-cross-origin"
