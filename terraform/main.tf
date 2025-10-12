@@ -512,7 +512,7 @@ resource "null_resource" "install_sealed_secrets" {
       "cat <<EOF | kubectl apply -f -",
       "${data.local_file.sealed-secret-keys.content}",
       "EOF",
-      "kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.24.0/controller.yaml",
+      "kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.32.2/controller.yaml",
     ]
   }
 }
@@ -624,8 +624,6 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
         ssh_authorized_keys: [${join(",", [for k in var.ssh_public_keys : k])}]
     
     ssh_pwauth: false
-    ssh_deletekeys: false
-    ssh_genkeytypes: []
 
     # Ensure PermitRootLogin is yes (key-only) and disable password authentication
     # Different distros may already default to key-only if no password is set.
@@ -641,8 +639,10 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
           UsePAM yes
 
     package_update: true
+    package_upgrade: true
+    package_reboot_if_required: true
     packages:
-      - open-iscsid
+      - open-iscsi
       - nfs-common
       - qemu-guest-agent
       - curl
@@ -654,7 +654,8 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
       - tailscale up --auth-key=${var.tailscale_authkey}
       - systemctl enable --now qemu-guest-agent
       - systemctl enable --now iscsid
-      - systemctl reload ssh || systemctl reload sshd
+      - systemctl reload ssh
+      - systemctl reload sshd
       - echo "done" > /tmp/cloud-config.done
     EOF
   }
@@ -688,50 +689,6 @@ resource "proxmox_virtual_environment_file" "meta_data_cloud_config_k3s_agent" {
     local-hostname: k3s-agent-${count.index + 1}
     EOF
 
-  }
-}
-
-resource "null_resource" "reapply_cloudinit_master" {
-  count = local.k3s_master_count
-  triggers = {
-    user_data_id = proxmox_virtual_environment_file.user_data_cloud_config.id,
-    meta_data_id = proxmox_virtual_environment_file.meta_data_cloud_config_k3s_master[count.index].id,
-  }
-
-  depends_on = [proxmox_virtual_environment_file.user_data_cloud_config, proxmox_virtual_environment_file.meta_data_cloud_config_k3s_master]
-
-  connection {
-    type = "ssh"
-    user = "root"
-    host = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "cloud-init clean",
-    ]
-  }
-}
-
-resource "null_resource" "reapply_cloudinit_agent" {
-  count = local.k3s_agent_count
-  triggers = {
-    user_data_id = proxmox_virtual_environment_file.user_data_cloud_config.id,
-    meta_data_id = proxmox_virtual_environment_file.meta_data_cloud_config_k3s_agent[count.index].id,
-  }
-
-  depends_on = [proxmox_virtual_environment_file.user_data_cloud_config, proxmox_virtual_environment_file.meta_data_cloud_config_k3s_agent]
-
-  connection {
-    type = "ssh"
-    user = "root"
-    host = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "cloud-init clean"
-    ]
   }
 }
 
