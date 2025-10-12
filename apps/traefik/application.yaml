@@ -59,11 +59,8 @@ spec:
         # Metrics
         metrics:
           prometheus:
-            buckets:
-              - 0.1
-              - 0.3
-              - 1.2
-              - 5.0
+            addEntryPointsLabels: true
+            addServicesLabels: true
 
         # Logs
         logs:
