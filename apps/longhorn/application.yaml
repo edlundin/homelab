@@ -9,12 +9,12 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    repoURL: https://charts.longhorn.io
-    targetRevision: 1.10.0
-    chart: longhorn
-    helm:
-      values: |
+  sources:
+    - repoURL: https://charts.longhorn.io
+      targetRevision: 1.10.0
+      chart: longhorn
+      helm:
+        values: |
         persistence:
           defaultClass: true
           defaultClassReplicaCount: 1
@@ -23,7 +23,7 @@ spec:
         defaultSettings:
           backupTarget: s3://homelab-backups@garage/
           backupTargetCredentialSecret: longhorn-backup-secret
-          
+
         ingress:
           enabled: true
           ingressClassName: traefik
@@ -35,7 +35,13 @@ spec:
             traefik.ingress.kubernetes.io/router.middlewares: longhorn-auth@kubernetescrd
 
         preUpgradeChecker:
-            jobEnabled: false
+          jobEnabled: false
+    - repoURL: https://github.com/edlundin/homelab
+      targetRevision: HEAD
+      path: apps/longhorn
+      directory:
+        include: "*.yaml"
+        exclude: "application.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
