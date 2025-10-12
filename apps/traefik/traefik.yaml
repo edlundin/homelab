@@ -168,6 +168,13 @@ spec:
           image: traefik:v3.5
           args:
             - --configfile=/config/traefik.yml
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
           ports:
             - name: web
               containerPort: 80

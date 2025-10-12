@@ -77,6 +77,13 @@ spec:
         - name: tailscale
           image: tailscale/tailscale:latest
           imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
           env:
             # Auth key from secret
             - name: TS_AUTHKEY
