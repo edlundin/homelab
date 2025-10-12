@@ -1,0 +1,29 @@
+---
+- name: Ensure docker Python SDK is present
+  ansible.builtin.pip:
+    name: docker
+  when: ansible_python.version.major is defined
+
+- name: Run Watchtower container
+  community.docker.docker_container:
+    name: watchtower
+    image: containrrr/watchtower:latest
+    restart_policy: unless-stopped
+    state: started
+    pull: true
+    detach: true
+    restart: false
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    env:
+      TZ: Europe/Paris
+
+- name: Ensure container is up and healthy
+  community.docker.docker_container_info:
+    name: watchtower
+  register: wt_info
+
+- name: Fail if container not running
+  ansible.builtin.fail:
+    msg: "Watchtower container is not running."
+  when: not wt_info.container.State.Running

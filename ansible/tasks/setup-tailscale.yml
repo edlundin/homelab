@@ -1,0 +1,184 @@
+---
+# setup-tailscale.yml - Tailscale setup task file
+# Usage as task file:
+#   - include_tasks: setup-tailscale.yml
+#     vars:
+#       proxmox_node: "pve1"
+#
+# Required variables:
+#   - proxmox_node: The Proxmox host to configure
+
+# Validation
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - proxmox_node is defined
+    fail_msg: "Required variables missing. Please provide proxmox_node."
+
+- name: Validate Proxmox API credentials when needed
+  ansible.builtin.assert:
+    that:
+      - vault_proxmox_user is defined
+      - vault_proxmox_password is defined
+    fail_msg: "Proxmox API credentials required. Please provide vault_proxmox_user and vault_proxmox_password."
+  when: not (skip_proxmox_config | default(false))
+
+# Step 1: Configure Proxmox host for LXC containers
+- name: Configure Proxmox host for Tailscale support
+  when: inventory_hostname in groups['lxc_containers']
+  block:
+    - name: Ensure proxmoxer is installed
+      ansible.builtin.pip:
+        name: "proxmoxer"
+        state: present
+        break_system_packages: true
+      delegate_to: "{{ proxmox_node }}"
+
+    - name: Ensure requests is installed
+      ansible.builtin.pip:
+        name: "requests"
+        state: present
+        break_system_packages: true
+      delegate_to: "{{ proxmox_node }}"
+
+    - name: Display containers to configure
+      ansible.builtin.debug:
+        msg: "Configuring Tailscale for containers: {{ inventory_hostname }}"
+
+    - name: Add TUN device support to LXC configs
+      ansible.builtin.lineinfile:
+        path: "/etc/pve/lxc/{{ hostvars[inventory_hostname]['vmid'] }}.conf"
+        regexp: ".*{{ item.key }}.*"
+        line: "{{ item.key }}: {{ item.value }}"
+      loop:
+        - { "key": "lxc.cgroup2.devices.allow", "value": "c 10:200 rwm" }
+        - {
+            "key": "lxc.mount.entry",
+            "value": "/dev/net/tun dev/net/tun none bind,create=file",
+          }
+      delegate_to: "{{ proxmox_node }}"
+      notify:
+        - Restart containers if config changed
+
+    - name: Run handlers now
+      ansible.builtin.meta: flush_handlers
+
+# Step 2: Install and configure Tailscale on host
+- name: Install and configure Tailscale on containers
+  block:
+    - name: Check if Tailscale is already installed
+      ansible.builtin.command: which tailscale
+      register: tailscale_installed
+      changed_when: false
+      failed_when: false
+      delegate_to: "{{ inventory_hostname }}"
+
+    - name: Display Tailscale installation status
+      ansible.builtin.debug:
+        msg: "Tailscale is already installed on {{ inventory_hostname }}, skipping installation steps"
+      when: tailscale_installed.rc == 0
+
+    - name: Verify TUN device is available
+      ansible.builtin.stat:
+        path: /dev/net/tun
+      register: tun_device
+      failed_when: not tun_device.stat.exists
+
+    - name: Install required packages
+      ansible.builtin.apt:
+        name:
+          - curl
+          - ca-certificates
+          - gnupg
+        state: present
+        update_cache: true
+      when: tailscale_installed.rc != 0
+      become: true
+
+    - name: Add Tailscale GPG key
+      ansible.builtin.get_url:
+        url: https://pkgs.tailscale.com/stable/debian/trixie.noarmor.gpg
+        dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+        mode: "0644"
+      when: tailscale_installed.rc != 0
+      become: true
+
+    - name: Add Tailscale repository
+      ansible.builtin.get_url:
+        url: https://pkgs.tailscale.com/stable/debian/trixie.tailscale-keyring.list
+        dest: /etc/apt/sources.list.d/tailscale.list
+        mode: "0644"
+      when: tailscale_installed.rc != 0
+      become: true
+
+    - name: Install Tailscale
+      ansible.builtin.apt:
+        name: tailscale
+        state: present
+        update_cache: true
+      when: tailscale_installed.rc != 0
+      become: true
+
+    - name: Enable and start Tailscale service
+      ansible.builtin.systemd:
+        name: tailscaled
+        enabled: true
+        state: started
+      delegate_to: "{{ inventory_hostname }}"
+      become: true
+
+    - name: Check if Tailscale is already connected
+      ansible.builtin.command: tailscale status
+      register: tailscale_status
+      changed_when: false
+      failed_when: false
+      delegate_to: "{{ inventory_hostname }}"
+
+    - name: Connect to Tailscale network
+      ansible.builtin.command: "tailscale up --authkey={{ vault_tailscale_auth_key }}"
+      when:
+        - vault_tailscale_auth_key is defined
+        - vault_tailscale_auth_key != ""
+        - tailscale_status.rc != 0
+      register: tailscale_up
+      changed_when: tailscale_up.rc == 0
+      become: true
+
+    - name: Get Tailscale IP address
+      ansible.builtin.command: tailscale ip -4
+      register: tailscale_ip
+      changed_when: false
+      delegate_to: "{{ inventory_hostname }}"
+      failed_when: false
+
+    - name: Display Tailscale status
+      ansible.builtin.debug:
+        msg: |
+          Tailscale configured successfully!
+          Host: {{ inventory_hostname }}
+          Tailscale IP: {{ tailscale_ip.stdout if tailscale_ip.stdout != "" else 'Not connected - provide tailscale_auth_key or run tailscale up manually' }}
+
+# Step 3: Verification
+- name: Verify Tailscale setup
+  block:
+    - name: Check Tailscale status
+      ansible.builtin.command: tailscale status --json
+      register: ts_status
+      changed_when: false
+      failed_when: false
+      delegate_to: "{{ inventory_hostname }}"
+
+    - name: Parse and display Tailscale status
+      block:
+        - name: Display connectivity status
+          ansible.builtin.debug:
+            msg: |
+              Host: {{ inventory_hostname }}
+              VMID: {{ hostvars[inventory_hostname]['vmid'] | default('N/A') }}
+              Status: {{ 'Connected' if (ts_status.stdout | from_json).BackendState == 'Running' else 'Not connected' }}
+              Tailscale IP: {{ (ts_status.stdout | from_json).Self.TailscaleIPs[0] if (ts_status.stdout | from_json).Self.TailscaleIPs is defined else 'N/A' }}
+          when: ts_status.rc == 0
+      rescue:
+        - name: Show error if Tailscale check failed
+          ansible.builtin.debug:
+            msg: "Host {{ inventory_hostname }}: Tailscale not running or not configured"

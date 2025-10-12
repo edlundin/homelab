@@ -1,0 +1,85 @@
+---
+# deploy-nietzsche-s3.yml - Install deps and deploy S3 on the reserved LXC container
+# Usage: ansible-playbook -i inventory/inventory.ini playbooks/deploy-nietzsche-s3.yml
+
+- name: Deploy nietzsche-s3
+  hosts: nietzsche-s3
+  vars:
+    ansible_distribution: trixie
+    deployment_dir: /opt/oisd/s3
+    pip_install_packages:
+      - name: docker
+    proxmox_node: "nietzsche"
+
+  roles:
+    - geerlingguy.docker
+    - geerlingguy.pip
+
+  handlers:
+    - name: Include handlers
+      ansible.builtin.import_tasks: ../handlers/lxc-restart-on-change.yml
+
+  tasks:
+    - name: Setup Tailscale
+      ansible.builtin.include_tasks: ../tasks/setup-tailscale.yml
+
+    - name: Prepare the system
+      ansible.builtin.include_tasks: ../tasks/update-systems.yml
+
+    - name: Deploy Watchtower
+      ansible.builtin.include_tasks: ../tasks/deploy-watchtower.yml
+
+    - name: Create deployment directory if it does not exist
+      ansible.builtin.file:
+        path: "{{ deployment_dir }}"
+        state: directory
+        mode: '0700'
+
+    - name: Create configuration directory if it does not exist
+      ansible.builtin.file:
+        path: "{{ deployment_dir }}/data/garage"
+        state: directory
+        mode: '0700'
+
+    - name: Checks if the stack is already deployed
+      become: true
+      ansible.builtin.stat:
+        path: '{{ deployment_dir }}/docker-compose.yml'
+      register: s3_stack
+
+    - name: Attempt to bring down stack gracefully
+      when: s3_stack.stat.exists
+      block:
+        - name: Ensures any existing stack is down
+          community.docker.docker_compose_v2:
+            project_src: '{{ deployment_dir }}'
+            files:
+              - docker-compose.yml
+            state: absent
+      rescue:
+        - name: Handle compose down failure
+          ansible.builtin.debug:
+            msg: "Failed to bring down stack cleanly (possibly due to syntax error), continuing..."
+
+    - name: Render garage.toml from Jinja2 template
+      ansible.builtin.template:
+        force: true
+        src: ../compositions/s3/garage/garage.toml.j2
+        dest: "{{ deployment_dir }}/data/garage/garage.toml"
+        mode: "0600"
+
+    - name: Render docker-compose.yml from Jinja2 template
+      ansible.builtin.template:
+        force: true
+        src: ../compositions/s3/garage/docker-compose.yml.j2
+        dest: "{{ deployment_dir }}/docker-compose.yml"
+        mode: "0600"
+
+    - name: Ensures the stack is up
+      community.docker.docker_compose_v2:
+        project_src: '{{ deployment_dir }}'
+        files:
+          - docker-compose.yml
+        state: present
+        wait: true
+        wait_timeout: 600

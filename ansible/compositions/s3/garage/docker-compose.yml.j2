@@ -1,0 +1,28 @@
+services:
+  garage:
+    image: dxflrs/garage:v2.1.0
+    container_name: garage
+    restart: unless-stopped
+    ports:
+      - "3900:3900" # S3 API
+      - "3901:3901" # RPC endpoint
+      # - "3902:3902" # S3 Web
+      - "3903:3903" # Admin console
+    environment:
+      RUST_LOG: garage=info
+    volumes:
+      - ./data/garage/data:/data
+      - ./data/garage/meta:/meta
+      - ./data/garage/garage.toml:/etc/garage.toml:ro
+  webui:
+    image: khairul169/garage-webui:latest
+    container_name: garage-webui
+    restart: unless-stopped
+    environment:
+      AUTH_USER_PASS: "{{ vault_garage_webui_auth | replace('$', '$$') }}"
+      API_BASE_URL: "http://garage:3903"
+      S3_ENDPOINT_URL: "http://garage:3900"
+    volumes:
+      - ./data/garage/garage.toml:/etc/garage.toml:ro
+    ports:
+      - "3909:3909"

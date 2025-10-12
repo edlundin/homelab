@@ -1,0 +1,9 @@
+---
+- name: Restart containers if config changed
+  community.proxmox.proxmox:
+    api_host: "{{ hostvars[proxmox_node]['ansible_host'] }}"
+    api_user: "{{ vault_proxmox_user }}"
+    api_password: "{{ vault_proxmox_password }}"
+    vmid: "{{ vmid }}"
+    state: restarted
+  delegate_to: "{{ proxmox_node }}"
