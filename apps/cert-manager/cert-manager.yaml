@@ -1,0 +1,151 @@
+---
+# Namespace for cert-manager
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+
+---
+# Job to install cert-manager CRDs and controller
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cert-manager-installer
+  namespace: cert-manager
+spec:
+  template:
+    spec:
+      serviceAccountName: cert-manager-installer
+      restartPolicy: OnFailure
+      containers:
+        - name: installer
+          image: bitnami/kubectl:latest
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - |
+              set -e
+              echo "Installing cert-manager CRDs..."
+              kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.19.0/cert-manager.crds.yaml
+
+              echo "Installing cert-manager..."
+              kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.19.0/cert-manager.yaml
+
+              echo "Waiting for cert-manager deployment..."
+              kubectl wait --for=condition=available --timeout=300s deployment/cert-manager -n cert-manager
+              kubectl wait --for=condition=available --timeout=300s deployment/cert-manager-cainjector -n cert-manager  
+              kubectl wait --for=condition=available --timeout=300s deployment/cert-manager-webhook -n cert-manager
+
+              echo "cert-manager installed successfully!"
+
+---
+# Service Account for cert-manager installer
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cert-manager-installer
+  namespace: cert-manager
+
+---
+# ClusterRole for cert-manager installer
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cert-manager-installer
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+
+---
+# ClusterRoleBinding for cert-manager installer
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cert-manager-installer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cert-manager-installer
+subjects:
+  - kind: ServiceAccount
+    name: cert-manager-installer
+    namespace: cert-manager
+
+---
+# ClusterIssuer for Let's Encrypt production with Cloudflare DNS
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: admin@oisd.io
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-api-token-secret
+              key: api-token
+        selector:
+          dnsNames:
+            - "oisd.io"
+            - "*.oisd.io"
+
+---
+# ClusterIssuer for Let's Encrypt staging (for testing)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: admin@oisd.io
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-api-token-secret
+              key: api-token
+        selector:
+          dnsNames:
+            - "oisd.io"
+            - "*.oisd.io"
+
+---
+# Certificate for wildcard oisd.io domain
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-oisd-io
+  namespace: traefik
+spec:
+  secretName: wildcard-tls-oisd
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - "oisd.io"
+    - "*.oisd.io"
+
+---
+# Certificate for wildcard bos.oisd.io domain
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-bos-oisd-io
+  namespace: traefik
+spec:
+  secretName: wildcard-tls-bos-oisd
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - "bos.oisd.io"
+    - "*.bos.oisd.io"
