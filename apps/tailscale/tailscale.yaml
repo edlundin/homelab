@@ -53,7 +53,7 @@ spec:
   resources:
     requests:
       storage: 100Mi # Small amount is enough
-  storageClassName: local-path # k3s default storage class
+  storageClassName: longhorn # Distributed storage with S3 backups
 
 ---
 # The Tailscale deployment
