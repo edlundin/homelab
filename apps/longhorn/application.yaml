@@ -9,12 +9,12 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  sources:
-    - repoURL: https://charts.longhorn.io
-      targetRevision: 1.10.0
-      chart: longhorn
-      helm:
-        values: |
+  source:
+    repoURL: https://charts.longhorn.io
+    targetRevision: 1.10.0
+    chart: longhorn
+    helm:
+      values: |
         persistence:
           defaultClass: true
           defaultClassReplicaCount: 1
@@ -36,12 +36,6 @@ spec:
 
         preUpgradeChecker:
           jobEnabled: false
-    - repoURL: https://github.com/edlundin/homelab
-      targetRevision: HEAD
-      path: apps/longhorn
-      directory:
-        include: "*.yaml"
-        exclude: "application.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system

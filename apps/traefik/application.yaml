@@ -9,12 +9,12 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  sources:
-    - repoURL: https://traefik.github.io/charts
-      targetRevision: 32.1.0
-      chart: traefik
-      helm:
-        values: |
+  source:
+    repoURL: https://traefik.github.io/charts
+    targetRevision: 32.1.0
+    chart: traefik
+    helm:
+      values: |
         # Deployment configuration
         deployment:
           replicas: 1
@@ -91,12 +91,6 @@ spec:
           capabilities:
             drop:
               - ALL
-    - repoURL: https://github.com/edlundin/homelab
-      targetRevision: HEAD
-      path: apps/traefik
-      directory:
-        include: "*.yaml"
-        exclude: "application.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik
