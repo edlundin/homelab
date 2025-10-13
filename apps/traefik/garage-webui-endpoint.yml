@@ -10,7 +10,7 @@ spec:
     - protocol: TCP
       port: 3909
 ---
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: s3-ingress
@@ -23,8 +23,7 @@ spec:
       kind: Rule
       services:
         - name: nietzsche-s3-external
-          namespace: external-services # Cross-namespace reference
           port: 3909
           scheme: http
   tls:
-    certResolver: letsencrypt
+    secretName: wildcard-tls-oisd
