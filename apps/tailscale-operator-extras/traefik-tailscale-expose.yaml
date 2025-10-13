@@ -1,0 +1,26 @@
+---
+# LoadBalancer Service to expose Traefik via Tailscale operator
+# This creates a Tailscale LoadBalancer that will be accessible on your tailnet
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-tailscale
+  namespace: traefik
+  annotations:
+    # Set the hostname that will appear in Tailscale (defaults to <service>-<namespace>)
+    tailscale.com/hostname: "k3s-cluster"
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  ports:
+    - name: web
+      port: 80
+      targetPort: web
+      protocol: TCP
+    - name: websecure
+      port: 443
+      targetPort: websecure
+      protocol: TCP
+  selector:
+    app.kubernetes.io/instance: traefik-traefik
+    app.kubernetes.io/name: traefik

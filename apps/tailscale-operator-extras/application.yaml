@@ -1,31 +1,26 @@
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: tailscale
+  name: tailscale-operator-extras
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "4"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
     repoURL: https://github.com/edlundin/homelab.git
+    path: apps/tailscale-operator-extras
     targetRevision: HEAD
-    path: apps/tailscale
+    directory:
+      recurse: true
   destination:
     server: https://kubernetes.default.svc
-    namespace: tailscale
+    # Note: This will deploy resources to their specified namespaces
+    # The sealed secret will go to tailscale-system, traefik service to traefik
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - SkipDryRunOnMissingResource=true
-    retry:
-      limit: 5
-      backoff:
-        duration: 30s
-        factor: 2
-        maxDuration: 5m

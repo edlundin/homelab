@@ -32,7 +32,7 @@ spec:
           tlsSecret: wildcard-tls-oisd
           annotations:
             traefik.ingress.kubernetes.io/router.entrypoints: websecure
-            traefik.ingress.kubernetes.io/router.middlewares: longhorn-auth@kubernetescrd
+            traefik.ingress.kubernetes.io/router.middlewares: longhorn-system-longhorn-auth@kubernetescrd
 
         preUpgradeChecker:
           jobEnabled: false
