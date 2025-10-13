@@ -13,6 +13,9 @@ spec:
     repoURL: https://github.com/edlundin/homelab
     targetRevision: HEAD
     path: apps/traefik-extras
+    directory:
+      recurse: true
+      exclude: "application.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik
