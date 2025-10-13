@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nietzsche-actual-budget-external
+  namespace: traefik
+spec:
+  type: ExternalName
+  externalName: actual-budget.ison-mirfak.ts.net
+  ports:
+    - protocol: TCP
+      port: 5006
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: actual-budget-ingress
+  namespace: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`budget.oisd.io`)
+      kind: Rule
+      services:
+        - name: nietzsche-actual-budget-external
+          port: 5006
+          scheme: http
+  tls:
+    secretName: wildcard-tls-oisd
