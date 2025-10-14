@@ -1,0 +1,85 @@
+# Qdrant Helm Chart Values
+# Official chart: https://github.com/qdrant/qdrant-helm
+
+# Override the name to ensure service is named "qdrant" for IngressRoute compatibility
+nameOverride: "qdrant"
+fullnameOverride: "qdrant"
+
+replicaCount: 1
+
+image:
+  repository: qdrant/qdrant
+  # Use a specific version tag or comment out to use chart default
+  tag: "v1.15.5"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 6333
+  grpcPort: 6334
+
+# Resource limits
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "200m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+# Persistence configuration
+persistence:
+  enabled: true
+  size: 1Gi
+  storageClass: "longhorn"
+  accessModes:
+    - ReadWriteOnce
+
+# Security context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+# Probes
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: 6333
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: 6333
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 2
+
+# Init containers for permission fixes
+initContainers:
+  - name: fix-permissions
+    image: busybox:latest
+    command:
+      - sh
+      - -c
+      - |
+        chown -R 1000:1000 /qdrant/storage
+        chown -R 1000:1000 /qdrant/storage/snapshots
+    volumeMounts:
+      - name: storage
+        mountPath: /qdrant/storage
+    securityContext:
+      runAsUser: 0

@@ -17,13 +17,19 @@ spec:
             limits:
               memory: "64Mi"
               cpu: "100m"
+          env:
+            - name: QDRANT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: qdrant-api-key
+                  key: api-key
           command:
             - /bin/sh
             - -c
             - |
               # Wait for Qdrant to be ready
               echo "Waiting for Qdrant to be ready..."
-              until curl -f http://qdrant:6333/health; do
+              until curl -f -H "api-key: ${QDRANT_API_KEY}" http://qdrant:6333/readyz; do
                 echo "Qdrant not ready, waiting..."
                 sleep 5
               done
@@ -33,6 +39,7 @@ spec:
               # Create collection with the specified configuration
               curl -X PUT "http://qdrant:6333/collections/code_chunks" \
                 -H "Content-Type: application/json" \
+                -H "api-key: ${QDRANT_API_KEY}" \
                 -d @/config/collection-config.json
 
               echo "Collection created, creating payload schema..."
@@ -40,6 +47,7 @@ spec:
               # Create payload schema
               curl -X PATCH "http://qdrant:6333/collections/code_chunks" \
                 -H "Content-Type: application/json" \
+                -H "api-key: ${QDRANT_API_KEY}" \
                 -d @/config/payload-schema.json
 
               echo "Collection initialization completed successfully"
