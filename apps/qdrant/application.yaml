@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: qdrant
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/edlundin/homelab
+    targetRevision: HEAD
+    path: apps/qdrant
+    directory:
+      recurse: false
+      exclude: "application.yaml"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: qdrant
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

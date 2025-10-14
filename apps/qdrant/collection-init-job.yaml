@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: qdrant-collection-init
+  namespace: qdrant
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: init-collection
+          image: curlimages/curl:latest
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
+          command:
+            - /bin/sh
+            - -c
+            - |
+              # Wait for Qdrant to be ready
+              echo "Waiting for Qdrant to be ready..."
+              until curl -f http://qdrant:6333/health; do
+                echo "Qdrant not ready, waiting..."
+                sleep 5
+              done
+
+              echo "Qdrant is ready, creating collection..."
+
+              # Create collection with the specified configuration
+              curl -X PUT "http://qdrant:6333/collections/code_chunks" \
+                -H "Content-Type: application/json" \
+                -d @/config/collection-config.json
+
+              echo "Collection created, creating payload schema..."
+
+              # Create payload schema
+              curl -X PATCH "http://qdrant:6333/collections/code_chunks" \
+                -H "Content-Type: application/json" \
+                -d @/config/payload-schema.json
+
+              echo "Collection initialization completed successfully"
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: qdrant-collection-config

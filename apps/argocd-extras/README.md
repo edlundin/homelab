@@ -14,8 +14,7 @@ This directory contains additional ArgoCD configurations that are managed separa
 ### ArgoCD Admin Password
 
 The ArgoCD admin password is managed via sealed secrets with external reference:
-- **Username**: `admin` 
-- **Password**: `Directed5-Overuse8-Carless8-Nest2-Disarray5`
+- **Username**: `admin`
 - **Method**: External sealed secret `argocd-admin-password` referenced in `argocd-cm`
 
 ### How it Works

@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qdrant-collection-config
+  namespace: qdrant
+data:
+  collection-config.json: |
+    {
+      "vectors": {
+        "dense": {
+          "size": 3584,
+          "distance": "Cosine"
+        }
+      },
+      "hnsw_config": {
+        "m": 16,
+        "ef_construct": 256
+      },
+      "optimizers_config": {
+        "default_segment_number": 1
+      },
+      "shard_number": 1,
+      "replication_factor": 1,
+      "write_consistency_factor": 1
+    }
+  payload-schema.json: |
+    {
+      "payload_schema": {
+        "path": {
+          "type": "keyword"
+        },
+        "lang": {
+          "type": "keyword"
+        },
+        "symbol": {
+          "type": "keyword"
+        }
+      }
+    }

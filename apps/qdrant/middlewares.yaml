@@ -1,0 +1,31 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: qdrant-basic-auth
+  namespace: qdrant
+spec:
+  basicAuth:
+    secret: qdrant-auth-secret
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: qdrant-ingress
+  namespace: qdrant
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`qdrant.oisd.io`)
+      kind: Rule
+      services:
+        - name: qdrant
+          port: 6333
+          namespace: qdrant
+      middlewares:
+        - name: qdrant-basic-auth
+          namespace: qdrant
+        - name: default-chain
+          namespace: traefik
+  tls:
+    secretName: wildcard-tls-oisd
