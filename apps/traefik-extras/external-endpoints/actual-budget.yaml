@@ -5,7 +5,7 @@ metadata:
   namespace: traefik
 spec:
   type: ExternalName
-  externalName: actual-budget # tailscale hostname
+  externalName: actual-budget.ison-mirfak.ts.net
   ports:
     - protocol: TCP
       port: 5006

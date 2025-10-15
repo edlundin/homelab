@@ -5,7 +5,7 @@ metadata:
   namespace: traefik
 spec:
   type: ExternalName
-  externalName: wirebos # tailscale hostname
+  externalName: wirebos.ison-mirfak.ts.net
   ports:
     - protocol: TCP
       port: 4000

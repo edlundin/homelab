@@ -5,7 +5,7 @@ metadata:
   namespace: traefik
 spec:
   type: ExternalName
-  externalName: nietzsche # tailscale hostname
+  externalName: nietzsche.ison-mirfak.ts.net
   ports:
     - protocol: TCP
       port: 8006

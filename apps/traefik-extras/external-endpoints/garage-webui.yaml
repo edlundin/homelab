@@ -5,7 +5,7 @@ metadata:
   namespace: traefik
 spec:
   type: ExternalName
-  externalName: nietzsche-s3 # tailscale hostname
+  externalName: nietzsche-s3.ison-mirfak.ts.net
   ports:
     - protocol: TCP
       port: 3909
