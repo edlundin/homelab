@@ -8,13 +8,13 @@ data:
     {
       "vectors": {
         "dense": {
-          "size": 3584,
+          "size": 1024,
           "distance": "Cosine"
         }
       },
       "hnsw_config": {
-        "m": 16,
-        "ef_construct": 256
+        "m": 32,
+        "ef_construct": 200
       },
       "optimizers_config": {
         "default_segment_number": 1
