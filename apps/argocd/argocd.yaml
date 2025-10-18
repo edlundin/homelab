@@ -24,8 +24,8 @@ data:
     echo "Waiting for ArgoCD server to be ready..."
     kubectl wait --for=condition=available --timeout=600s deployment/argocd-server -n argocd
 
-    echo "Patching ArgoCD server service to NodePort..."
-    kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
+    echo "Patching ArgoCD server service to ClusterIP..."
+    kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "ClusterIP"}}'
 
     echo "ArgoCD installation completed!"
 
@@ -102,33 +102,25 @@ data:
   server.insecure: "true"
 
 ---
-# ArgoCD Server Ingress
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+# ArgoCD Server IngressRoute
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
 metadata:
   name: argocd-server
   namespace: argocd
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.middlewares: argocd-argocd-headers@kubernetescrd
-    traefik.ingress.kubernetes.io/service.serversscheme: http
 spec:
-  ingressClassName: traefik
-  rules:
-    - host: argocd.oisd.io
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: argocd-server
-                port:
-                  number: 80
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`argocd.oisd.io`)
+      kind: Rule
+      services:
+        - name: argocd-server
+          port: 80
+      middlewares:
+        - name: argocd-headers
   tls:
-    - hosts:
-        - argocd.oisd.io
-      secretName: wildcard-tls-oisd
+    secretName: wildcard-tls-oisd
 
 ---
 # Middleware for ArgoCD headers
