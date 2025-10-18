@@ -1,0 +1,94 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pulse
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: pulse
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+  sources:
+    # Helm chart source
+    - repoURL: oci://ghcr.io/rcourtman/pulse-chart
+      chart: pulse
+      targetRevision: 1.0.15
+      helm:
+        values: |
+          # Pulse configuration
+          image:
+            repository: rcourtman/pulse
+            tag: latest
+            pullPolicy: Always
+
+          # Service configuration
+          service:
+            type: ClusterIP
+            port: 7655
+
+          # Environment variables for Pulse
+          env:
+            - name: PORT
+              value: "7655"
+            - name: FRONTEND_PORT
+              value: "7655"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: DISCOVERY_SUBNET
+              value: "192.168.0.0/16"
+
+          # Persistence for Pulse data
+          persistence:
+            enabled: true
+            storageClass: ""  # Use default storage class
+            accessMode: ReadWriteOnce
+            size: 5Gi
+            mountPath: /data
+
+          # Resource limits
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+
+          # Security context
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            fsGroup: 1000
+
+          # Ingress configuration
+          ingress:
+            enabled: true
+            className: traefik
+            annotations:
+              cert-manager.io/cluster-issuer: "letsencrypt-prod"
+              traefik.ingress.kubernetes.io/router.middlewares: "traefik-extras-security-headers@kubernetescrd"
+            hosts:
+              - host: pulse.oisd.io
+                paths:
+                  - path: /
+                    pathType: Prefix
+            tls:
+              - secretName: wildcard-tls-oisd
+                hosts:
+                  - pulse.oisd.io
+
+    # Git source for additional manifests
+    - repoURL: https://github.com/edlundin/homelab.git
+      targetRevision: master
+      path: apps/pulse
+      directory:
+        include: "*.yaml"
+        exclude: "application.yaml"
