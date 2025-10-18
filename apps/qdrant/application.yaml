@@ -19,6 +19,12 @@ spec:
     - repoURL: https://github.com/edlundin/homelab
       targetRevision: HEAD
       ref: values
+    - repoURL: https://github.com/edlundin/homelab
+      targetRevision: HEAD
+      path: apps/qdrant
+      directory:
+        include: "*.yaml"
+        exclude: "application.yaml,values.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: qdrant

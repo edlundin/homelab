@@ -23,7 +23,7 @@ spec:
     - repoURL: https://github.com/edlundin/homelab
       path: apps/searxng
       directory:
-        exclude: "application.yaml"
+        exclude: "application.yaml,values.yaml"
         recurse: false
         include: "{*.yaml}"
   destination:

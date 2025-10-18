@@ -23,7 +23,7 @@ spec:
       targetRevision: HEAD
       path: apps/redis
       directory:
-        exclude: "application.yaml"
+        exclude: "application.yaml,values.yaml"
         recurse: false
         include: "*.yaml"
   destination:

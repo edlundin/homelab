@@ -23,14 +23,18 @@ spec:
       targetRevision: 1.0.15
       helm:
         values: |
+          image:
+            repository: n8nio/n8n
+            pullPolicy: IfNotPresent
+            tag: "1.116.2"
           # Basic n8n configuration
           main:
             config:
               generic:
-                timezone: "UTC"
+                timezone: "Europe/Paris"
               n8n:
                 # Hide usage statistics page
-                hide_usage_page: true
+                hide_usage_page: false
                 # Webhook URL for external access
                 webhook_url: "https://n8n.oisd.io/"
                 # Editor base URL
@@ -66,22 +70,9 @@ spec:
               type: ClusterIP
               port: 80
 
-          # Ingress configuration for Traefik
+          # Disable chart's ingress - we'll create our own
           ingress:
-            enabled: true
-            className: "traefik"
-            annotations:
-              cert-manager.io/cluster-issuer: "letsencrypt-prod"
-              traefik.ingress.kubernetes.io/router.middlewares: "traefik-extras-security-headers@kubernetescrd"
-            hosts:
-              - host: n8n.oisd.io
-                paths:
-                  - path: /
-                    pathType: Prefix
-            tls:
-              - hosts:
-                  - n8n.oisd.io
-                secretName: wildcard-tls-oisd
+            enabled: false
 
           # Disable workers and webhooks for single-instance deployment
           worker:
@@ -94,9 +85,10 @@ spec:
           scaling:
             enabled: false
 
-    # Sealed secret source
+    # Git source for manifests (sealed secret + ingress)
     - repoURL: https://github.com/edlundin/homelab.git
       targetRevision: master
       path: apps/n8n
       directory:
-        include: "n8n-secrets-sealed.yaml"
+        include: "*.yaml"
+        exclude: "application.yaml,values.yaml"
