@@ -1,0 +1,16 @@
+global:
+  # default storageClass or additional global settings can go here
+
+installCRDs: true
+
+# Configure cert-manager controller settings
+replicaCount: 1
+
+webhook:
+  enabled: true
+  replicaCount: 1
+
+prometheus:
+  enabled: true
+# Example: configure ACME issuer via extra resources (users typically keep Issuer in repo)
+# Keep sensitive credentials in sealed secrets and reference them from Issuer manifests in apps/cert-manager

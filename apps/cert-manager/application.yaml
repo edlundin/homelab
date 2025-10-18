@@ -4,15 +4,26 @@ metadata:
   name: cert-manager
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "1"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    repoURL: https://github.com/edlundin/homelab
-    targetRevision: HEAD
-    path: apps/cert-manager
+  sources:
+    - repoURL: https://charts.jetstack.io
+      chart: cert-manager
+      targetRevision: v1.19.1 # Use latest stable or pin as needed
+      helm:
+        values: |
+          installCRDs: true
+          replicaCount: 1
+    - repoURL: https://github.com/edlundin/homelab
+      targetRevision: HEAD
+      path: apps/cert-manager
+      directory:
+        exclude: "application.yaml"
+        recurse: true
+        include: "*.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: cert-manager
@@ -22,10 +33,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - SkipDryRunOnMissingResource=true
-    retry:
-      limit: 5
-      backoff:
-        duration: 30s
-        factor: 2
-        maxDuration: 5m
