@@ -24,7 +24,7 @@ spec:
       targetRevision: HEAD
       path: apps/cert-manager
       directory:
-        exclude: "application.yaml"
+        exclude: "application.yaml,values.yaml"
         recurse: true
         include: "*.yaml"
   destination:
