@@ -2,7 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = ">= 0.84.1"
+      version = ">= 0.85.1"
     }
   }
 }
@@ -92,25 +92,25 @@ locals {
       ipv4_address     = "192.168.2.140/24"
       gateway_ipv4     = local.network_gateway
     },
-    # "searxng" = {
-    #   node_name        = var.proxmox_node_name
-    #   vm_id            = 101
-    #   start_at_boot    = true
-    #   started          = true
-    #   os_template_path = local.debian_13_lxc_template_path
-    #   os_type          = "debian"
-    #   unprivileged     = true
-    #   nesting          = true
-    #   keyctl           = false
-    #   description      = "SearxNG private instance"
-    #   cores            = 4
-    #   memory           = 1024
-    #   swap             = local.swap_size
-    #   disk_size        = 4
-    #   dns_server       = local.dns_server
-    #   ipv4_address     = "192.168.2.101/24"
-    #   gateway_ipv4     = local.network_gateway
-    # },
+    "tailscale-exit-node" = {
+      node_name        = var.proxmox_node_name
+      vm_id            = 143
+      start_at_boot    = true
+      started          = true
+      os_template_path = local.debian_13_lxc_template_path
+      os_type          = "debian"
+      unprivileged     = true
+      nesting          = true
+      keyctl           = false
+      description      = "Tailscale exit node into ProtonVPN"
+      cores            = 2
+      memory           = 1024
+      swap             = local.swap_size
+      disk_size        = 4
+      dns_server       = local.dns_server
+      ipv4_address     = "192.168.2.143/24"
+      gateway_ipv4     = local.network_gateway
+    },
     # "wirebos" = {
     #   node_name        = var.proxmox_node_name
     #   vm_id            = 200

@@ -135,7 +135,7 @@
       delegate_to: "{{ inventory_hostname }}"
 
     - name: Connect to Tailscale network
-      ansible.builtin.command: "tailscale up --authkey={{ vault_tailscale_auth_key }}"
+      ansible.builtin.command: "tailscale up --authkey={{ vault_tailscale_auth_key }} {{ '--advertise-exit-node --accept-routes' if enable_exit_node else '' }} {{ '--advertise-routes=192.168.2.0/24' if enable_subroutes else '' }}"
       when:
         - vault_tailscale_auth_key is defined
         - vault_tailscale_auth_key != ""

@@ -16,6 +16,7 @@
     name:
       - neovim
       - curl
+      - htop
     state: present
 
 - name: Set timezone

@@ -1,0 +1,102 @@
+---
+# deploy-nietzsche-s3.yml - Install deps and deploy S3 on the reserved LXC container
+# Usage: ansible-playbook -i inventory/inventory.ini playbooks/deploy-nietzsche-tailscale-exit-node.yml
+
+- name: Deploy nietzsche-tailscale-exit-node
+  hosts: nietzsche-tailscale-exit-node
+  vars:
+    ansible_distribution: trixie
+    proxmox_node: "nietzsche"
+    enable_exit_node: true
+    enable_subroutes: true
+
+  roles:
+    - geerlingguy.pip
+
+  handlers:
+    - name: Include handlers
+      ansible.builtin.import_tasks: ../handlers/lxc-restart-on-change.yml
+
+  tasks:
+    - name: Setup Tailscale
+      ansible.builtin.include_tasks: ../tasks/setup-tailscale.yml
+
+    - name: Prepare the system
+      ansible.builtin.include_tasks: ../tasks/update-systems.yml
+
+    - name: Install WireGuard and iptables
+      ansible.builtin.apt:
+        name:
+          - wireguard
+          - wireguard-tools
+          - iptables
+          - iptables-persistent
+          - resolvconf
+        state: present
+
+    - name: Apply sysctl settings
+      ansible.posix.sysctl:
+        sysctl_set: true
+        reload: true
+        sysctl_file: /etc/sysctl.conf
+        name: net.ipv4.ip_forward
+        value: 1
+
+    - name: Apply sysctl settings
+      ansible.posix.sysctl:
+        sysctl_set: true
+        reload: true
+        sysctl_file: /etc/sysctl.conf
+        name: net.ipv6.conf.all.forwarding
+        value: 1
+
+    - name: Deploy proton.conf
+      ansible.builtin.copy:
+        src: ../secrets/tailscale-exit-node/proton.conf
+        dest: /etc/wireguard/proton.conf
+        mode: "0600"
+        force: true
+
+    - name: Enable and start wg-quick@proton service
+      ansible.builtin.systemd:
+        name: wg-quick@proton
+        enabled: true
+        state: started
+
+    - name: Create systemd override directory for wg-quick@proton
+      ansible.builtin.file:
+        path: /etc/systemd/system/wg-quick@proton.service.d
+        state: directory
+        mode: '0755'
+
+    - name: Add systemd override to make WireGuard wait for Tailscale
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/wg-quick@proton.service.d/override.conf
+        content: |
+          [Unit]
+          After=tailscaled.service
+          Wants=tailscaled.service
+        mode: '0644'
+      notify: reload systemd
+
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: Configure iptables rules for Tailscale to ProtonVPN
+      ansible.builtin.iptables:
+        chain: "{{ item.chain }}"
+        in_interface: "{{ item.in_interface | default(omit) }}"
+        out_interface: "{{ item.out_interface | default(omit) }}"
+        jump: "{{ item.jump }}"
+        ctstate: "{{ item.state | default(omit) }}"
+        table: "{{ item.table | default('filter') }}"
+      loop:
+        - { chain: FORWARD, in_interface: tailscale0, out_interface: proton, jump: ACCEPT }
+        - { chain: FORWARD, in_interface: proton, out_interface: tailscale0, jump: ACCEPT, ctstate: 'RELATED,ESTABLISHED' }
+        - { chain: POSTROUTING, out_interface: proton, jump: MASQUERADE, table: nat }
+
+    - name: Save iptables rules persistently
+      community.general.iptables_state:
+        state: saved
+        path: /etc/iptables/rules.v4
