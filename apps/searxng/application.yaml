@@ -9,13 +9,23 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    repoURL: https://github.com/edlundin/homelab
-    targetRevision: HEAD
-    path: apps/searxng
-    directory:
-      recurse: false
-      exclude: "application.yaml"
+  sources:
+    # Use TrueCharts stable searxng chart
+    - repoURL: oci.trueforge.org/truecharts
+      chart: searxng
+      targetRevision: "*"
+      helm:
+        valueFiles:
+          - $values/apps/searxng/values.yaml
+    - repoURL: https://github.com/edlundin/homelab
+      targetRevision: HEAD
+      ref: values
+    - repoURL: https://github.com/edlundin/homelab
+      path: apps/searxng
+      directory:
+        exclude: "application.yaml"
+        recurse: false
+        include: "{*.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: searxng

@@ -1,0 +1,29 @@
+## Values for TrueCharts searxng chart
+replicaCount: 2
+
+# SearXNG Configuration
+env:
+  SEARXNG_BASE_URL: "https://search.oisd.io"
+
+# Disable Redis entirely for initial deployment
+cnpg:
+  redis:
+    enabled: false
+
+redis:
+  enabled: false
+
+# Ingress (optional)
+ingress:
+  main:
+    enabled: true
+    hosts:
+      - host: search.oisd.io
+        paths:
+          - path: /
+            pathType: Prefix
+
+persistence:
+  config:
+    enabled: true
+    size: 256Mi

@@ -1,0 +1,15 @@
+# Bitnami redis settings
+architecture: standalone
+
+auth:
+  enabled: true
+  existingSecret: redis-password
+  existingSecretPasswordKey: password
+
+master:
+  persistence:
+    enabled: true
+    size: 1Gi
+
+metrics:
+  enabled: true

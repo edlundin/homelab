@@ -19,6 +19,9 @@ spec:
           replicaCount: 1
     - repoURL: https://github.com/edlundin/homelab
       targetRevision: HEAD
+      ref: values
+    - repoURL: https://github.com/edlundin/homelab
+      targetRevision: HEAD
       path: apps/cert-manager
       directory:
         exclude: "application.yaml"

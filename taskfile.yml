@@ -9,12 +9,12 @@ tasks:
       - task --list-all
   generate-sealed-secrets:
     cmds:
-      - kubeseal --format=yaml < apps/tailscale-operator-extras/.secrets.yaml > apps/tailscale-operator-extras/tailscale-operator-secrets-sealed.yaml
-      - kubeseal --format=yaml < apps/traefik-extras/.secrets.yaml > apps/traefik-extras/traefik-secrets-sealed.yaml
+      - kubeseal --format=yaml < apps/argocd-extras/.secrets.yaml > apps/argocd-extras/argocd-secrets-sealed.yaml
       - kubeseal --format=yaml < apps/cert-manager/.secrets.yaml > apps/cert-manager/cert-manager-secrets-sealed.yaml
       - kubeseal --format=yaml < apps/longhorn-extras/.secrets.yaml > apps/longhorn-extras/longhorn-backup-secrets-sealed.yaml
-      - kubeseal --format=yaml < apps/argocd-extras/.secrets.yaml > apps/argocd-extras/argocd-secrets-sealed.yaml
-      - kubeseal --format=yaml < apps/qdrant/.secrets.yaml > apps/qdrant/qdrant-secrets-sealed.yaml
+      - kubeseal --format=yaml < apps/redis/.secrets.yaml > apps/redis/redis-secrets-sealed.yaml
+      - kubeseal --format=yaml < apps/tailscale-operator-extras/.secrets.yaml > apps/tailscale-operator-extras/tailscale-operator-secrets-sealed.yaml
+      - kubeseal --format=yaml < apps/traefik-extras/.secrets.yaml > apps/traefik-extras/traefik-secrets-sealed.yaml
 
   deploy-argocd:
     desc: "Deploy ArgoCD to the cluster"

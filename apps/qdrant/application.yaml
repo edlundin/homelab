@@ -10,20 +10,15 @@ metadata:
 spec:
   project: default
   sources:
-    # Qdrant Helm Chart
     - repoURL: https://qdrant.github.io/qdrant-helm
       chart: qdrant
       targetRevision: 1.15.5
       helm:
         valueFiles:
           - $values/apps/qdrant/values.yaml
-    # Values from Git repository
     - repoURL: https://github.com/edlundin/homelab
-      path: apps/qdrant
       targetRevision: HEAD
       ref: values
-      directory:
-        exclude: "application.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: qdrant
