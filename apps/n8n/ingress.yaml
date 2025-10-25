@@ -3,6 +3,8 @@ kind: IngressRoute
 metadata:
   name: n8n-ingress
   namespace: traefik
+  labels:
+    app: n8n
 spec:
   entryPoints:
     - websecure

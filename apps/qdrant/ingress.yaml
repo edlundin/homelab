@@ -3,6 +3,8 @@ kind: IngressRoute
 metadata:
   name: qdrant-ingress
   namespace: traefik
+  labels:
+    app: qdrant
 spec:
   entryPoints:
     - websecure
