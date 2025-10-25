@@ -90,5 +90,4 @@ spec:
       targetRevision: master
       path: apps/n8n
       directory:
-        include: "*.yaml"
-        exclude: "application.yaml,values.yaml"
+        include: "{n8n-secrets-sealed.yaml,ingress.yaml,external-secret-*.yaml}"

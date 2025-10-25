@@ -23,9 +23,7 @@ spec:
     - repoURL: https://github.com/edlundin/homelab
       path: apps/searxng
       directory:
-        exclude: "application.yaml,values.yaml"
-        recurse: false
-        include: "{*.yaml}"
+        include: "{external-secret.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: searxng

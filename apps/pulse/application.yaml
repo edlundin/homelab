@@ -22,5 +22,4 @@ spec:
       targetRevision: master
       path: apps/pulse
       directory:
-        include: "*.yaml"
-        exclude: "application.yaml"
+        include: "{deployment.yaml,ingress.yaml,external-secret-*.yaml}"

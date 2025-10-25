@@ -1,68 +1,114 @@
-# Matrix Synapse Deployment# Matrix Synapse (matrix.oisd.io)
+# Matrix Synapse (matrix.oisd.io)
 
+This deploys a Matrix Synapse server with external PostgreSQL for `matrix.oisd.io`.
 
+## Components
 
-This directory contains the Kubernetes manifests for running Matrix Synapse in the homelab cluster.This deploys a Matrix Synapse server (default: sqlite) for `matrix.oisd.io`.
+- **Matrix Synapse**: Homeserver application
+- **PostgreSQL**: External database instance (deployed in `postgresql` namespace)
+- **Redis**: External Redis instance (deployed in `redis` namespace)
+- **Ingress**: HTTPS ingress at `matrix.oisd.io`
+- **Storage**: Longhorn persistent volume for Synapse data
 
+## Files
 
+- `application.yaml` - ArgoCD Application to deploy Matrix Synapse
+- `ingress.yaml` - Traefik Ingress for `matrix.oisd.io`
+- `external-secret-tls.yaml` - ExternalSecret for TLS certificate
+- `external-secret-redis.yaml` - ExternalSecret for Redis connection
+- `external-secret-postgresql.yaml` - ExternalSecret for PostgreSQL credentials
+- `.secrets.yaml` - Template for Matrix signing key secret (gitignored)
+- `matrix-secrets-sealed.yaml` - SealedSecret for Matrix signing key
 
-## ComponentsFiles created:
+## Database Configuration
 
-- `application.yaml` - ArgoCD Application to deploy everything in this folder
+Matrix Synapse uses an external PostgreSQL database deployed in the `postgresql` namespace:
 
-- **ArgoCD Application**: Uses the official Matrix Synapse Helm chart- `deployment.yaml` - Deployment + PVC + Service for Synapse
+- **Service**: `postgresql-postgresql.postgresql.svc.cluster.local:5432`
+- **Database**: `synapse`
+- **User**: `synapse`
+- **Credentials**: Synced from `postgresql` namespace via ExternalSecrets
 
-- **Ingress**: Exposed at `matrix.oisd.io` with TLS- `ingress.yaml` - Traefik Ingress for `matrix.oisd.io`
+See the [PostgreSQL app documentation](../postgresql/README.md) for database management.
 
-- **Storage**: Uses Longhorn for persistent storage (both main storage and signing keys)- `external-secret.yaml` - ExternalSecret + Role/RoleBinding to copy wildcard TLS secret from `traefik` namespace into `matrix`
+## TLS Configuration
 
-- **Database**: Initially configured with SQLite (can be migrated to PostgreSQL later if needed)
+TLS is provided by the wildcard secret `wildcard-tls-oisd` copied into the `matrix` namespace via ExternalSecrets.
 
-Notes:
+## How to apply (via ArgoCD)
 
-## TLS Configuration- Synapse uses sqlite stored under `/data` (PVC `synapse-data`) for now.
+**Prerequisites**: 
+1. Deploy PostgreSQL first: `kubectl apply -f apps/postgresql/application.yaml`
+2. Ensure PostgreSQL is healthy before deploying Matrix
 
-- TLS is provided by the wildcard secret `wildcard-tls-oisd` copied into the `matrix` namespace via ExternalSecrets.
+Then deploy Matrix:
+```bash
+kubectl apply -f apps/matrix/application.yaml
+```
 
-TLS is provided by the wildcard secret `wildcard-tls-oisd` copied into the `matrix` namespace via ExternalSecrets.- If you want Postgres instead of sqlite, modify `deployment.yaml` and add a Postgres chart + credentials.
+After the ArgoCD Application syncs, visit: https://matrix.oisd.io
 
+## Post-Install Steps
 
-
-## Post-Install StepsHow to apply (via ArgoCD):
-
-
-
-1. Get the registration shared secret:```bash
-
-   ```bashkubectl apply -f apps/matrix/application.yaml
-
-   kubectl -n matrix get secret matrix-synapse -o jsonpath='{.data.registrationSharedSecret}' | base64 -d```
-
+1. Wait for all pods to be ready:
+   ```bash
+   kubectl -n matrix get pods
+   kubectl -n postgresql get pods
    ```
 
-After the ArgoCD Application syncs, visit:
+2. Get the registration shared secret:
+   ```bash
+   kubectl -n matrix get secret matrix-synapse -o jsonpath='{.data.registrationSharedSecret}' | base64 -d
+   ```
 
-2. Create an admin user:
-
-   ```bashhttps://matrix.oisd.io
-
+3. Create an admin user:
+   ```bash
    kubectl -n matrix exec -it deploy/matrix-synapse -- register_new_matrix_user \
-
      -c /synapse/config/homeserver.yaml \
      -u ADMIN_USERNAME \
      -p ADMIN_PASSWORD \
      -a
    ```
 
-3. Verify the server is running:
+4. Verify the server is running:
    ```bash
    curl https://matrix.oisd.io/_matrix/client/versions
    ```
 
-## Migration to PostgreSQL (Optional)
+## Troubleshooting
 
-To migrate from SQLite to PostgreSQL:
+### Check Synapse logs
+```bash
+kubectl -n matrix logs -f deploy/matrix-synapse
+```
 
-1. Add a PostgreSQL instance (or connection details to existing one)
-2. Update the `database` section in the Helm values
-3. Follow the Matrix Synapse database migration guide
+### Verify PostgreSQL connectivity
+```bash
+kubectl -n matrix exec -it deploy/matrix-synapse -- nc -zv postgresql-postgresql.postgresql.svc.cluster.local 5432
+```
+
+### Check database connection
+```bash
+# Get the database password
+DB_PASS=$(kubectl -n postgresql get secret postgresql-credentials -o jsonpath='{.data.password}' | base64 -d)
+
+# Test connection from Matrix pod
+kubectl -n matrix exec -it deploy/matrix-synapse -- \
+  psql "postgresql://synapse:$DB_PASS@postgresql-postgresql.postgresql.svc.cluster.local:5432/synapse" \
+  -c "SELECT version();"
+```
+
+### Check ExternalSecrets status
+```bash
+kubectl -n matrix get externalsecrets
+kubectl -n matrix describe externalsecret postgresql-db-secret
+```
+
+## Migration from SQLite
+
+If migrating from a previous SQLite deployment, follow the [Matrix Synapse database migration guide](https://github.com/matrix-org/synapse/blob/develop/docs/postgres.md):
+
+1. Ensure PostgreSQL is deployed and accessible
+2. Use the `synapse_port_db` script from within the Synapse container
+3. Update the application.yaml to use external PostgreSQL
+4. Restart Synapse

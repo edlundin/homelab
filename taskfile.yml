@@ -12,6 +12,8 @@ tasks:
       - kubeseal --format=yaml < apps/argocd-extras/.secrets.yaml > apps/argocd-extras/argocd-secrets-sealed.yaml
       - kubeseal --format=yaml < apps/cert-manager/.secrets.yaml > apps/cert-manager/cert-manager-secrets-sealed.yaml
       - kubeseal --format=yaml < apps/longhorn-extras/.secrets.yaml > apps/longhorn-extras/longhorn-backup-secrets-sealed.yaml
+      - kubeseal --format=yaml < apps/matrix/.secrets.yaml > apps/matrix/matrix-secrets-sealed.yaml
+      - kubeseal --format=yaml < apps/postgresql/.secrets.yaml > apps/postgresql/postgresql-secrets-sealed.yaml
       - kubeseal --format=yaml < apps/n8n/.secrets.yaml > apps/n8n/n8n-secrets-sealed.yaml
       - kubeseal --format=yaml < apps/redis/.secrets.yaml > apps/redis/redis-secrets-sealed.yaml
       - kubeseal --format=yaml < apps/tailscale-operator-extras/.secrets.yaml > apps/tailscale-operator-extras/tailscale-operator-secrets-sealed.yaml
