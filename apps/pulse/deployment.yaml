@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pulse
+  namespace: pulse
+  labels:
+    app: pulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pulse
+  template:
+    metadata:
+      labels:
+        app: pulse
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: pulse
+          image: rcourtman/pulse:latest
+          # Use IfNotPresent to avoid unnecessary pulls (helps with rate limits and restarts)
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 7655
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "7655"
+            - name: FRONTEND_PORT
+              value: "7655"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: DISCOVERY_SUBNET
+              value: "192.168.0.0/16"
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            # give the app more time to boot before failing
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 5
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: pulse-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pulse-data
+  namespace: pulse
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  # Prefer Longhorn storage if available in the cluster
+  storageClassName: longhorn
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pulse
+  namespace: pulse
+  labels:
+    app: pulse
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7655
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: pulse

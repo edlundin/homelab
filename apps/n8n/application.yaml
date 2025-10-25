@@ -26,7 +26,7 @@ spec:
           image:
             repository: n8nio/n8n
             pullPolicy: IfNotPresent
-            tag: "1.116.2"
+            tag: latest
           # Basic n8n configuration
           main:
             config:
