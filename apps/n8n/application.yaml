@@ -79,7 +79,7 @@ spec:
             enabled: false
 
           webhook:
-            enabled: false
+            enabled: true
 
           # Scaling/Queue mode disabled for simple deployment
           scaling:
