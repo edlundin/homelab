@@ -9,8 +9,20 @@ spec:
   entryPoints:
     - websecure
   routes:
+    # Webhook route - direct to webhook service
+    - match: Host(`n8n.oisd.io`) && PathPrefix(`/webhook`, `/webhook-test`, `/webhook-waiting`)
+      kind: Rule
+      priority: 10
+      services:
+        - name: n8n-webhook
+          port: 80
+      middlewares:
+        - name: default-chain
+          namespace: traefik
+    # Main UI route - direct to main service
     - match: Host(`n8n.oisd.io`)
       kind: Rule
+      priority: 5
       services:
         - name: n8n
           port: 80

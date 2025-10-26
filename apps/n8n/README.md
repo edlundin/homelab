@@ -17,8 +17,46 @@ kubectl apply -f application.yaml
 
 - **URL**: https://n8n.oisd.io
 - **Ingress**: Traefik with automatic TLS via cert-manager
+- **Public Webhooks**: Exposed via Tailscale Funnel for external services
+
+### Webhook Access
+
+Webhooks are exposed in two ways:
+
+1. **Internal (Traefik)**: https://n8n.oisd.io/webhook/* - for use within your network
+2. **Public (Tailscale Funnel)**: https://n8n-webhook-funnel-n8n.{tailnet}.ts.net/webhook/* - for external services
+
+The Tailscale Funnel ingress allows external services (like GitHub, Stripe, etc.) to send webhooks directly to n8n without requiring VPN access.
 
 ## Configuration
+
+### Tailscale Funnel Setup
+
+For the Tailscale Funnel to work, you need to configure your Tailscale ACL policy file with the following:
+
+1. **Node Attributes** - Allow nodes created by the Kubernetes operator to use Funnel:
+```json
+"nodeAttrs": [
+  {
+    "target": ["tag:k8s"],
+    "attr": ["funnel"]
+  }
+]
+```
+
+2. **Tag Owners** - If not already configured:
+```json
+"tagOwners": {
+  "tag:k8s": []
+}
+```
+
+After applying the configuration, you can find your webhook URL by running:
+```bash
+kubectl get ingress -n n8n n8n-webhook-funnel
+```
+
+The funnel URL will be in the format: `https://n8n-webhook-funnel-n8n.{your-tailnet}.ts.net`
 
 ### Initial Setup
 

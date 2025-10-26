@@ -33,28 +33,60 @@ spec:
               generic:
                 timezone: "Europe/Paris"
               n8n:
-                # Hide usage statistics page
-                hide_usage_page: false
-                # Webhook URL for external access
-                webhook_url: "https://n8n.oisd.io/"
-                # Editor base URL
-                editor_base_url: "https://n8n.oisd.io/"
+                editor_base_url: "https://n8n.ison-mirfak.ts.net/"
+              # Enable queue mode for webhooks and workers
+              executions_mode: queue
+              # Database configuration
+              db:
+                type: postgresdb
+                postgresdb:
+                  host: "postgres-postgresql.postgres.svc.cluster.local"
+                  port: 5432
+                  database: n8n
+                  user: n8n
+                  pool:
+                    size: 10
+              # Queue configuration with Redis
+              queue:
+                health:
+                  check:
+                    active: true
+                bull:
+                  redis:
+                    host: "redis-master.redis.svc.cluster.local"
+                    port: 6379
             
-            # Reference encryption key from sealed secret via extraEnv
-            extraEnv:
+            # Environment variables for secrets
+            extraEnv: &extraEnv
+              # Override the Kubernetes-generated N8N_PORT env var to prevent conflicts
+              N8N_PORT:
+                value: "5678"
+              WEBHOOK_URL:
+                value: "https://n8n.ison-mirfak.ts.net/"
+              N8N_PROXY_HOPS:
+                value: "1"
               N8N_ENCRYPTION_KEY:
                 valueFrom:
                   secretKeyRef:
                     name: n8n-encryption-key
                     key: encryption_key
+              DB_POSTGRESDB_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: n8n-postgres
+                    key: password
+              QUEUE_BULL_REDIS_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: n8n-redis
+                    key: password
+              N8N_PAYLOAD_SIZE_MAX:
+                value: "16"
             
-            # Persistence for workflow data
+            # Persistence - disabled since we're using PostgreSQL
+            # All workflow data is stored in the database
             persistence:
-              enabled: true
-              type: dynamic
-              size: 2Gi
-              accessModes:
-                - ReadWriteOnce
+              enabled: false
             
             # Resource limits
             resources:
@@ -74,20 +106,35 @@ spec:
           ingress:
             enabled: false
 
-          # Disable workers and webhooks for single-instance deployment
+          # Enable workers for queue processing
           worker:
-            enabled: false
+            enabled: true
+            replicaCount: 1
+            extraEnv: *extraEnv  # Reuse environment variables from main
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 1024Mi
+              requests:
+                cpu: 100m
+                memory: 512Mi
 
+          # Enable webhook service
           webhook:
             enabled: true
-
-          # Scaling/Queue mode disabled for simple deployment
-          scaling:
-            enabled: false
+            replicaCount: 1
+            extraEnv: *extraEnv  # Reuse environment variables from main
+            resources:
+              limits:
+                cpu: 500m
+                memory: 512Mi
+              requests:
+                cpu: 50m
+                memory: 256Mi
 
     # Git source for manifests (sealed secret + ingress)
     - repoURL: https://github.com/edlundin/homelab.git
       targetRevision: master
       path: apps/n8n
       directory:
-        include: "{n8n-secrets-sealed.yaml,ingress.yaml,external-secret-*.yaml}"
+        include: "{n8n-secrets-sealed.yaml,ingress.yaml,external-secret-*.yaml,tailscale-funnel-ingress.yaml}"

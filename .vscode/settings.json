@@ -50,6 +50,7 @@
 		"oisd",
 		"pipefail",
 		"posix",
+		"postgres",
 		"postgresql",
 		"POSTROUTING",
 		"proxmox",

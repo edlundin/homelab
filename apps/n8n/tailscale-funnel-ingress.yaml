@@ -1,0 +1,53 @@
+---
+# Tailscale Funnel Ingress for n8n webhooks
+# This exposes n8n webhooks to the public internet via Tailscale Funnel
+# allowing external services to send webhooks directly to n8n
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: n8n-webhook-funnel
+  namespace: n8n
+  annotations:
+    # Enable Tailscale Funnel to expose webhooks to the public internet
+    tailscale.com/funnel: "true"
+spec:
+  ingressClassName: tailscale
+  rules:
+    # Only expose webhook endpoints via funnel (UI is internal-only)
+    - host: n8n.ison-mirfak.ts.net
+      http:
+        paths:
+          # Production webhooks go to dedicated webhook service
+          - path: /webhook
+            pathType: Prefix
+            backend:
+              service:
+                name: n8n-webhook
+                port:
+                  number: 80
+          # Test webhooks go to main n8n service (queue mode requirement)
+          - path: /webhook-test
+            pathType: Prefix
+            backend:
+              service:
+                name: n8n
+                port:
+                  number: 80
+          # Waiting webhooks go to webhook service
+          - path: /webhook-waiting
+            pathType: Prefix
+            backend:
+              service:
+                name: n8n-webhook
+                port:
+                  number: 80
+          - path: /rest/oauth2-credential
+            pathType: Prefix
+            backend:
+              service:
+                name: n8n
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - n8n.ison-mirfak.ts.net
