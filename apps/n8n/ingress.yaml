@@ -10,7 +10,7 @@ spec:
     - websecure
   routes:
     # Webhook route - direct to webhook service
-    - match: Host(`n8n.oisd.io`) && PathPrefix(`/webhook`, `/webhook-test`, `/webhook-waiting`)
+    - match: Host(`n8n.oisd.io`) && (PathPrefix(`/webhook`) || PathPrefix(`/webhook-test`) || PathPrefix(`/webhook-waiting`))
       kind: Rule
       priority: 10
       services:
