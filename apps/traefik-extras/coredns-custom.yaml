@@ -6,8 +6,8 @@ metadata:
   namespace: kube-system
 data:
   tailscale.server: |
-    ts.net:53 {
+    ts.net {
         errors
         cache 30
-        forward . 100.100.100.100
+        forward . 10.43.74.183
     }

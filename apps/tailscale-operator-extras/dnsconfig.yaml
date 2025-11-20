@@ -1,0 +1,11 @@
+---
+# DNSConfig for Tailscale operator
+# This enables the operator to provide DNS resolution for ts.net domains
+# See: https://tailscale.com/kb/1438/kubernetes-operator-cluster-egress
+apiVersion: tailscale.com/v1alpha1
+kind: DNSConfig
+metadata:
+  name: ts-dns
+  namespace: tailscale-system
+spec:
+  nameserver: {}
