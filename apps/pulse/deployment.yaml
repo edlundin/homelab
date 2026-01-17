@@ -27,7 +27,7 @@ spec:
         - name: pulse
           image: rcourtman/pulse:latest
           # Use IfNotPresent to avoid unnecessary pulls (helps with rate limits and restarts)
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 7655

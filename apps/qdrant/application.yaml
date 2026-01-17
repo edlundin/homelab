@@ -12,7 +12,7 @@ spec:
   sources:
     - repoURL: https://qdrant.github.io/qdrant-helm
       chart: qdrant
-      targetRevision: 1.15.5
+      targetRevision: 1.16.3
       helm:
         valueFiles:
           - $values/apps/qdrant/values.yaml
