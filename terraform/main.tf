@@ -2,7 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = ">= 0.85.1"
+      version = ">= 0.93.0"
     }
   }
 }
@@ -31,7 +31,7 @@ locals {
   debian_13_lxc_template_url           = "http://download.proxmox.com/images/system/debian-13-standard_13.1-2_amd64.tar.zst"
   debian_13_genericcloud_filename      = "debian-13-genericcloud-amd64.qcow2"
   debian_13_genericcloud_path          = "${var.diskimages_storage}:vztmpl/${local.debian_13_genericcloud_filename}"
-  debian_13_genericcloud_sha           = "aa1963a7356a7fab202e5eebc0c1954c4cbd4906e3d8e9bf993beb22e0a90cd7fe644bd5e0fb5ec4b9fbea16744c464fda34ef1be5c3532897787d16c7211f86"
+  debian_13_genericcloud_sha           = "7d735e0314850bc7e452eebb86448839b52082f6be525b914f4beb45421ae1505e251b4ead0672ed7855c6420bdd0dbb862265327dc2a4ad2f2ab6df398aa9ac"
   debian_13_genericcloud_sha_algorithm = "sha512"
   debian_13_genericcloud_url           = "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
 
@@ -90,6 +90,25 @@ locals {
       disk_size        = 15
       dns_server       = local.dns_server
       ipv4_address     = "192.168.2.140/24"
+      gateway_ipv4     = local.network_gateway
+    },
+    "clawdbot" = {
+      node_name        = var.proxmox_node_name
+      vm_id            = 143
+      start_at_boot    = true
+      started          = true
+      os_template_path = local.debian_13_lxc_template_path
+      os_type          = "debian"
+      unprivileged     = true
+      nesting          = true
+      keyctl           = false
+      description      = "ClawdBot private instance"
+      cores            = 4
+      memory           = 2048
+      swap             = local.swap_size
+      disk_size        = 8
+      dns_server       = local.dns_server
+      ipv4_address     = "192.168.2.143/24"
       gateway_ipv4     = local.network_gateway
     },
     # "tailscale-exit-node" = {

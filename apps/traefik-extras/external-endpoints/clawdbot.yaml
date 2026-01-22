@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nietzsche-clawdbot-external
+  namespace: traefik
+spec:
+  type: ExternalName
+  externalName: nietzsche-clawdbot.ison-mirfak.ts.net
+  ports:
+    - protocol: TCP
+      port: 18789
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: clawdbot-ingress
+  namespace: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`clawd.oisd.io`)
+      kind: Rule
+      services:
+        - name: nietzsche-clawdbot-external
+          port: 18789
+          scheme: http
+  tls:
+    secretName: wildcard-tls-oisd
