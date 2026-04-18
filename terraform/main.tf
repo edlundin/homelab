@@ -507,6 +507,83 @@ resource "null_resource" "k3s_agents_setup" {
   }
 }
 
+resource "null_resource" "k3s_master_init_dns_config" {
+  depends_on = [null_resource.k3s_master_init_setup]
+
+  triggers = {
+    container_id = proxmox_virtual_environment_vm.k3s_master_init.id
+    dns_server   = local.dns_server
+  }
+
+  connection {
+    type  = "ssh"
+    user  = "root"
+    agent = true
+    host  = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "set -euo pipefail",
+      "install -d -m 0755 /etc/rancher/k3s",
+      "printf '%s\n' 'nameserver ${local.dns_server}' 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
+      "printf '%s\n' 'resolv-conf: /etc/rancher/k3s/resolv.conf' >/etc/rancher/k3s/config.yaml",
+    ]
+  }
+}
+
+resource "null_resource" "k3s_masters_dns_config" {
+  count = local.k3s_master_count - 1
+
+  depends_on = [null_resource.k3s_masters_setup]
+
+  triggers = {
+    container_id = proxmox_virtual_environment_vm.k3s_masters[count.index].id
+    dns_server   = local.dns_server
+  }
+
+  connection {
+    type = "ssh"
+    user = "root"
+    host = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_masters[count.index].initialization[0].ip_config[0].ipv4[0].address)[0]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "set -euo pipefail",
+      "install -d -m 0755 /etc/rancher/k3s",
+      "printf '%s\n' 'nameserver ${local.dns_server}' 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
+      "printf '%s\n' 'resolv-conf: /etc/rancher/k3s/resolv.conf' >/etc/rancher/k3s/config.yaml",
+    ]
+  }
+}
+
+resource "null_resource" "k3s_agents_dns_config" {
+  count = local.k3s_agent_count
+
+  depends_on = [null_resource.k3s_agents_setup]
+
+  triggers = {
+    container_id = proxmox_virtual_environment_vm.k3s_agents[count.index].id
+    dns_server   = local.dns_server
+  }
+
+  connection {
+    type = "ssh"
+    user = "root"
+    host = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_agents[count.index].initialization[0].ip_config[0].ipv4[0].address)[0]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "set -euo pipefail",
+      "install -d -m 0755 /etc/rancher/k3s",
+      "printf '%s\n' 'nameserver ${local.dns_server}' 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
+      "printf '%s\n' 'resolv-conf: /etc/rancher/k3s/resolv.conf' >/etc/rancher/k3s/config.yaml",
+    ]
+  }
+}
+
 resource "null_resource" "install_sealed_secrets" {
   depends_on = [
     null_resource.k3s_master_init_setup,
