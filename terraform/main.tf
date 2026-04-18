@@ -31,9 +31,9 @@ locals {
   debian_13_lxc_template_url           = "http://download.proxmox.com/images/system/debian-13-standard_13.1-2_amd64.tar.zst"
   debian_13_genericcloud_filename      = "debian-13-genericcloud-amd64.qcow2"
   debian_13_genericcloud_path          = "${var.diskimages_storage}:vztmpl/${local.debian_13_genericcloud_filename}"
-  debian_13_genericcloud_sha           = "7d735e0314850bc7e452eebb86448839b52082f6be525b914f4beb45421ae1505e251b4ead0672ed7855c6420bdd0dbb862265327dc2a4ad2f2ab6df398aa9ac"
+  debian_13_genericcloud_sha           = "0e5edfbe49b0cca779a4a7dc9738f34c92e3ff481ee1f7d5c4e93e180654fe275eb8c96397224c6ca04a2910eaaed27489f431573ebe4cb5412ef257888b2b18"
   debian_13_genericcloud_sha_algorithm = "sha512"
-  debian_13_genericcloud_url           = "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
+  debian_13_genericcloud_url           = "https://cloud.debian.org/images/cloud/trixie/20260316-2418/debian-13-genericcloud-amd64-20260316-2418.qcow2"
 
   dns_server = "192.168.2.3"
 
@@ -67,7 +67,7 @@ locals {
     cores            = 6
     memory           = 10240
     swap             = local.swap_size
-    disk_size        = 30
+    disk_size        = 40
     dns_server       = local.dns_server
     gateway_ipv4     = local.network_gateway
   }
@@ -92,7 +92,7 @@ locals {
       ipv4_address     = "192.168.2.140/24"
       gateway_ipv4     = local.network_gateway
     },
-    "clawdbot" = {
+    "hydra" = {
       node_name        = var.proxmox_node_name
       vm_id            = 143
       start_at_boot    = true
@@ -102,11 +102,11 @@ locals {
       unprivileged     = true
       nesting          = true
       keyctl           = false
-      description      = "ClawdBot private instance"
+      description      = ""
       cores            = 4
-      memory           = 2048
+      memory           = 4096
       swap             = local.swap_size
-      disk_size        = 8
+      disk_size        = 24
       dns_server       = local.dns_server
       ipv4_address     = "192.168.2.143/24"
       gateway_ipv4     = local.network_gateway

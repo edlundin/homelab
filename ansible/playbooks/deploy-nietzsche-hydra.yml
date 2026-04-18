@@ -1,0 +1,22 @@
+---
+# deploy-nietzsche-hydra.yml - Install deps and deploy hydra on the reserved LXC container
+# Usage: ansible-playbook -i inventory/inventory.ini playbooks/deploy-nietzsche-hydra.yml
+
+- name: Deploy nietzsche-hydra
+  hosts: nietzsche-hydra
+  vars:
+    ansible_distribution: trixie
+    pip_install_packages:
+      - name: docker
+    proxmox_node: "nietzsche"
+
+  handlers:
+    - name: Include handlers
+      ansible.builtin.import_tasks: ../handlers/lxc-restart-on-change.yml
+
+  tasks:
+    - name: Setup Tailscale
+      ansible.builtin.include_tasks: ../tasks/setup-tailscale.yml
+
+    - name: Prepare the system
+      ansible.builtin.include_tasks: ../tasks/update-systems.yml

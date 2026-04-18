@@ -46,6 +46,7 @@ spec:
           kubernetesIngress:
             publishedService:
               enabled: true
+              pathOverride: traefik/traefik-tailscale
           kubernetesCRD:
             enabled: true
             allowCrossNamespace: true
