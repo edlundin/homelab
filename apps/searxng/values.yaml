@@ -7,6 +7,9 @@ workload:
         main:
           env:
             BASE_URL: "https://search.oisd.io"
+            HTTP_PROXY: "http://searxng-egress-proxy.searxng.svc.cluster.local:8080"
+            HTTPS_PROXY: "http://searxng-egress-proxy.searxng.svc.cluster.local:8080"
+            NO_PROXY: "127.0.0.1,localhost,.svc,.cluster.local"
 
 # Disable Redis entirely for initial deployment
 cnpg:
