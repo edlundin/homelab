@@ -23,17 +23,3 @@ data:
       "replication_factor": 1,
       "write_consistency_factor": 1
     }
-  payload-schema.json: |
-    {
-      "payload_schema": {
-        "path": {
-          "type": "keyword"
-        },
-        "lang": {
-          "type": "keyword"
-        },
-        "symbol": {
-          "type": "keyword"
-        }
-      }
-    }

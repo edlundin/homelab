@@ -19,28 +19,31 @@ spec:
               cpu: "100m"
           command:
             - /bin/sh
-            - -c
+            - -ec
             - |
               # Wait for Qdrant to be ready
               echo "Waiting for Qdrant to be ready..."
-              until curl -f http://qdrant:6333/readyz; do
+              until curl -fsS http://qdrant:6333/readyz >/dev/null; do
                 echo "Qdrant not ready, waiting..."
                 sleep 5
               done
 
-              echo "Qdrant is ready, creating collection..."
+              if curl -fsS "http://qdrant:6333/collections/code_chunks" >/dev/null; then
+                echo "Collection code_chunks already exists, skipping create"
+              else
+                echo "Creating collection code_chunks..."
+                curl -fsS -X PUT "http://qdrant:6333/collections/code_chunks" \
+                  -H "Content-Type: application/json" \
+                  --data @/config/collection-config.json >/dev/null
+              fi
 
-              # Create collection with the specified configuration
-              curl -X PUT "http://qdrant:6333/collections/code_chunks" \
-                -H "Content-Type: application/json" \
-                -d @/config/collection-config.json
+              echo "Ensuring payload indexes exist..."
 
-              echo "Collection created, creating payload schema..."
-
-              # Create payload schema
-              curl -X PATCH "http://qdrant:6333/collections/code_chunks" \
-                -H "Content-Type: application/json" \
-                -d @/config/payload-schema.json
+              for field in path lang symbol; do
+                curl -fsS -X PUT "http://qdrant:6333/collections/code_chunks/index" \
+                  -H "Content-Type: application/json" \
+                  --data "{\"field_name\":\"${field}\",\"field_schema\":\"keyword\"}" >/dev/null
+              done
 
               echo "Collection initialization completed successfully"
           volumeMounts:
