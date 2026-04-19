@@ -1,9 +1,12 @@
 ## Values for TrueCharts searxng chart
-replicaCount: 2
-
-# SearXNG Configuration
-env:
-  SEARXNG_BASE_URL: "https://search.oisd.io"
+# TrueCharts expects app-specific values under workload.main, not top-level env.
+workload:
+  main:
+    podSpec:
+      containers:
+        main:
+          env:
+            BASE_URL: "https://search.oisd.io"
 
 # Disable Redis entirely for initial deployment
 cnpg:
