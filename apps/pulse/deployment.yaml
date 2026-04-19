@@ -25,7 +25,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: pulse
-          image: rcourtman/pulse:latest
+          image: rcourtman/pulse:5
           # Use IfNotPresent to avoid unnecessary pulls (helps with rate limits and restarts)
           imagePullPolicy: Always
           ports:

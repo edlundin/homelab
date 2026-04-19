@@ -23,4 +23,16 @@ variable "k3s_version" {
   default = "v1.34.1+k3s1"
 }
 
+variable "k3s_api_server_host" {
+  description = "Stable k3s API endpoint used for node joins and kubeconfig server"
+  type        = string
+  default     = "k3s-api.ison-mirfak.ts.net"
+}
+
+variable "k3s_kubeconfig_source_host" {
+  description = "Direct SSH host used to download /etc/rancher/k3s/k3s.yaml"
+  type        = string
+  default     = "192.168.2.101"
+}
+
 variable "tailscale_authkey" { type = string }

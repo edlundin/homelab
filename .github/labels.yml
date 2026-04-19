@@ -1,0 +1,19 @@
+- name: dependencies
+  color: "1d76db"
+  description: Dependency updates and version bumps
+
+- name: renovate
+  color: "0052cc"
+  description: Pull requests created by Renovate
+
+- name: docker
+  color: "0e8a16"
+  description: Container image updates
+
+- name: helm
+  color: "5319e7"
+  description: Helm chart updates
+
+- name: terraform
+  color: "7b42bc"
+  description: Terraform-related changes

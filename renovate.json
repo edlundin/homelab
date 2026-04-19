@@ -1,0 +1,121 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
+  "prBodyNotes": [
+    "## Review Checklist",
+    "- Confirm the target app/chart is expected to auto-sync via ArgoCD.",
+    "- Check release notes for breaking changes when the update is not a patch.",
+    "- Verify image/chart values still match this repo's manifests and secrets.",
+    "- After merge, confirm ArgoCD reaches `Synced` and `Healthy`."
+  ],
+  "enabledManagers": [
+    "argocd",
+    "helm-values",
+    "kubernetes",
+    "custom.regex"
+  ],
+  "argocd": {
+    "managerFilePatterns": [
+      "/(^|/)apps/.+\\.ya?ml$/"
+    ]
+  },
+  "kubernetes": {
+    "managerFilePatterns": [
+      "/(^|/)apps/.+\\.ya?ml$/"
+    ]
+  },
+  "helm-values": {
+    "managerFilePatterns": [
+      "/(^|/)apps/.+/values\\.ya?ml$/"
+    ]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/(^|/)apps/.+/application\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "repository:\\s*(?<depName>[^\\s]+)\\s*\\n(?:\\s+[^\\n]*\\n)*?\\s+tag:\\s*(?<currentValue>[^\\s]+)"
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/(^|/)apps/.+\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "image:\\s*[\"']?(?<depName>[^\\s:\"']+(?:/[^\\s:\"']+)+):(?<currentValue>[^\\s@\"']+)[\"']?"
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": [
+        "docker",
+        "helm"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor",
+        "digest"
+      ],
+      "automerge": true,
+      "platformAutomerge": true
+    },
+    {
+      "matchDatasources": [
+        "docker",
+        "helm"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false
+    },
+    {
+      "matchManagers": [
+        "argocd"
+      ],
+      "matchDatasources": [
+        "helm"
+      ],
+      "groupName": "argocd chart updates",
+      "addLabels": [
+        "helm"
+      ]
+    },
+    {
+      "matchManagers": [
+        "kubernetes",
+        "helm-values",
+        "custom.regex"
+      ],
+      "matchDatasources": [
+        "docker"
+      ],
+      "groupName": "container image updates",
+      "addLabels": [
+        "docker"
+      ]
+    },
+    {
+      "matchFileNames": [
+        "terraform/**"
+      ],
+      "addLabels": [
+        "terraform"
+      ]
+    }
+  ]
+}

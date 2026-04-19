@@ -1,24 +1,24 @@
----
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: tailscale-operator-extras
+  name: k3s-api-lb
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
     repoURL: https://github.com/edlundin/homelab.git
-    path: apps/tailscale-operator-extras
+    path: apps/k3s-api-lb
     targetRevision: HEAD
     directory:
       recurse: true
       exclude: "application.yaml"
   destination:
     server: https://kubernetes.default.svc
-    # Note: This will deploy resources to their specified namespaces
-    # The sealed secret will go to tailscale-system, traefik service to traefik
+    namespace: k3s-api-lb
   syncPolicy:
     automated:
       prune: true

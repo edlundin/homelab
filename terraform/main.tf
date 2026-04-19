@@ -293,7 +293,7 @@ resource "null_resource" "k3s_master_init_setup" {
     inline = [
       "set -euo pipefail",
 
-      "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${var.k3s_version}' INSTALL_K3S_EXEC='server --cluster-init --disable traefik --write-kubeconfig-mode=644 --node-taint CriticalAddonsOnly=true:NoExecute' K3S_TOKEN='${var.k3s_token}' sh -",
+      "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${var.k3s_version}' INSTALL_K3S_EXEC='server --cluster-init --disable traefik --write-kubeconfig-mode=644 --tls-san ${var.k3s_api_server_host} --node-taint CriticalAddonsOnly=true:NoExecute' K3S_TOKEN='${var.k3s_token}' sh -",
 
       # Wait for k3s service to be active
       "echo 'Waiting for any Node objects to appear...'",
@@ -407,7 +407,7 @@ resource "null_resource" "k3s_masters_setup" {
 
   provisioner "remote-exec" {
     inline = [
-      "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${var.k3s_version}' INSTALL_K3S_EXEC='server --server https://${regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]}:6443 --node-taint CriticalAddonsOnly=true:NoExecute' K3S_TOKEN='${var.k3s_token}' sh -"
+      "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${var.k3s_version}' INSTALL_K3S_EXEC='server --server https://${var.k3s_api_server_host}:6443 --tls-san ${var.k3s_api_server_host} --node-taint CriticalAddonsOnly=true:NoExecute' K3S_TOKEN='${var.k3s_token}' sh -"
     ]
 
   }
@@ -495,7 +495,7 @@ resource "null_resource" "k3s_agents_setup" {
 
   provisioner "remote-exec" {
     inline = [
-      "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${var.k3s_version}' K3S_URL='https://${regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]}:6443' K3S_TOKEN='${var.k3s_token}' sh -",
+      "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${var.k3s_version}' K3S_URL='https://${var.k3s_api_server_host}:6443' K3S_TOKEN='${var.k3s_token}' sh -",
       "sleep 10"
     ]
 
@@ -513,6 +513,7 @@ resource "null_resource" "k3s_master_init_dns_config" {
   triggers = {
     container_id = proxmox_virtual_environment_vm.k3s_master_init.id
     dns_server   = local.dns_server
+    api_host     = var.k3s_api_server_host
   }
 
   connection {
@@ -526,8 +527,34 @@ resource "null_resource" "k3s_master_init_dns_config" {
     inline = [
       "set -euo pipefail",
       "install -d -m 0755 /etc/rancher/k3s",
+      "install -d -m 0755 /etc/rancher/k3s/config.yaml.d",
       "printf '%s\n' 'nameserver ${local.dns_server}' 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
       "printf '%s\n' 'resolv-conf: /etc/rancher/k3s/resolv.conf' >/etc/rancher/k3s/config.yaml",
+      "printf '%s\n' 'tls-san:' '  - ${var.k3s_api_server_host}' >/etc/rancher/k3s/config.yaml.d/10-api-lb.yaml",
+    ]
+  }
+}
+
+resource "null_resource" "k3s_master_init_service_config" {
+  depends_on = [null_resource.k3s_master_init_dns_config]
+
+  triggers = {
+    container_id = proxmox_virtual_environment_vm.k3s_master_init.id
+  }
+
+  connection {
+    type  = "ssh"
+    user  = "root"
+    agent = true
+    host  = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "set -euo pipefail",
+      "install -d -m 0755 /etc/systemd/system/k3s.service.d",
+      "printf '%s\n' '[Service]' 'ExecStart=' 'ExecStart=/usr/local/bin/k3s server --cluster-init --disable traefik --write-kubeconfig-mode=644 --node-taint CriticalAddonsOnly=true:NoExecute' >/etc/systemd/system/k3s.service.d/10-api-lb.conf",
+      "systemctl daemon-reload",
     ]
   }
 }
@@ -540,6 +567,7 @@ resource "null_resource" "k3s_masters_dns_config" {
   triggers = {
     container_id = proxmox_virtual_environment_vm.k3s_masters[count.index].id
     dns_server   = local.dns_server
+    api_host     = var.k3s_api_server_host
   }
 
   connection {
@@ -552,8 +580,36 @@ resource "null_resource" "k3s_masters_dns_config" {
     inline = [
       "set -euo pipefail",
       "install -d -m 0755 /etc/rancher/k3s",
+      "install -d -m 0755 /etc/rancher/k3s/config.yaml.d",
       "printf '%s\n' 'nameserver ${local.dns_server}' 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
       "printf '%s\n' 'resolv-conf: /etc/rancher/k3s/resolv.conf' >/etc/rancher/k3s/config.yaml",
+      "printf '%s\n' 'tls-san:' '  - ${var.k3s_api_server_host}' >/etc/rancher/k3s/config.yaml.d/10-api-lb.yaml",
+    ]
+  }
+}
+
+resource "null_resource" "k3s_masters_api_endpoint_config" {
+  count = local.k3s_master_count - 1
+
+  depends_on = [null_resource.k3s_masters_dns_config]
+
+  triggers = {
+    container_id = proxmox_virtual_environment_vm.k3s_masters[count.index].id
+    api_host     = var.k3s_api_server_host
+  }
+
+  connection {
+    type = "ssh"
+    user = "root"
+    host = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_masters[count.index].initialization[0].ip_config[0].ipv4[0].address)[0]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "set -euo pipefail",
+      "install -d -m 0755 /etc/systemd/system/k3s.service.d",
+      "printf '%s\n' '[Service]' 'ExecStart=' 'ExecStart=/usr/local/bin/k3s server --server https://${var.k3s_api_server_host}:6443 --node-taint CriticalAddonsOnly=true:NoExecute' >/etc/systemd/system/k3s.service.d/10-api-lb.conf",
+      "systemctl daemon-reload",
     ]
   }
 }
@@ -580,6 +636,32 @@ resource "null_resource" "k3s_agents_dns_config" {
       "install -d -m 0755 /etc/rancher/k3s",
       "printf '%s\n' 'nameserver ${local.dns_server}' 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
       "printf '%s\n' 'resolv-conf: /etc/rancher/k3s/resolv.conf' >/etc/rancher/k3s/config.yaml",
+    ]
+  }
+}
+
+resource "null_resource" "k3s_agents_api_endpoint_config" {
+  count = local.k3s_agent_count
+
+  depends_on = [null_resource.k3s_agents_dns_config]
+
+  triggers = {
+    container_id = proxmox_virtual_environment_vm.k3s_agents[count.index].id
+    api_host     = var.k3s_api_server_host
+    k3s_token    = var.k3s_token
+  }
+
+  connection {
+    type = "ssh"
+    user = "root"
+    host = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_agents[count.index].initialization[0].ip_config[0].ipv4[0].address)[0]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "set -euo pipefail",
+      "printf '%s\n' \"K3S_TOKEN='${var.k3s_token}'\" \"K3S_URL='https://${var.k3s_api_server_host}:6443'\" >/etc/systemd/system/k3s-agent.service.env",
+      "systemctl daemon-reload",
     ]
   }
 }
@@ -803,7 +885,7 @@ output "k3s_agent_ips" {
 }
 
 output "kubeconfig_command" {
-  value       = "scp root@${regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]}:/etc/rancher/k3s/k3s.yaml ~/.kube/k3s-config && sed -i 's/127.0.0.1/${regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]}/g' ~/.kube/k3s-config"
+  value       = "scp root@${var.k3s_kubeconfig_source_host}:/etc/rancher/k3s/k3s.yaml ~/.kube/k3s-config && sed -i 's/127.0.0.1/${var.k3s_api_server_host}/g' ~/.kube/k3s-config"
   description = "Command to download and configure kubeconfig"
 }
 
@@ -820,7 +902,7 @@ output "cluster_info" {
     
     Next steps:
     1. Get kubeconfig:
-       scp root@${regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]}:/etc/rancher/k3s/k3s.yaml ~/.kube/k3s-config && sed -i 's/127.0.0.1/${regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]}/g' ~/.kube/k3s-config
+       scp root@${var.k3s_kubeconfig_source_host}:/etc/rancher/k3s/k3s.yaml ~/.kube/k3s-config && sed -i 's/127.0.0.1/${var.k3s_api_server_host}/g' ~/.kube/k3s-config
     
     2. Set KUBECONFIG:
        export KUBECONFIG=~/.kube/k3s-config

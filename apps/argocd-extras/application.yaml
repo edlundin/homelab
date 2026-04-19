@@ -13,6 +13,9 @@ spec:
     repoURL: https://github.com/edlundin/homelab.git
     targetRevision: HEAD
     path: apps/argocd-extras
+    directory:
+      recurse: true
+      exclude: "application.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd

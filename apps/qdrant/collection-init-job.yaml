@@ -9,7 +9,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: init-collection
-          image: curlimages/curl:latest
+          image: curlimages/curl:8.19.0
           resources:
             requests:
               memory: "32Mi"

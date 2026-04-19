@@ -13,7 +13,7 @@ spec:
     # Use TrueCharts stable searxng chart
     - repoURL: oci.trueforge.org/truecharts
       chart: searxng
-      targetRevision: "*"
+      targetRevision: 11.0.12
       helm:
         valueFiles:
           - $values/apps/searxng/values.yaml

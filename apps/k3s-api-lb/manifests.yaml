@@ -1,0 +1,137 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: k3s-api-lb
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haproxy-config
+  namespace: k3s-api-lb
+data:
+  traefik.yaml: |
+    entryPoints:
+      k3sapi:
+        address: ":6443"
+
+    providers:
+      file:
+        filename: /config/dynamic.yaml
+        watch: true
+
+    ping: {}
+
+    log:
+      level: INFO
+
+  dynamic.yaml: |
+    tcp:
+      routers:
+        k3sapi:
+          entryPoints:
+            - k3sapi
+          rule: HostSNI(`*`)
+          service: k3sapi
+
+      services:
+        k3sapi:
+          loadBalancer:
+            servers:
+              - address: 192.168.2.100:6443
+              - address: 192.168.2.101:6443
+              - address: 192.168.2.102:6443
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: haproxy
+  namespace: k3s-api-lb
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: haproxy
+  template:
+    metadata:
+      labels:
+        app: haproxy
+    spec:
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+          effect: NoExecute
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: Exists
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: haproxy
+                topologyKey: kubernetes.io/hostname
+      containers:
+        - name: proxy
+          image: docker.io/rancher/mirrored-library-traefik:3.3.6
+          imagePullPolicy: IfNotPresent
+          args:
+            - --configFile=/config/traefik.yaml
+          ports:
+            - name: k3s-api
+              containerPort: 6443
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 6443
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 6443
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: haproxy-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k3s-api-tailscale
+  namespace: k3s-api-lb
+  annotations:
+    tailscale.com/hostname: "k3s-api"
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  ports:
+    - name: k3s-api
+      port: 6443
+      targetPort: k3s-api
+      protocol: TCP
+  selector:
+    app: haproxy
