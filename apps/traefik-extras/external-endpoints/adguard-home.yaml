@@ -5,7 +5,7 @@ metadata:
   namespace: traefik
 spec:
   type: ExternalName
-  externalName: adguardhome.ison-mirfak.ts.net
+  externalName: adguardhome-oracle.ison-mirfak.ts.net
   ports:
     - protocol: TCP
       port: 80
