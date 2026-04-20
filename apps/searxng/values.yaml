@@ -3,6 +3,9 @@
 workload:
   main:
     podSpec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution: []
       containers:
         main:
           env:
