@@ -33,3 +33,4 @@ persistence:
   config:
     enabled: true
     size: 256Mi
+    storageClass: longhorn
