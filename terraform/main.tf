@@ -35,7 +35,7 @@ locals {
   debian_13_genericcloud_sha_algorithm = "sha512"
   debian_13_genericcloud_url           = "https://cloud.debian.org/images/cloud/trixie/20260316-2418/debian-13-genericcloud-amd64-20260316-2418.qcow2"
 
-  dns_server = "192.168.2.3"
+  dns_server = "141.253.110.131"
 
   swap_size       = 512
   network_gateway = "192.168.2.254"

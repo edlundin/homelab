@@ -23,10 +23,17 @@ spec:
         # Configure the operator
         operatorConfig:
           hostname: "tailscale-operator"
-          
-        # Enable default proxy class for ingress
-        defaultProxyConfig:
-          mode: "ingress"
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: node-role.kubernetes.io/control-plane
+                        operator: DoesNotExist
+
+        # Use worker-only ProxyClass as default for all proxy instances
+        proxyConfig:
+          defaultProxyClass: "worker-only"
   destination:
     server: https://kubernetes.default.svc
     namespace: tailscale-system
