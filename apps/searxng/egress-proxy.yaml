@@ -124,7 +124,7 @@ metadata:
   name: searxng-egress-proxy-config
   namespace: searxng
 data:
-  TS_ACCEPT_DNS: "false"
+  TS_ACCEPT_DNS: "true"
   TS_AUTH_ONCE: "true"
   TS_HOSTNAME: "searxng-egress-proxy"
   TS_KUBE_SECRET: "searxng-egress-proxy-state"
@@ -154,7 +154,7 @@ spec:
       containers:
         - name: tailscale
           image: ghcr.io/tailscale/tailscale:stable
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name: searxng-egress-proxy-config
