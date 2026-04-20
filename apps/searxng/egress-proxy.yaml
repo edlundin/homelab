@@ -132,7 +132,7 @@ data:
   TS_USERSPACE: "true"
   # tag:mullvad is a dedicated tag that grants Mullvad license slots only to this
   # proxy, keeping k8s-operator devices out of the Mullvad license count.
-  TS_EXTRA_ARGS: "--advertise-tags=tag:k8s-operator,tag:mullvad --exit-node=100.74.206.14 --exit-node-allow-lan-access=true"
+  TS_EXTRA_ARGS: "--advertise-tags=tag:k8s-operator,tag:mullvad --exit-node=ch-zrh-wg-201.mullvad.ts.net --exit-node-allow-lan-access=true"
 
 ---
 apiVersion: apps/v1
