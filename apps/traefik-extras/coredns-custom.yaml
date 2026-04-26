@@ -5,6 +5,12 @@ metadata:
   name: coredns-custom
   namespace: kube-system
 data:
+  disable-aaaa.override: |
+    # Return an empty NOERROR response for all IPv6 address lookups.
+    # This keeps cluster DNS IPv4-only so workloads like SearXNG do not try IPv6 egress.
+    template IN AAAA . {
+        rcode NOERROR
+    }
   tailscale.server: |
     ts.net {
         errors
