@@ -35,7 +35,7 @@ locals {
   debian_13_genericcloud_sha_algorithm = "sha512"
   debian_13_genericcloud_url           = "https://cloud.debian.org/images/cloud/trixie/20260316-2418/debian-13-genericcloud-amd64-20260316-2418.qcow2"
 
-  dns_server = "141.253.110.131"
+  dns_servers = ["141.253.110.131", "141.145.216.51"]
 
   swap_size       = 512
   network_gateway = "192.168.2.254"
@@ -53,7 +53,7 @@ locals {
     memory           = 3072
     swap             = local.swap_size
     disk_size        = 20
-    dns_server       = local.dns_server
+    dns_servers      = local.dns_servers
     gateway_ipv4     = local.network_gateway
   }
 
@@ -68,7 +68,7 @@ locals {
     memory           = 10240
     swap             = local.swap_size
     disk_size        = 40
-    dns_server       = local.dns_server
+    dns_servers      = local.dns_servers
     gateway_ipv4     = local.network_gateway
   }
 
@@ -88,7 +88,7 @@ locals {
       memory           = 3072
       swap             = local.swap_size
       disk_size        = 15
-      dns_server       = local.dns_server
+      dns_servers      = local.dns_servers
       ipv4_address     = "192.168.2.140/24"
       gateway_ipv4     = local.network_gateway
     },
@@ -107,7 +107,7 @@ locals {
       memory           = 4096
       swap             = local.swap_size
       disk_size        = 24
-      dns_server       = local.dns_server
+      dns_servers      = local.dns_servers
       ipv4_address     = "192.168.2.143/24"
       gateway_ipv4     = local.network_gateway
     },
@@ -126,7 +126,7 @@ locals {
     #   memory           = 1024
     #   swap             = local.swap_size
     #   disk_size        = 4
-    #   dns_server       = local.dns_server
+    #   dns_servers      = local.dns_servers
     #   ipv4_address     = "192.168.2.143/24"
     #   gateway_ipv4     = local.network_gateway
     # },
@@ -146,7 +146,7 @@ locals {
     #   memory           = 6144
     #   swap             = local.swap_size
     #   disk_size        = 16
-    #   dns_server       = local.dns_server
+    #   dns_servers      = local.dns_servers
     #   ipv4_address     = "192.168.2.200/24"
     #   gateway_ipv4     = local.network_gateway
     # },
@@ -165,7 +165,7 @@ locals {
     #   memory           = 2048
     #   swap             = local.swap_size
     #   disk_size        = 4
-    #   dns_server       = local.dns_server
+    #   dns_servers      = local.dns_servers
     #   ipv4_address     = "192.168.2.103/24"
     #   gateway_ipv4     = local.network_gateway
     # },
@@ -184,7 +184,7 @@ locals {
     #   memory           = 2048
     #   swap             = local.swap_size
     #   disk_size        = 4
-    #   dns_server       = local.dns_server
+    #   dns_servers      = local.dns_servers
     #   ipv4_address     = "192.168.2.104/24"
     #   gateway_ipv4     = local.network_gateway
     # },
@@ -203,7 +203,7 @@ locals {
     #   memory           = 2048
     #   swap             = local.swap_size
     #   disk_size        = 4
-    #   dns_server       = local.dns_server
+    #   dns_servers      = local.dns_servers
     #   ipv4_address     = "192.168.2.105/24"
     #   gateway_ipv4     = local.network_gateway
     # }
@@ -222,7 +222,7 @@ resource "proxmox_virtual_environment_vm" "k3s_master_init" {
     datastore_id = var.diskimages_storage
 
     dns {
-      servers = [local.k3s_master_config.dns_server]
+      servers = local.k3s_master_config.dns_servers
     }
 
     ip_config {
@@ -334,7 +334,7 @@ resource "proxmox_virtual_environment_vm" "k3s_masters" {
     datastore_id = var.diskimages_storage
 
     dns {
-      servers = [local.k3s_master_config.dns_server]
+      servers = local.k3s_master_config.dns_servers
     }
 
     ip_config {
@@ -427,7 +427,7 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
     datastore_id = var.diskimages_storage
 
     dns {
-      servers = [local.k3s_agent_config.dns_server]
+      servers = local.k3s_agent_config.dns_servers
     }
 
     ip_config {
@@ -512,7 +512,7 @@ resource "null_resource" "k3s_master_init_dns_config" {
 
   triggers = {
     container_id = proxmox_virtual_environment_vm.k3s_master_init.id
-    dns_server   = local.dns_server
+    dns_servers  = join(",", local.dns_servers)
     api_host     = var.k3s_api_server_host
   }
 
@@ -528,7 +528,7 @@ resource "null_resource" "k3s_master_init_dns_config" {
       "set -euo pipefail",
       "install -d -m 0755 /etc/rancher/k3s",
       "install -d -m 0755 /etc/rancher/k3s/config.yaml.d",
-      "printf '%s\n' 'nameserver ${local.dns_server}' 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
+      "printf '%s\n' ${join(" ", formatlist("'nameserver %s'", local.dns_servers))} 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
       "printf '%s\n' 'resolv-conf: /etc/rancher/k3s/resolv.conf' >/etc/rancher/k3s/config.yaml",
       "printf '%s\n' 'tls-san:' '  - ${var.k3s_api_server_host}' >/etc/rancher/k3s/config.yaml.d/10-api-lb.yaml",
     ]
@@ -566,7 +566,7 @@ resource "null_resource" "k3s_masters_dns_config" {
 
   triggers = {
     container_id = proxmox_virtual_environment_vm.k3s_masters[count.index].id
-    dns_server   = local.dns_server
+    dns_servers  = join(",", local.dns_servers)
     api_host     = var.k3s_api_server_host
   }
 
@@ -581,7 +581,7 @@ resource "null_resource" "k3s_masters_dns_config" {
       "set -euo pipefail",
       "install -d -m 0755 /etc/rancher/k3s",
       "install -d -m 0755 /etc/rancher/k3s/config.yaml.d",
-      "printf '%s\n' 'nameserver ${local.dns_server}' 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
+      "printf '%s\n' ${join(" ", formatlist("'nameserver %s'", local.dns_servers))} 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
       "printf '%s\n' 'resolv-conf: /etc/rancher/k3s/resolv.conf' >/etc/rancher/k3s/config.yaml",
       "printf '%s\n' 'tls-san:' '  - ${var.k3s_api_server_host}' >/etc/rancher/k3s/config.yaml.d/10-api-lb.yaml",
     ]
@@ -621,7 +621,7 @@ resource "null_resource" "k3s_agents_dns_config" {
 
   triggers = {
     container_id = proxmox_virtual_environment_vm.k3s_agents[count.index].id
-    dns_server   = local.dns_server
+    dns_servers  = join(",", local.dns_servers)
   }
 
   connection {
@@ -634,7 +634,7 @@ resource "null_resource" "k3s_agents_dns_config" {
     inline = [
       "set -euo pipefail",
       "install -d -m 0755 /etc/rancher/k3s",
-      "printf '%s\n' 'nameserver ${local.dns_server}' 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
+      "printf '%s\n' ${join(" ", formatlist("'nameserver %s'", local.dns_servers))} 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
       "printf '%s\n' 'resolv-conf: /etc/rancher/k3s/resolv.conf' >/etc/rancher/k3s/config.yaml",
     ]
   }
@@ -714,7 +714,7 @@ resource "proxmox_virtual_environment_container" "service" {
     }
 
     dns {
-      servers = [each.value.dns_server]
+      servers = each.value.dns_servers
     }
 
     ip_config {
