@@ -29,6 +29,7 @@ This SearXNG instance is deployed on the K3s cluster and accessible at:
 
 - Privacy-focused search with no user tracking
 - Aggregates results from multiple search engines
+- Google-backed search autocomplete
 - Rate limiting and security headers via Traefik middleware chain
 - Health checks for reliability
 - TLS termination with wildcard certificate
@@ -36,7 +37,7 @@ This SearXNG instance is deployed on the K3s cluster and accessible at:
 ## Engines Enabled
 
 - Brave, DuckDuckGo, Google, Bing, Startpage, Wikipedia
-- Disabled engines: Yahoo, Wikidata, currency converter (for performance)
+- Disabled engines: Yahoo, Wikidata, Karama, currency converter (for performance)
 
 ## Redis Cache
 

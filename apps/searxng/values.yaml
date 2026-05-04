@@ -26,8 +26,13 @@ ingress:
           - path: /
             pathType: Prefix
 
+secret:
+  searxng-config:
+    enabled: false
+
 persistence:
   config:
     enabled: true
-    size: 256Mi
-    storageClass: longhorn
+    type: secret
+    objectName: searxng-config
+    mountPath: /etc/searxng

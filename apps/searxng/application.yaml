@@ -13,7 +13,7 @@ spec:
     # Use TrueCharts stable searxng chart
     - repoURL: oci.trueforge.org/truecharts
       chart: searxng
-      targetRevision: 11.0.12
+      targetRevision: 11.2.2
       helm:
         valueFiles:
           - $values/apps/searxng/values.yaml
@@ -23,7 +23,7 @@ spec:
     - repoURL: https://github.com/edlundin/homelab
       path: apps/searxng
       directory:
-        include: "external-secret.yaml"
+        include: "{external-secret.yaml,searxng-config-sealed.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: searxng
