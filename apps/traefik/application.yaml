@@ -17,7 +17,7 @@ spec:
       values: |
         # Deployment configuration
         deployment:
-          replicas: 1
+          replicas: 2
 
         # Service configuration
         service:
