@@ -4,9 +4,8 @@ Pulse provides real-time monitoring for Proxmox VE, Proxmox Backup Server, and D
 
 ## Installation
 
-Deployed via Helm chart from GitHub Container Registry:
-- **Chart**: oci://ghcr.io/rcourtman/pulse-chart
-- **Version**: 1.0.15
+Deployed via raw Kubernetes manifests synced by Argo CD:
+- **Image**: rcourtman/pulse:5.1.30
 - **Namespace**: pulse
 
 ```bash
