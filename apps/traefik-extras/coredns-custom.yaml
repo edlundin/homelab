@@ -19,5 +19,5 @@ data:
         ts.net {
             errors
             cache 30
-            forward . nameserver.tailscale-system.svc.cluster.local
+            forward . 100.100.100.100
         }
