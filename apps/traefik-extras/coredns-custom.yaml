@@ -11,13 +11,3 @@ data:
         template IN AAAA . {
             rcode NOERROR
         }
-    tailscale.server: |
-        # Resolve tailnet names through the Tailscale Kubernetes operator nameserver.
-        # Keep general recursion in the main k3s CoreDNS Corefile (`forward . /etc/resolv.conf`),
-        # which uses node systemd-resolved and host Tailscale DNS. Do not point cluster
-        # DNS at LAN/public resolvers here; all non-Kubernetes DNS should stay on Tailscale.
-        ts.net {
-            errors
-            cache 30
-            forward . 100.100.100.100
-        }
