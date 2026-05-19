@@ -50,7 +50,7 @@ locals {
     os_template_path = local.debian_13_lxc_template_path
     os_type          = "debian"
     cores            = 2
-    memory           = 3072
+    memory           = 4096
     swap             = local.swap_size
     disk_size        = 20
     dns_servers      = local.dns_servers
@@ -90,25 +90,6 @@ locals {
       disk_size        = 15
       dns_servers      = local.dns_servers
       ipv4_address     = "192.168.2.140/24"
-      gateway_ipv4     = local.network_gateway
-    },
-    "hydra" = {
-      node_name        = var.proxmox_node_name
-      vm_id            = 143
-      start_at_boot    = true
-      started          = true
-      os_template_path = local.debian_13_lxc_template_path
-      os_type          = "debian"
-      unprivileged     = true
-      nesting          = true
-      keyctl           = false
-      description      = ""
-      cores            = 4
-      memory           = 4096
-      swap             = local.swap_size
-      disk_size        = 24
-      dns_servers      = local.dns_servers
-      ipv4_address     = "192.168.2.143/24"
       gateway_ipv4     = local.network_gateway
     },
     # "tailscale-exit-node" = {
@@ -800,7 +781,7 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
         lock_passwd: true
         shell: /bin/bash
         ssh_authorized_keys: [${join(",", [for k in var.ssh_public_keys : k])}]
-    
+
     ssh_pwauth: false
 
     # Ensure PermitRootLogin is yes (key-only) and disable password authentication
@@ -825,7 +806,7 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
       - qemu-guest-agent
       - curl
       - neovim
-    
+
     runcmd:
       - curl -fsSL https://tailscale.com/install.sh | sh
       - echo 'net.ipv4.ip_forward = 1' | tee -a /etc/sysctl.d/99-tailscale.conf
@@ -891,22 +872,22 @@ output "kubeconfig_command" {
 
 output "cluster_info" {
   value = <<-EOT
-    
+
     ====================================
     K3s Cluster Deployed Successfully!
     ====================================
-    
+
     Masters: ${local.k3s_master_count} nodes
     Agents:  ${local.k3s_agent_count} nodes
     K3s Version: ${var.k3s_version}
-    
+
     Next steps:
     1. Get kubeconfig:
        scp root@${var.k3s_kubeconfig_source_host}:/etc/rancher/k3s/k3s.yaml ~/.kube/k3s-config && sed -i 's/127.0.0.1/${var.k3s_api_server_host}/g' ~/.kube/k3s-config
-    
+
     2. Set KUBECONFIG:
        export KUBECONFIG=~/.kube/k3s-config
-    
+
     3. Verify cluster:
        kubectl get nodes
   EOT
