@@ -1,0 +1,8 @@
+helm:
+  parameters:
+  - name: image.repository
+    value: n8nio/n8n
+    forcestring: true
+  - name: image.tag
+    value: 1.123.46
+    forcestring: true
