@@ -10,6 +10,7 @@ tasks:
   generate-sealed-secrets:
     cmds:
       - kubeseal --format=yaml < apps/argocd-extras/.secrets.yaml > apps/argocd-extras/argocd-secrets-sealed.yaml
+      - kubeseal --format=yaml < apps/argocd-image-updater/.secrets.yaml > apps/argocd-image-updater/argocd-image-updater-secrets-sealed.yaml
       - kubeseal --format=yaml < apps/cert-manager/.secrets.yaml > apps/cert-manager/cert-manager-secrets-sealed.yaml
       - kubeseal --format=yaml < apps/clawdbot/.secrets.yaml > apps/clawdbot/clawdbot-secrets-sealed.yaml
       - kubeseal --format=yaml < apps/longhorn-extras/.secrets.yaml > apps/longhorn-extras/longhorn-backup-secrets-sealed.yaml

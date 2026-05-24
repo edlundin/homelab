@@ -1,0 +1,6 @@
+config:
+  logLevel: info
+
+image:
+  repository: quay.io/argoprojlabs/argocd-image-updater
+  tag: v1.2.0

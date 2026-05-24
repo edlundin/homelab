@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - deployment.yaml
+  - ingress.yaml
+  - external-secret-tls.yaml
+images:
+  - name: rcourtman/pulse
+    newTag: 5.1.30
