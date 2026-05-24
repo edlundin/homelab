@@ -20,7 +20,7 @@ variable "diskimages_storage" {
 variable "k3s_token" { type = string }
 variable "k3s_version" {
   type    = string
-  default = "v1.34.1+k3s1"
+  default = "v1.36.1+k3s1"
 }
 
 variable "k3s_api_server_host" {

@@ -589,7 +589,7 @@ resource "null_resource" "k3s_masters_api_endpoint_config" {
     inline = [
       "set -euo pipefail",
       "install -d -m 0755 /etc/systemd/system/k3s.service.d",
-      "printf '%s\n' '[Service]' 'ExecStart=' 'ExecStart=/usr/local/bin/k3s server --server https://${var.k3s_api_server_host}:6443 --node-taint CriticalAddonsOnly=true:NoExecute' >/etc/systemd/system/k3s.service.d/10-api-lb.conf",
+      "printf '%s\n' '[Service]' 'ExecStart=' 'ExecStart=/usr/local/bin/k3s server --server https://${var.k3s_api_server_host}:6443 --disable traefik --node-taint CriticalAddonsOnly=true:NoExecute' >/etc/systemd/system/k3s.service.d/10-api-lb.conf",
       "systemctl daemon-reload",
     ]
   }
