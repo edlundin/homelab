@@ -97,6 +97,18 @@
     },
     {
       "matchManagers": [
+        "argocd"
+      ],
+      "matchDatasources": [
+        "helm"
+      ],
+      "matchPackageNames": [
+        "postgresql"
+      ],
+      "allowedVersions": "<19.0.0"
+    },
+    {
+      "matchManagers": [
         "kubernetes",
         "helm-values",
         "custom.regex"

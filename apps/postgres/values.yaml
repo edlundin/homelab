@@ -1,11 +1,6 @@
 # Bitnami PostgreSQL settings
 architecture: standalone
 
-image:
-    registry: docker.io
-    repository: bitnami/postgresql
-    tag: 18
-
 auth:
     # Use existing secrets for passwords
     existingSecret: postgres-password
