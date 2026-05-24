@@ -26,7 +26,7 @@ spec:
     - key: CriticalAddonsOnly
       operator: Exists
       effect: NoExecute
-  channel: https://update.k3s.io/v1-release/channels/stable
+  version: v1.36.1+k3s1
   upgrade:
     image: rancher/k3s-upgrade
 ---
@@ -65,6 +65,6 @@ spec:
     - key: CriticalAddonsOnly
       operator: Exists
       effect: NoExecute
-  channel: https://update.k3s.io/v1-release/channels/stable
+  version: v1.36.1+k3s1
   upgrade:
     image: rancher/k3s-upgrade
