@@ -1,45 +1,44 @@
 version: "3"
 
 env:
-  KUBECONFIG: ~/.kube/k3s-config
+    KUBECONFIG: ~/.kube/k3s-config
 
 tasks:
-  default:
-    cmds:
-      - task --list-all
-  generate-sealed-secrets:
-    cmds:
-      - kubeseal --format=yaml < apps/argocd-extras/.secrets.yaml > apps/argocd-extras/argocd-secrets-sealed.yaml
-      - kubeseal --format=yaml < apps/argocd-image-updater/.secrets.yaml > apps/argocd-image-updater/argocd-image-updater-secrets-sealed.yaml
-      - kubeseal --format=yaml < apps/cert-manager/.secrets.yaml > apps/cert-manager/cert-manager-secrets-sealed.yaml
-      - kubeseal --format=yaml < apps/clawdbot/.secrets.yaml > apps/clawdbot/clawdbot-secrets-sealed.yaml
-      - kubeseal --format=yaml < apps/longhorn-extras/.secrets.yaml > apps/longhorn-extras/longhorn-backup-secrets-sealed.yaml
-      - kubeseal --format=yaml < apps/postgres/.secrets.yaml > apps/postgres/postgres-secrets-sealed.yaml
-      - kubeseal --format=yaml < apps/n8n/.secrets.yaml > apps/n8n/n8n-secrets-sealed.yaml
-      - kubeseal --format=yaml < apps/redis/.secrets.yaml > apps/redis/redis-secrets-sealed.yaml
-      - kubeseal --format=yaml < apps/tailscale-operator-extras/.secrets.yaml > apps/tailscale-operator-extras/tailscale-operator-secrets-sealed.yaml
-      - kubeseal --format=yaml < apps/traefik-extras/.secrets.yaml > apps/traefik-extras/traefik-secrets-sealed.yaml
+    default:
+        cmds:
+            - task --list-all
+    generate-sealed-secrets:
+        cmds:
+            - kubeseal --format=yaml < apps/argocd-extras/.secrets.yaml > apps/argocd-extras/argocd-secrets-sealed.yaml
+            - kubeseal --format=yaml < apps/argocd-image-updater/.secrets.yaml > apps/argocd-image-updater/argocd-image-updater-secrets-sealed.yaml
+            - kubeseal --format=yaml < apps/cert-manager/.secrets.yaml > apps/cert-manager/cert-manager-secrets-sealed.yaml
+            - kubeseal --format=yaml < apps/longhorn-extras/.secrets.yaml > apps/longhorn-extras/longhorn-backup-secrets-sealed.yaml
+            - kubeseal --format=yaml < apps/postgres/.secrets.yaml > apps/postgres/postgres-secrets-sealed.yaml
+            - kubeseal --format=yaml < apps/n8n/.secrets.yaml > apps/n8n/n8n-secrets-sealed.yaml
+            - kubeseal --format=yaml < apps/redis/.secrets.yaml > apps/redis/redis-secrets-sealed.yaml
+            - kubeseal --format=yaml < apps/tailscale-operator-extras/.secrets.yaml > apps/tailscale-operator-extras/tailscale-operator-secrets-sealed.yaml
+            - kubeseal --format=yaml < apps/traefik-extras/.secrets.yaml > apps/traefik-extras/traefik-secrets-sealed.yaml
 
-  deploy-argocd:
-    desc: "Deploy ArgoCD to the cluster"
-    cmds:
-      - echo "Deploying ArgoCD..."
-      - kubectl apply -f apps/argocd/argocd.yaml
-      - echo "Waiting for ArgoCD installer job to complete..."
-      - kubectl wait --for=condition=complete --timeout=600s job/argocd-installer -n argocd
-      - echo "ArgoCD deployed successfully!"
-      - echo 'Access ArgoCD at https://argocd.oisd.io'
-      - echo "Get admin password with kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d"
+    deploy-argocd:
+        desc: "Deploy ArgoCD to the cluster"
+        cmds:
+            - echo "Deploying ArgoCD..."
+            - kubectl apply -f apps/argocd/argocd.yaml
+            - echo "Waiting for ArgoCD installer job to complete..."
+            - kubectl wait --for=condition=complete --timeout=600s job/argocd-installer -n argocd
+            - echo "ArgoCD deployed successfully!"
+            - echo 'Access ArgoCD at https://argocd.oisd.io'
+            - echo "Get admin password with kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d"
 
-  bootstrap-apps:
-    desc: "Bootstrap all applications via ArgoCD"
-    deps: [deploy-argocd]
-    cmds:
-      - echo "Deploying root application..."
-      - kubectl apply -f apps/argocd/application.yaml
-      - echo "Root application deployed. ArgoCD will now manage all applications."
+    bootstrap-apps:
+        desc: "Bootstrap all applications via ArgoCD"
+        deps: [deploy-argocd]
+        cmds:
+            - echo "Deploying root application..."
+            - kubectl apply -f apps/argocd/application.yaml
+            - echo "Root application deployed. ArgoCD will now manage all applications."
 
-  get-argocd-password:
-    desc: "Get ArgoCD admin password"
-    cmds:
-      - kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
+    get-argocd-password:
+        desc: "Get ArgoCD admin password"
+        cmds:
+            - kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
