@@ -4,5 +4,5 @@ helm:
     value: n8nio/n8n
     forcestring: true
   - name: image.tag
-    value: 1.123.47
+    value: 1.123.48
     forcestring: true
