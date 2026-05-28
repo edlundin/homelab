@@ -11,3 +11,7 @@ data:
         template IN AAAA . {
             rcode NOERROR
         }
+    ison-mirfak.server: |
+        ison-mirfak.ts.net:53 {
+            forward . 100.100.100.100
+        }
