@@ -1,0 +1,166 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: picsou
+  namespace: picsou
+  labels:
+    app: picsou
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: picsou
+  template:
+    metadata:
+      labels:
+        app: picsou
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: picsou
+          image: ghcr.io/zoeille/picsou-finance:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://picsou-postgres:5432/picsou?sslmode=prefer
+            - name: SPRING_DATASOURCE_USERNAME
+              value: picsou
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: picsou-secrets
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: picsou-secrets
+                  key: POSTGRES_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: picsou-secrets
+                  key: JWT_SECRET
+                  optional: true
+            - name: CRYPTO_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: picsou-secrets
+                  key: CRYPTO_ENCRYPTION_KEY
+                  optional: true
+            - name: TR_AUTH_URL
+              value: http://picsou-tr-auth:8001
+            - name: PUBLIC_BASE_URL
+              value: https://picsou.oisd.io
+            - name: SECURE_COOKIES
+              value: "true"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 120
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 250m
+              memory: 768Mi
+            limits:
+              cpu: 1500m
+              memory: 1536Mi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: picsou-data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: picsou-tr-auth
+  namespace: picsou
+  labels:
+    app: picsou-tr-auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: picsou-tr-auth
+  template:
+    metadata:
+      labels:
+        app: picsou-tr-auth
+    spec:
+      containers:
+        - name: tr-auth
+          image: ghcr.io/zoeille/picsou-finance/tr-auth:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8001
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: picsou
+  namespace: picsou
+  labels:
+    app: picsou
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+  selector:
+    app: picsou
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: picsou-tr-auth
+  namespace: picsou
+  labels:
+    app: picsou-tr-auth
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8001
+      targetPort: http
+  selector:
+    app: picsou-tr-auth
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: picsou-data
+  namespace: picsou
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 2Gi

@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: picsou-postgres
+  namespace: picsou
+  labels:
+    app: picsou-postgres
+spec:
+  type: ClusterIP
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+  selector:
+    app: picsou-postgres
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: picsou-postgres
+  namespace: picsou
+  labels:
+    app: picsou-postgres
+spec:
+  serviceName: picsou-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: picsou-postgres
+  template:
+    metadata:
+      labels:
+        app: picsou-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: picsou
+            - name: POSTGRES_USER
+              value: picsou
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: picsou-secrets
+                  key: POSTGRES_PASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - picsou
+                - -d
+                - picsou
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: 10Gi
