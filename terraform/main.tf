@@ -274,7 +274,7 @@ resource "null_resource" "k3s_master_init_setup" {
     inline = [
       "set -euo pipefail",
 
-      "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${var.k3s_version}' INSTALL_K3S_EXEC='server --cluster-init --disable traefik --write-kubeconfig-mode=644 --tls-san ${var.k3s_api_server_host} --node-taint CriticalAddonsOnly=true:NoExecute' K3S_TOKEN='${var.k3s_token}' sh -",
+      "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${var.k3s_version}' INSTALL_K3S_EXEC='server --cluster-init --disable traefik --write-kubeconfig-mode=600 --tls-san ${var.k3s_api_server_host} --node-taint CriticalAddonsOnly=true:NoExecute' K3S_TOKEN='${var.k3s_token}' sh -",
 
       # Wait for k3s service to be active
       "echo 'Waiting for any Node objects to appear...'",
@@ -520,7 +520,8 @@ resource "null_resource" "k3s_master_init_service_config" {
   depends_on = [null_resource.k3s_master_init_dns_config]
 
   triggers = {
-    container_id = proxmox_virtual_environment_vm.k3s_master_init.id
+    container_id    = proxmox_virtual_environment_vm.k3s_master_init.id
+    kubeconfig_mode = "0600"
   }
 
   connection {
@@ -534,7 +535,8 @@ resource "null_resource" "k3s_master_init_service_config" {
     inline = [
       "set -euo pipefail",
       "install -d -m 0755 /etc/systemd/system/k3s.service.d",
-      "printf '%s\n' '[Service]' 'ExecStart=' 'ExecStart=/usr/local/bin/k3s server --cluster-init --disable traefik --write-kubeconfig-mode=644 --node-taint CriticalAddonsOnly=true:NoExecute' >/etc/systemd/system/k3s.service.d/10-api-lb.conf",
+      "printf '%s\n' '[Service]' 'ExecStart=' 'ExecStart=/usr/local/bin/k3s server --cluster-init --disable traefik --write-kubeconfig-mode=600 --node-taint CriticalAddonsOnly=true:NoExecute' >/etc/systemd/system/k3s.service.d/10-api-lb.conf",
+      "chmod 0600 /etc/rancher/k3s/k3s.yaml",
       "systemctl daemon-reload",
     ]
   }
@@ -627,9 +629,10 @@ resource "null_resource" "k3s_agents_api_endpoint_config" {
   depends_on = [null_resource.k3s_agents_dns_config]
 
   triggers = {
-    container_id = proxmox_virtual_environment_vm.k3s_agents[count.index].id
-    api_host     = var.k3s_api_server_host
-    k3s_token    = var.k3s_token
+    container_id     = proxmox_virtual_environment_vm.k3s_agents[count.index].id
+    api_host         = var.k3s_api_server_host
+    k3s_token        = var.k3s_token
+    credentials_mode = "0600"
   }
 
   connection {
@@ -641,7 +644,7 @@ resource "null_resource" "k3s_agents_api_endpoint_config" {
   provisioner "remote-exec" {
     inline = [
       "set -euo pipefail",
-      "printf '%s\n' \"K3S_TOKEN='${var.k3s_token}'\" \"K3S_URL='https://${var.k3s_api_server_host}:6443'\" >/etc/systemd/system/k3s-agent.service.env",
+      "umask 077; printf '%s\n' \"K3S_TOKEN='${var.k3s_token}'\" \"K3S_URL='https://${var.k3s_api_server_host}:6443'\" >/etc/systemd/system/k3s-agent.service.env; chmod 0600 /etc/systemd/system/k3s-agent.service.env",
       "systemctl daemon-reload",
     ]
   }
