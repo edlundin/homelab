@@ -5,8 +5,10 @@ Pulse provides real-time monitoring for Proxmox VE, Proxmox Backup Server, and D
 ## Installation
 
 Deployed via raw Kubernetes manifests synced by Argo CD:
-- **Image**: rcourtman/pulse:5.1.30
+- **Image**: rcourtman/pulse:6.1.2
 - **Namespace**: pulse
+
+Before the first v6 deployment, create an encrypted backup from **Settings → System → Recovery → Create Backup**. The existing `/data` PVC is retained during the upgrade.
 
 ```bash
 kubectl apply -f application.yaml
