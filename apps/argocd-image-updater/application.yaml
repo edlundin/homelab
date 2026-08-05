@@ -23,7 +23,7 @@ spec:
       targetRevision: HEAD
       path: apps/argocd-image-updater
       directory:
-        exclude: "{application.yaml,.secrets.yaml}"
+        exclude: "{application.yaml,.secrets.yaml,values.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd

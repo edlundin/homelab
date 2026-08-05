@@ -14,7 +14,7 @@ spec:
     targetRevision: HEAD
     directory:
       recurse: true
-      exclude: "application.yaml"
+      exclude: "{application.yaml,.secrets.yaml}"
   destination:
     server: https://kubernetes.default.svc
     # Note: This will deploy resources to their specified namespaces
