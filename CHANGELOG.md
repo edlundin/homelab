@@ -2,7 +2,8 @@
 
 ## 2026-08-08
 
-- **fix**: Constrain Pulse image automation to v6 so it cannot downgrade the v6 deployment to v5. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **feat**: Make Pulse available privately over HTTPS at https://pulse.ison-mirfak.ts.net through the Tailscale ingress/operator. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Constrain Pulse image automation to v6 so it cannot downgrade the v6 deployment to v5. ([43ed2b0](https://github.com/edlundin/homelab/commit/43ed2b0))
 - **feat**: Add Tandoor Recipes through Argo CD with persistent media, a dedicated PostgreSQL database, and public and tailnet routes. ([35c4538](https://github.com/edlundin/homelab/commit/35c4538))
 
 ## 2026-08-05

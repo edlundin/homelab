@@ -17,8 +17,9 @@ kubectl apply -f application.yaml
 ## Access
 
 - **URL**: https://pulse.oisd.io
+- **Tailscale URL**: https://pulse.ison-mirfak.ts.net
 - **Port**: 7655
-- **Ingress**: Traefik with automatic TLS via cert-manager
+- **Ingress**: Traefik with cert-manager TLS and private Tailscale access
 
 ## Initial Setup
 

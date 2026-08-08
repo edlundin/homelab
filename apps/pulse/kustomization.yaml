@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - deployment.yaml
   - ingress.yaml
+  - tailscale-ingress.yaml
   - external-secret-tls.yaml
 images:
   - name: rcourtman/pulse

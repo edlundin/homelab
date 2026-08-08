@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pulse
+  namespace: pulse
+  labels:
+    app: pulse
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: pulse
+      port:
+        number: 7655
+  tls:
+    - hosts:
+        - pulse
