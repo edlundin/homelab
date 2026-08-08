@@ -19,9 +19,17 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik
+  ignoreDifferences:
+    - group: ""
+      kind: ConfigMap
+      name: coredns
+      namespace: kube-system
+      jsonPointers:
+        - /data/NodeHosts
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true
