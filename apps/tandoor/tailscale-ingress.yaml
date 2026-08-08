@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tandoor
+  namespace: tandoor
+  labels:
+    app.kubernetes.io/name: tandoor
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: tandoor
+      port:
+        number: 80
+  tls:
+    - hosts:
+        - tandoor
