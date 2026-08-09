@@ -108,6 +108,8 @@ spec:
           env:
             - name: TZ
               value: Europe/Paris
+            - name: TANDOOR_PORT
+              value: "80"
             - name: DB_ENGINE
               value: django.db.backends.postgresql
             - name: POSTGRES_HOST
