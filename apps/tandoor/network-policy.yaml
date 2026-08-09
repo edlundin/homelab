@@ -17,7 +17,7 @@ spec:
               kubernetes.io/metadata.name: traefik
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: tailscale
+              kubernetes.io/metadata.name: tailscale-system
       ports:
         - protocol: TCP
           port: 80
