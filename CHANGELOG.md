@@ -2,7 +2,8 @@
 
 ## 2026-08-09
 
-- **fix**: Set Tandoor's `TANDOOR_PORT` to `80` so its container listens on the port used by the Kubernetes Service and ingress. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Set Tandoor's `TANDOOR_PORT` to `80` so its container listens on the port used by the Kubernetes Service and ingress. ([818109e](https://github.com/edlundin/homelab/commit/818109e))
+- **fix**: Send `Host: tandoor.oisd.io` on Tandoor HTTP health probes so Django accepts them. ([pending](https://github.com/edlundin/homelab/commit/pending))
 
 ## 2026-08-08
 

@@ -136,12 +136,18 @@ spec:
             httpGet:
               path: /openapi
               port: http
+              httpHeaders:
+                - name: Host
+                  value: tandoor.oisd.io
             periodSeconds: 5
             failureThreshold: 24
           readinessProbe:
             httpGet:
               path: /openapi
               port: http
+              httpHeaders:
+                - name: Host
+                  value: tandoor.oisd.io
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
@@ -149,6 +155,9 @@ spec:
             httpGet:
               path: /openapi
               port: http
+              httpHeaders:
+                - name: Host
+                  value: tandoor.oisd.io
             periodSeconds: 30
             timeoutSeconds: 5
             failureThreshold: 3
