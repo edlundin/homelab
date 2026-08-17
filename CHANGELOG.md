@@ -1,10 +1,14 @@
 # Changelog
 
+## 2026-08-18
+
+- **feat**: Upgrade the Tailscale Kubernetes operator and proxy images from 1.98.9 to 1.102.2 and configure Argo CD Image Updater to track and write back future stable semantic-version releases. ([pending](https://github.com/edlundin/homelab/commit/pending))
+
 ## 2026-08-09
 
 - **fix**: Set Tandoor's `TANDOOR_PORT` to `80` so its container listens on the port used by the Kubernetes Service and ingress. ([818109e](https://github.com/edlundin/homelab/commit/818109e))
 - **fix**: Send `Host: tandoor.oisd.io` on Tandoor HTTP health probes so Django accepts them. ([5724305](https://github.com/edlundin/homelab/commit/5724305))
-- **fix**: Allow Tandoor ingress from the actual `tailscale-system` namespace in its NetworkPolicy, restoring the tailnet route. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Allow Tandoor ingress from the actual `tailscale-system` namespace in its NetworkPolicy, restoring the tailnet route. ([eea6f5c](https://github.com/edlundin/homelab/commit/eea6f5c))
 
 ## 2026-08-08
 

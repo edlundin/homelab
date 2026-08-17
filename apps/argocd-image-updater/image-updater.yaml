@@ -12,6 +12,7 @@ spec:
   applicationRefs:
     - namePattern: argocd-image-updater
       writeBackConfig:
+        method: git:secret:argocd/argocd-image-updater-github
         gitConfig:
           writeBackTarget: helmvalues:/apps/argocd-image-updater/values.yaml
       images:
@@ -37,6 +38,7 @@ spec:
               tag: image.tag
     - namePattern: qdrant
       writeBackConfig:
+        method: git:secret:argocd/argocd-image-updater-github
         gitConfig:
           writeBackTarget: helmvalues:/apps/qdrant/values.yaml
       images:
@@ -51,6 +53,7 @@ spec:
               tag: image.tag
     - namePattern: pulse
       writeBackConfig:
+        method: git:secret:argocd/argocd-image-updater-github
         gitConfig:
           writeBackTarget: kustomization:/apps/pulse/kustomization.yaml
       images:
@@ -64,6 +67,7 @@ spec:
               name: rcourtman/pulse
     - namePattern: searxng
       writeBackConfig:
+        method: git:secret:argocd/argocd-image-updater-github
         gitConfig:
           writeBackTarget: helmvalues:/apps/searxng/values.yaml
       images:
@@ -75,3 +79,28 @@ spec:
             helm:
               name: image.repository
               tag: image.tag
+    - namePattern: tailscale-operator
+      writeBackConfig:
+        method: git:secret:argocd/argocd-image-updater-github
+        gitConfig:
+          writeBackTarget: helmvalues:/apps/tailscale-operator/values.yaml
+      images:
+        - alias: tailscale-operator
+          imageName: tailscale/k8s-operator
+          commonUpdateSettings:
+            updateStrategy: semver
+            allowTags: regexp:^v[0-9]+\.[0-9]+\.[0-9]+$
+          manifestTargets:
+            helm:
+              name: operatorConfig.image.repository
+              tag: operatorConfig.image.tag
+        - alias: tailscale-proxy
+          imageName: tailscale/tailscale
+          commonUpdateSettings:
+            updateStrategy: semver
+            forceUpdate: true
+            allowTags: regexp:^v[0-9]+\.[0-9]+\.[0-9]+$
+          manifestTargets:
+            helm:
+              name: proxyConfig.image.repository
+              tag: proxyConfig.image.tag
