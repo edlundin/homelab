@@ -4,20 +4,16 @@
 # Override the name to ensure service is named "qdrant" for IngressRoute compatibility
 nameOverride: "qdrant"
 fullnameOverride: "qdrant"
-
 replicaCount: 1
-
 image:
   repository: qdrant/qdrant
   # Use a specific version tag or comment out to use chart default
-  tag: "v1.15.5"
+  tag: "v1.19.0"
   pullPolicy: IfNotPresent
-
 service:
   type: ClusterIP
   port: 6333
   grpcPort: 6334
-
 # Resource limits
 resources:
   requests:
@@ -26,15 +22,13 @@ resources:
   limits:
     memory: "1Gi"
     cpu: "500m"
-
 # Persistence configuration
 persistence:
   enabled: true
   size: 1Gi
   storageClass: "longhorn"
   accessModes:
-    - ReadWriteOnce
-
+  - ReadWriteOnce
 # Security context
 securityContext:
   runAsNonRoot: true
@@ -45,8 +39,7 @@ securityContext:
   allowPrivilegeEscalation: false
   capabilities:
     drop:
-      - ALL
-
+    - ALL
 # Probes
 livenessProbe:
   enabled: true
@@ -57,7 +50,6 @@ livenessProbe:
   periodSeconds: 10
   timeoutSeconds: 5
   failureThreshold: 3
-
 readinessProbe:
   enabled: true
   httpGet:
@@ -67,19 +59,18 @@ readinessProbe:
   periodSeconds: 5
   timeoutSeconds: 3
   failureThreshold: 2
-
 # Init containers for permission fixes
 initContainers:
-  - name: fix-permissions
-    image: busybox:1.37
-    command:
-      - sh
-      - -c
-      - |
-        chown -R 1000:1000 /qdrant/storage
-        chown -R 1000:1000 /qdrant/storage/snapshots
-    volumeMounts:
-      - name: storage
-        mountPath: /qdrant/storage
-    securityContext:
-      runAsUser: 0
+- name: fix-permissions
+  image: busybox:1.37
+  command:
+  - sh
+  - -c
+  - |
+    chown -R 1000:1000 /qdrant/storage
+    chown -R 1000:1000 /qdrant/storage/snapshots
+  volumeMounts:
+  - name: storage
+    mountPath: /qdrant/storage
+  securityContext:
+    runAsUser: 0
