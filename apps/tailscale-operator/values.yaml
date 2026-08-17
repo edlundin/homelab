@@ -2,7 +2,6 @@ oauth:
   existingSecret: "operator-oauth"
   clientIdKey: "client_id"
   clientSecretKey: "client_secret"
-
 operatorConfig:
   image:
     repository: tailscale/k8s-operator
@@ -12,10 +11,9 @@ operatorConfig:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
-          - matchExpressions:
-              - key: node-role.kubernetes.io/control-plane
-                operator: DoesNotExist
-
+        - matchExpressions:
+          - key: node-role.kubernetes.io/control-plane
+            operator: DoesNotExist
 proxyConfig:
   image:
     repository: tailscale/tailscale
