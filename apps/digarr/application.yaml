@@ -52,22 +52,8 @@ spec:
           database:
             backend: postgres
             existingSecret: digarr-db
-            pglite:
-              path: /app/data
-              persistence:
-                enabled: true
-                size: 2Gi
-                storageClass: longhorn
-                accessMode: ReadWriteOnce
           postgresql:
-            enabled: true
-            auth:
-              username: digarr
-              database: digarr
-            persistence:
-              enabled: true
-              size: 1Gi
-              storageClass: longhorn
+            enabled: false
           backups:
             persistence:
               enabled: true
