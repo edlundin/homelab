@@ -5,8 +5,9 @@ applications run as UID/GID `1000`. The NFS export must therefore have the
 matching ownership and permissions before downloads start. Create
 `multimedia/Downloads/music` on the export before the first sync.
 
-NFS is mounted directly by the Pods. The server is `610n1r0`, export
-`/srv/nfs/raid`. qBittorrent and Lidarr mount the export at `/nas`; use
+NFS is mounted directly by the Pods. The NAS is `610n1r0`, with export
+`/srv/nfs/raid`. Pods connect to the NAS through `192.168.2.1` so mounts stay
+on the allowed LAN path. qBittorrent and Lidarr mount the export at `/nas`; use
 `/nas/multimedia/Downloads` for downloads and `/nas/multimedia/Music` as the
 Lidarr root folder. This common mount keeps imports as atomic moves or
 hardlinks. Navidrome mounts the same export read-only and scans

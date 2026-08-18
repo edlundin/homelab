@@ -6,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: subwave
   annotations:
-    homelab.oisd.io/root-container-justification: SUB/WAVE controller reads root-only Icecast secrets; broadcast renders Icecast configuration and drops to its bundled user.
+    homelab.oisd.io/root-container-justification: SUB/WAVE controller reads root-only Icecast secrets; broadcast renders Icecast configuration with DAC_OVERRIDE, then drops to its bundled user.
 spec:
   replicas: 1
   strategy:
@@ -148,7 +148,6 @@ spec:
               cpu: 1000m
               memory: 1Gi
           securityContext:
-            runAsNonRoot: true
             allowPrivilegeEscalation: false
             capabilities:
               drop: [ALL]
@@ -261,7 +260,7 @@ spec:
             runAsGroup: 0
             allowPrivilegeEscalation: false
             capabilities:
-              add: [CHOWN, KILL, SETGID, SETUID]
+              add: [CHOWN, DAC_OVERRIDE, KILL, SETGID, SETUID]
               drop: [ALL]
           volumeMounts:
             - name: state
