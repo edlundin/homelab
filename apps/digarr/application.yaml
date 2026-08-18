@@ -72,7 +72,7 @@ spec:
               ephemeral-storage: 256Mi
             limits:
               cpu: 500m
-              memory: 1Gi
+              memory: 2Gi
               ephemeral-storage: 1Gi
     - repoURL: https://github.com/edlundin/homelab.git
       targetRevision: HEAD
