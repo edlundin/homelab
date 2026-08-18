@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: digarr
+  namespace: digarr
+  labels:
+    app.kubernetes.io/name: digarr
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: digarr
+      port:
+        name: http
+  tls:
+    - hosts: [digarr]

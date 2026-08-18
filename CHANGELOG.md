@@ -2,7 +2,8 @@
 
 ## 2026-08-18
 
-- **feat**: Upgrade the Tailscale Kubernetes operator and proxy images from 1.98.9 to 1.102.2 and configure Argo CD Image Updater to track and write back future stable semantic-version releases. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **feat**: Add the Spotify-to-Digarr-to-Lidarr/Prowlarr/qBittorrent-to-NFS-to-Navidrome-to-SUB/WAVE stack with private Tailscale ingress at https://wave.ison-mirfak.ts.net. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **feat**: Upgrade the Tailscale Kubernetes operator and proxy images from 1.98.9 to 1.102.2 and configure Argo CD Image Updater to track and write back future stable semantic-version releases. ([82f223d](https://github.com/edlundin/homelab/commit/82f223dd4983ae7b383181335e10d935522073e6))
 
 ## 2026-08-09
 

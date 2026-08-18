@@ -1,0 +1,171 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: music
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: qbittorrent
+  namespace: music
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: qbittorrent
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: tailscale-system
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: lidarr
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prowlarr
+  namespace: music
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: prowlarr
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: tailscale-system
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: lidarr
+      ports:
+        - protocol: TCP
+          port: 9696
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: lidarr
+      ports:
+        - protocol: TCP
+          port: 8686
+    - ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: lidarr
+  namespace: music
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: lidarr
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: tailscale-system
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: digarr
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prowlarr
+      ports:
+        - protocol: TCP
+          port: 8686
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: qbittorrent
+      ports:
+        - protocol: TCP
+          port: 8080
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prowlarr
+      ports:
+        - protocol: TCP
+          port: 9696
+    - ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: navidrome
+  namespace: music
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: navidrome
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: tailscale-system
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: subwave
+      ports:
+        - protocol: TCP
+          port: 4533
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53

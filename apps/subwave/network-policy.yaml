@@ -1,0 +1,77 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: subwave
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: subwave
+  namespace: subwave
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: subwave
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: tailscale-system
+      ports:
+        - protocol: TCP
+          port: 80
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: subwave
+      ports:
+        - protocol: TCP
+          port: 7700
+        - protocol: TCP
+          port: 7701
+        - protocol: TCP
+          port: 7702
+        - protocol: TCP
+          port: 8080
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: subwave
+      ports:
+        - protocol: TCP
+          port: 7700
+        - protocol: TCP
+          port: 7701
+        - protocol: TCP
+          port: 7702
+        - protocol: TCP
+          port: 8080
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: music
+      ports:
+        - protocol: TCP
+          port: 4533
+    - ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 20128

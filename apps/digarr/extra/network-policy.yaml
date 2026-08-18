@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: digarr-music-bridge
+  namespace: digarr
+  labels:
+    app.kubernetes.io/name: digarr
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: digarr
+      app.kubernetes.io/instance: digarr
+      app.kubernetes.io/component: app
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: music
+      ports:
+        - protocol: TCP
+          port: 8686
+    - to:
+        - ipBlock:
+            cidr: 100.64.0.0/10
+        - ipBlock:
+            cidr: 192.168.0.0/16
+      ports:
+        - protocol: TCP
+          port: 20128

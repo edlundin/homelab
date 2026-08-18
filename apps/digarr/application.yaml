@@ -1,0 +1,85 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: digarr
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: digarr
+  sources:
+    - repoURL: https://github.com/iuliandita/digarr.git
+      targetRevision: v1.15.1
+      path: deploy/helm/digarr
+      helm:
+        values: |
+          replicaCount: 1
+          image:
+            repository: ghcr.io/iuliandita/digarr
+            tag: "1.15.1"
+            digest: "sha256:28d72da6c40fa58b4baf1c8e3ce8c3e6534602324380e5a2bbb59c11e05dcb99"
+            pullPolicy: IfNotPresent
+          podSecurityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            fsGroup: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          containerSecurityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          serviceAccount:
+            create: true
+            name: digarr
+            automountServiceAccountToken: false
+          service:
+            type: ClusterIP
+            port: 3000
+          networkPolicy:
+            enabled: true
+          ingress:
+            enabled: false
+            controllerNamespace: tailscale-system
+          database:
+            backend: pglite
+            pglite:
+              path: /app/data
+              persistence:
+                enabled: true
+                size: 2Gi
+                storageClass: longhorn
+                accessMode: ReadWriteOnce
+          postgresql:
+            enabled: false
+          backups:
+            persistence:
+              enabled: true
+              size: 5Gi
+              storageClass: longhorn
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+              ephemeral-storage: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+              ephemeral-storage: 1Gi
+    - repoURL: https://github.com/edlundin/homelab.git
+      targetRevision: HEAD
+      path: apps/digarr/extra
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
