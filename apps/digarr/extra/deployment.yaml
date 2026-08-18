@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: digarr
+  namespace: digarr
+  labels:
+    app.kubernetes.io/name: digarr
+    app.kubernetes.io/instance: digarr
+    app.kubernetes.io/component: app
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: digarr
+      app.kubernetes.io/instance: digarr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: digarr
+        app.kubernetes.io/instance: digarr
+        app.kubernetes.io/component: app
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: 610n1r0
+      serviceAccountName: digarr
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 45
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: digarr
+          image: ghcr.io/iuliandita/digarr:1.15.1-debian@sha256:af1dc12bcfac0a7e58258880cdab342b4e73c1f43bd5d415382f44c2299ee6f3
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: digarr
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: digarr-db
+                  key: DATABASE_URL
+            - name: ALLOWED_ORIGIN
+              value: https://digarr.ison-mirfak.ts.net
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            failureThreshold: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 2
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+              ephemeral-storage: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+              ephemeral-storage: 1Gi
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: backups
+              mountPath: /app/backups
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: backups
+          persistentVolumeClaim:
+            claimName: digarr-backups
