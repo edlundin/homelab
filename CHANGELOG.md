@@ -1,8 +1,12 @@
 # Changelog
 
+## 2026-08-19
+
+- **fix**: Expose host CPU features, including SSE4.2, to both K3s agent VMs so Bun-based workloads can run without the `qemu64` CPU incompatibility. ([pending](https://github.com/edlundin/homelab/commit/pending))
+
 ## 2026-08-18
 
-- **fix**: Schedule Digarr on the node where its runtime is stable and use a recreate rollout for its single-writer backup volume. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Schedule Digarr on the node where its runtime is stable and use a recreate rollout for its single-writer backup volume. ([b412ca7](https://github.com/edlundin/homelab/commit/b412ca7a256142d755d07d44b70c995c49606032))
 - **fix**: Run Digarr's Debian image to avoid the Alpine runtime OOM and set its HTTPS origin for browser authentication. ([dce5900](https://github.com/edlundin/homelab/commit/dce5900c5c6fffc0e96bbddfa72bf5ab2b091e6c))
 - **fix**: Reuse the existing PostgreSQL service for Digarr, with an idempotent database bootstrap, sealed credentials, and restricted cross-namespace access. ([6a57459](https://github.com/edlundin/homelab/commit/6a574590d87098d7840814dbb61b3cd75e8f3e5b))
 - **fix**: Replace Digarr's failing embedded PGlite startup with its supported bundled PostgreSQL backend and a sealed database credential. ([eccbb8f](https://github.com/edlundin/homelab/commit/eccbb8fd0499eec3100c3a2985e88b24245c8baa))

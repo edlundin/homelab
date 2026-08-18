@@ -425,6 +425,7 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
 
   cpu {
     cores = local.k3s_agent_config.cores
+    type  = "host"
   }
 
   memory {
