@@ -2,7 +2,8 @@
 
 ## 2026-08-18
 
-- **chore**: Remove Picsou and Tandoor from Argo CD and infrastructure-as-code definitions to retire their deployments. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Replace Digarr's failing embedded PGlite startup with its supported bundled PostgreSQL backend and a sealed database credential. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **chore**: Remove Picsou and Tandoor from Argo CD and infrastructure-as-code definitions to retire their deployments. ([f821de0](https://github.com/edlundin/homelab/commit/f821de0445f5ed8c3cf31fbb00463ada1fc61a58))
 - **fix**: Remove the remaining radio rollout blockers by breaking the SUB/WAVE readiness deadlock and raising Digarr's memory tripwire after a confirmed 1Gi OOM. ([dc7e479](https://github.com/edlundin/homelab/commit/dc7e479cac3017b218c4e3ea3ac580d92770106b))
 - **fix**: Repair the first Spotify music radio rollout by routing NFS over the NAS LAN address, allowing LinuxServer root initialization before the PUID/PGID drop, fixing SUB/WAVE web and broadcast startup permissions, and raising Digarr memory after a 512Mi OOM. ([5b38b43](https://github.com/edlundin/homelab/commit/5b38b43232206d5e3bf1f6efba250fa287475085))
 - **feat**: Add the Spotify-to-Digarr-to-Lidarr/Prowlarr/qBittorrent-to-NFS-to-Navidrome-to-SUB/WAVE stack with private Tailscale ingress at https://wave.ison-mirfak.ts.net. ([9477a45](https://github.com/edlundin/homelab/commit/9477a45f3cbe9a6ad443677c957fd20b2649571b))
