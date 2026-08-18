@@ -19,8 +19,8 @@ spec:
           replicaCount: 1
           image:
             repository: ghcr.io/iuliandita/digarr
-            tag: "1.15.1"
-            digest: "sha256:28d72da6c40fa58b4baf1c8e3ce8c3e6534602324380e5a2bbb59c11e05dcb99"
+            tag: "1.15.1-debian"
+            digest: "sha256:af1dc12bcfac0a7e58258880cdab342b4e73c1f43bd5d415382f44c2299ee6f3"
             pullPolicy: IfNotPresent
           podSecurityContext:
             runAsNonRoot: true
@@ -49,6 +49,8 @@ spec:
           ingress:
             enabled: false
             controllerNamespace: tailscale-system
+          env:
+            ALLOWED_ORIGIN: https://digarr.ison-mirfak.ts.net
           database:
             backend: postgres
             existingSecret: digarr-db
