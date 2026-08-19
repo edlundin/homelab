@@ -6,3 +6,11 @@ resources:
   - deployment.yaml
   - ingress.yaml
   - network-policy.yaml
+images:
+  - name: ghcr.io/iuliandita/digarr
+    newName: ghcr.io/iuliandita/digarr
+    newTag: 1.15.1-debian
+  - name: postgres
+    newName: docker.io/postgres
+    newTag: 17-alpine
+    digest: sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73
