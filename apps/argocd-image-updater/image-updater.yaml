@@ -25,6 +25,127 @@ spec:
             helm:
               name: image.repository
               tag: image.tag
+    - namePattern: music
+      writeBackConfig:
+        method: git:secret:argocd/argocd-image-updater-github
+        gitConfig:
+          writeBackTarget: kustomization:/apps/music
+      images:
+        - alias: qbittorrent
+          imageName: lscr.io/linuxserver/qbittorrent
+          commonUpdateSettings:
+            updateStrategy: newest-build
+            allowTags: regexp:^[0-9]+\.[0-9]+\.[0-9]+_v[0-9]+\.[0-9]+\.[0-9]+-ls[0-9]+$
+          manifestTargets:
+            kustomize:
+              name: lscr.io/linuxserver/qbittorrent
+        - alias: prowlarr
+          imageName: lscr.io/linuxserver/prowlarr
+          commonUpdateSettings:
+            updateStrategy: newest-build
+            allowTags: regexp:^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+-ls[0-9]+$
+          manifestTargets:
+            kustomize:
+              name: lscr.io/linuxserver/prowlarr
+        - alias: flaresolverr
+          imageName: ghcr.io/flaresolverr/flaresolverr:v3.x
+          commonUpdateSettings:
+            updateStrategy: semver
+            allowTags: regexp:^v[0-9]+\.[0-9]+\.[0-9]+$
+          manifestTargets:
+            kustomize:
+              name: ghcr.io/flaresolverr/flaresolverr
+        - alias: lidarr
+          imageName: lscr.io/linuxserver/lidarr
+          commonUpdateSettings:
+            updateStrategy: newest-build
+            allowTags: regexp:^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+-ls[0-9]+$
+          manifestTargets:
+            kustomize:
+              name: lscr.io/linuxserver/lidarr
+        - alias: navidrome
+          imageName: docker.io/deluan/navidrome:0.x
+          commonUpdateSettings:
+            updateStrategy: semver
+            allowTags: regexp:^[0-9]+\.[0-9]+\.[0-9]+$
+          manifestTargets:
+            kustomize:
+              name: deluan/navidrome
+    - namePattern: digarr
+      writeBackConfig:
+        method: git:secret:argocd/argocd-image-updater-github
+        gitConfig:
+          writeBackTarget: kustomization:/apps/digarr/extra
+      images:
+        - alias: digarr
+          imageName: ghcr.io/iuliandita/digarr
+          commonUpdateSettings:
+            updateStrategy: newest-build
+            allowTags: regexp:^[0-9]+\.[0-9]+\.[0-9]+-debian$
+          manifestTargets:
+            kustomize:
+              name: ghcr.io/iuliandita/digarr
+        - alias: postgres-bootstrap
+          imageName: docker.io/library/postgres:17-alpine
+          commonUpdateSettings:
+            updateStrategy: digest
+          manifestTargets:
+            kustomize:
+              name: postgres
+    - namePattern: subwave
+      writeBackConfig:
+        method: git:secret:argocd/argocd-image-updater-github
+        gitConfig:
+          writeBackTarget: kustomization:/apps/subwave
+      images:
+        - alias: busybox
+          imageName: docker.io/library/busybox:1.x
+          commonUpdateSettings:
+            updateStrategy: semver
+            allowTags: regexp:^[0-9]+\.[0-9]+\.[0-9]+$
+          manifestTargets:
+            kustomize:
+              name: busybox
+        - alias: subwave-caddy
+          imageName: ghcr.io/perminder-klair/subwave-caddy:1.x
+          commonUpdateSettings:
+            updateStrategy: semver
+            allowTags: regexp:^[0-9]+\.[0-9]+\.[0-9]+$
+          manifestTargets:
+            kustomize:
+              name: ghcr.io/perminder-klair/subwave-caddy
+        - alias: subwave-web
+          imageName: ghcr.io/perminder-klair/subwave-web:1.x
+          commonUpdateSettings:
+            updateStrategy: semver
+            allowTags: regexp:^[0-9]+\.[0-9]+\.[0-9]+$
+          manifestTargets:
+            kustomize:
+              name: ghcr.io/perminder-klair/subwave-web
+        - alias: subwave-controller
+          imageName: ghcr.io/perminder-klair/subwave-controller:1.x
+          commonUpdateSettings:
+            updateStrategy: semver
+            allowTags: regexp:^[0-9]+\.[0-9]+\.[0-9]+$
+          manifestTargets:
+            kustomize:
+              name: ghcr.io/perminder-klair/subwave-controller
+        - alias: subwave-broadcast
+          imageName: ghcr.io/perminder-klair/subwave-broadcast:1.x
+          commonUpdateSettings:
+            updateStrategy: semver
+            allowTags: regexp:^[0-9]+\.[0-9]+\.[0-9]+$
+          manifestTargets:
+            kustomize:
+              name: ghcr.io/perminder-klair/subwave-broadcast
+        - alias: subwave-analyzer
+          imageName: ghcr.io/perminder-klair/subwave-analyzer:1.x
+          commonUpdateSettings:
+            updateStrategy: semver
+            allowTags: regexp:^[0-9]+\.[0-9]+\.[0-9]+$
+          manifestTargets:
+            kustomize:
+              name: ghcr.io/perminder-klair/subwave-analyzer
     - namePattern: n8n
       images:
         - alias: n8n
@@ -55,7 +176,7 @@ spec:
       writeBackConfig:
         method: git:secret:argocd/argocd-image-updater-github
         gitConfig:
-          writeBackTarget: kustomization:/apps/pulse/kustomization.yaml
+          writeBackTarget: kustomization:/apps/pulse
       images:
         - alias: pulse
           imageName: rcourtman/pulse:6.x

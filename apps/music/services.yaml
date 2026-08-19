@@ -35,6 +35,23 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: flaresolverr
+  namespace: music
+  labels:
+    app.kubernetes.io/name: flaresolverr
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8191
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: flaresolverr
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: lidarr
   namespace: music
   labels:

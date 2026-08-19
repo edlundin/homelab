@@ -2,7 +2,8 @@
 
 ## 2026-08-19
 
-- **fix**: Expose host CPU features, including SSE4.2, to both K3s agent VMs so Bun-based workloads can run without the `qemu64` CPU incompatibility. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **feat**: Add an internal FlareSolverr proxy for Prowlarr, automate all 13 radio-stack images through Argo CD Image Updater, and repair Pulse image write-back. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Expose host CPU features, including SSE4.2, to both K3s agent VMs so Bun-based workloads can run without the `qemu64` CPU incompatibility. ([88cbbef](https://github.com/edlundin/homelab/commit/88cbbef184c7e247f9109ab9e3df457f6fecd435))
 
 ## 2026-08-18
 

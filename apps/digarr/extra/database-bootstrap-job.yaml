@@ -5,6 +5,7 @@ metadata:
   namespace: postgres
   annotations:
     argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-options: Force=true,Replace=true
   labels:
     app.kubernetes.io/name: digarr
     app.kubernetes.io/component: database-bootstrap
