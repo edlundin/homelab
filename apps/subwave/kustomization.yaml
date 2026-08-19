@@ -26,3 +26,6 @@ images:
   - name: ghcr.io/perminder-klair/subwave-analyzer
     newName: ghcr.io/perminder-klair/subwave-analyzer
     newTag: 1.8.0
+  - name: ghcr.io/perminder-klair/subwave-tts-heavy
+    newName: ghcr.io/perminder-klair/subwave-tts-heavy
+    newTag: 1.8.0

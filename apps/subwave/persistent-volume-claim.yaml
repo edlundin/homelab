@@ -11,3 +11,20 @@ spec:
   resources:
     requests:
       storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: subwave-pocket-tts-cache
+  namespace: subwave
+  labels:
+    app.kubernetes.io/name: subwave
+    app.kubernetes.io/component: pocket-tts-cache
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: longhorn
+  resources:
+    requests:
+      # Pocket TTS language weights are currently 225-641 MiB. Five GiB
+      # retains model and voice-cache growth without using the state claim.
+      storage: 5Gi
