@@ -1,9 +1,10 @@
 # Music stack
 
 This namespace runs qBittorrent, Prowlarr, FlareSolverr, Lidarr, Navidrome,
-slskd, and Soularr. All seven applications run as UID/GID `1000`.
-qBittorrent, Lidarr, Navidrome, slskd, and Soularr access the NFS export,
-which must have matching ownership and permissions before downloads start.
+slskd, Soularr, and MusicGrabber. All eight applications run as UID/GID
+`1000`. qBittorrent, Lidarr, Navidrome, slskd, Soularr, and MusicGrabber
+access the NFS export, which must have matching ownership and permissions
+before downloads start.
 Create `multimedia/Downloads/music` and
 `multimedia/Downloads/slskd/{complete,incomplete}` on the export before the
 first sync.
@@ -15,7 +16,9 @@ on the allowed LAN path. qBittorrent and Lidarr mount the export at `/nas`; use
 Lidarr root folder. This common mount keeps imports as atomic moves or
 hardlinks. Navidrome mounts the same export read-only and scans
 `/nas/multimedia/Music`. Soularr mounts the completed slskd directory at the
-same path used by Lidarr and slskd.
+same path used by Lidarr and slskd. MusicGrabber writes finished tracks to the
+Music directory and mounts completed slskd downloads read-only as acquisition
+staging.
 
 Internal service URLs are:
 
@@ -25,13 +28,15 @@ Internal service URLs are:
 - Lidarr: `http://lidarr.music.svc.cluster.local:8686`
 - Navidrome: `http://navidrome.music.svc.cluster.local:4533`
 - slskd: `http://slskd.music.svc.cluster.local:5030`
+- MusicGrabber: `http://musicgrabber.music.svc.cluster.local:8080`
 
 Soularr has no Service or ingress. Its upstream web UI has no authentication
 and exposes its Lidarr and slskd API keys, so this deployment disables it.
 Soularr reads its sealed configuration and runs every five minutes.
 
 The CPU and memory budgets are conservative starting bounds for one replica
-per service. Review actual usage before increasing them.
+per service. MusicGrabber idle use was 2.2m CPU and 146Mi memory. Its first
+browser-based Spotify import must be measured before adding a CPU limit.
 
 ## One-time setup
 
@@ -69,9 +74,50 @@ per service. Review actual usage before increasing them.
    to slskd, then Lidarr import from the shared NFS path. Increase
    `number_of_albums_to_grab` in the sealed Soularr configuration only after
    the first import succeeds.
+7. Open MusicGrabber at <https://musicgrabber.ison-mirfak.ts.net>. Read its
+   generated API key locally with:
+
+   ```sh
+   kubectl -n music get secret musicgrabber-credentials \
+     -o jsonpath='{.data.API_KEY}' | base64 -d
+   ```
+
+   Enter the key when the browser prompts for it. Soulseek is already enabled
+   and uses the existing slskd credentials and read-only download staging.
+   Keep **Convert audio** disabled. MusicGrabber then preserves native lossless
+   files and does not put lossy audio in a FLAC container.
 
 The services are ClusterIP-only. FlareSolverr has no external ingress and
 accepts requests only from Prowlarr. qBittorrent peer ports and the slskd
 Soulseek listen port `50300` are not exposed by a Service. slskd can use
 indirect connections, but a firewalled peer can remain unavailable. Digarr
 and SUB/WAVE are documented in their own operator README.
+
+## Exact Spotify track import
+
+MusicGrabber accepts Spotify playlist URLs as watched playlists or bulk
+imports. It ranks confident native-lossless Monochrome/Qobuz and Soulseek
+results ahead of lossy sources. A preferred source only breaks a tie inside
+the same quality tier. YouTube and other lossy sources remain fallbacks.
+
+For an Exportify CSV, convert it to the `Artist - Title` format used by the
+MusicGrabber Bulk Import page:
+
+```sh
+python3 apps/music/scripts/exportify_to_musicgrabber.py \
+  ~/Downloads/spotify_playlists/Liked_Songs.csv
+```
+
+Upload `Liked_Songs.musicgrabber.txt` in **Bulk Import**, review the detected
+tracks, and start the import. Use a watched Spotify playlist with **Append**
+sync for playlists that must keep receiving new tracks.
+
+spotDL is not part of this stack. It uses Spotify only for metadata and gets
+audio from YouTube. Its upstream maximum is 128 kbps without YouTube Music
+Premium and 256 kbps with it. MusicGrabber already provides this lossy
+fallback after its lossless sources, so a second spotDL path adds no quality.
+
+Tubifarry is also not installed. The existing Soularr and slskd flow already
+handles missing Lidarr albums, while MusicGrabber handles exact Spotify
+tracks. Adding a second Lidarr slskd indexer and downloader would create a
+duplicate acquisition path.

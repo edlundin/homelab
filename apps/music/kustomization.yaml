@@ -5,6 +5,7 @@ resources:
   - persistent-volume-claims.yaml
   - slskd-sealed-secret.yaml
   - soularr-sealed-secret.yaml
+  - musicgrabber-sealed-secret.yaml
   - deployments.yaml
   - services.yaml
   - ingresses.yaml
@@ -31,3 +32,6 @@ images:
   - name: mrusse/soularr
     newName: ghcr.io/mrusse/soularr
     newTag: 1.2.2
+  - name: g33kphr33k/musicgrabber
+    newName: docker.io/g33kphr33k/musicgrabber
+    newTag: 4.0.2

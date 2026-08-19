@@ -87,6 +87,14 @@ spec:
           manifestTargets:
             kustomize:
               name: mrusse/soularr
+        - alias: musicgrabber
+          imageName: docker.io/g33kphr33k/musicgrabber:4.x
+          commonUpdateSettings:
+            updateStrategy: semver
+            allowTags: regexp:^[0-9]+\.[0-9]+\.[0-9]+$
+          manifestTargets:
+            kustomize:
+              name: g33kphr33k/musicgrabber
     - namePattern: digarr
       writeBackConfig:
         method: git:secret:argocd/argocd-image-updater-github

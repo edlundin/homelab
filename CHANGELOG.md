@@ -2,7 +2,8 @@
 
 ## 2026-08-19
 
-- **fix**: Expose the SUB/WAVE Liquidsoap TCP 1234 control endpoint through the Service and NetworkPolicy so the controller can manage the mixer. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **feat**: Add MusicGrabber for lossless-first Spotify exact-track acquisition through existing slskd/Soulseek and Monochrome/Qobuz, with lossy fallback, CSV conversion, private Tailscale access with a sealed API key, NFS music/staging mounts, and Argo CD Image Updater tracking. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Expose the SUB/WAVE Liquidsoap TCP 1234 control endpoint through the Service and NetworkPolicy so the controller can manage the mixer. ([aa8916a](https://github.com/edlundin/homelab/commit/aa8916a0764bf20e76fef1cb5a42aeaca580794c))
 - **feat**: Add Soularr to bridge Lidarr wanted albums to slskd, with sealed configuration, a shared NFS path, and Argo CD Image Updater tracking. ([15a9953](https://github.com/edlundin/homelab/commit/15a99537239fc303e04162f05a0ca2b6800da0e))
 - **feat**: Add slskd as a Soulseek download target for Digarr and Lidarr, with NAS storage, Tailscale access, sealed credentials, and automated image updates. ([c631838](https://github.com/edlundin/homelab/commit/c63183851035fc585a87ca9d5fc45c730cf1e98c))
 - **fix**: Enable Digarr field encryption with a persistent sealed key so saved API and OAuth credentials are not stored as plaintext. ([695f90b](https://github.com/edlundin/homelab/commit/695f90b9bf33d3725b648c95a27c599a0350d50d))

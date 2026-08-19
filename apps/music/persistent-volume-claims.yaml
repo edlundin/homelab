@@ -85,3 +85,19 @@ spec:
   resources:
     requests:
       storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: musicgrabber-data
+  namespace: music
+  labels:
+    app.kubernetes.io/name: musicgrabber
+  annotations:
+    homelab.oisd.io/storage-basis: A new v4.0.2 SQLite database measured 4Ki; 1Gi is the smallest Longhorn tripwire used for this workload.
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi

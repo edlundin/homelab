@@ -235,6 +235,9 @@ spec:
         - podSelector:
             matchLabels:
               app.kubernetes.io/name: soularr
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: musicgrabber
       ports:
         - protocol: TCP
           port: 5030
@@ -285,3 +288,44 @@ spec:
       ports:
         - protocol: TCP
           port: 5030
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: musicgrabber
+  namespace: music
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: musicgrabber
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: tailscale-system
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: slskd
+      ports:
+        - protocol: TCP
+          port: 5030
+    - ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
