@@ -2,7 +2,8 @@
 
 ## 2026-08-19
 
-- **feat**: Add the CPU-only Pocket TTS sidecar to SUB/WAVE with persistent model caching and automated image updates. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Let the pod `fsGroup` grant Pocket TTS cache access instead of running a `chown` after the init container drops the required capability. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **feat**: Add the CPU-only Pocket TTS sidecar to SUB/WAVE with persistent model caching and automated image updates. ([f25f1db](https://github.com/edlundin/homelab/commit/f25f1db))
 - **fix**: Remove MusicGrabber API-key authentication because its v4.0.2 browser client does not send the required header, which restores settings load and save through the private Tailscale route. ([5a516a7](https://github.com/edlundin/homelab/commit/5a516a7))
 - **feat**: Add MusicGrabber for lossless-first Spotify exact-track acquisition through existing slskd/Soulseek and Monochrome/Qobuz, with lossy fallback, CSV conversion, private Tailscale access with a sealed API key, NFS music/staging mounts, and Argo CD Image Updater tracking. ([5831ddb](https://github.com/edlundin/homelab/commit/5831ddb9a6d2c2fdef5092907379fdf4585d4689))
 - **fix**: Expose the SUB/WAVE Liquidsoap TCP 1234 control endpoint through the Service and NetworkPolicy so the controller can manage the mixer. ([aa8916a](https://github.com/edlundin/homelab/commit/aa8916a0764bf20e76fef1cb5a42aeaca580794c))
