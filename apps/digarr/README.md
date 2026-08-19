@@ -19,6 +19,9 @@ configuration. Choose automatic approval only after reviewing the first
 recommendations. Automatic operation starts only after this setup and the
 Music stack setup are complete.
 
+`DIGARR_ENCRYPTION_KEY` is stored in the `digarr-db` SealedSecret. Keep this
+key stable. Use Digarr's documented rotation procedure before replacing it.
+
 Create a Spotify developer application and register the callback below. In
 Digarr, open **Settings > Connections > Spotify**, enter the client ID and
 client secret, connect the account, and select Spotify as the listening

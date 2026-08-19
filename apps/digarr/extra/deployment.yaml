@@ -51,6 +51,11 @@ spec:
                 secretKeyRef:
                   name: digarr-db
                   key: DATABASE_URL
+            - name: DIGARR_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: digarr-db
+                  key: DIGARR_ENCRYPTION_KEY
             - name: ALLOWED_ORIGIN
               value: https://digarr.ison-mirfak.ts.net
           startupProbe:
