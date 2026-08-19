@@ -74,16 +74,9 @@ browser-based Spotify import must be measured before adding a CPU limit.
    to slskd, then Lidarr import from the shared NFS path. Increase
    `number_of_albums_to_grab` in the sealed Soularr configuration only after
    the first import succeeds.
-7. Open MusicGrabber at <https://musicgrabber.ison-mirfak.ts.net>. Read its
-   generated API key locally with:
-
-   ```sh
-   kubectl -n music get secret musicgrabber-credentials \
-     -o jsonpath='{.data.API_KEY}' | base64 -d
-   ```
-
-   Enter the key when the browser prompts for it. Soulseek is already enabled
-   and uses the existing slskd credentials and read-only download staging.
+7. Open MusicGrabber at <https://musicgrabber.ison-mirfak.ts.net>. Soulseek is
+   already enabled and uses the existing slskd credentials and read-only
+   download staging.
    Keep **Convert audio** disabled. MusicGrabber then preserves native lossless
    files and does not put lossy audio in a FLAC container.
 

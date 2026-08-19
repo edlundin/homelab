@@ -722,11 +722,6 @@ spec:
                   key: SLSKD_PASSWORD
             - name: SLSKD_DOWNLOADS_PATH
               value: /downloads
-            - name: API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: musicgrabber-credentials
-                  key: API_KEY
           startupProbe:
             httpGet:
               path: /
