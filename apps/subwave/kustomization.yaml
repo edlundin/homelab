@@ -7,3 +7,22 @@ resources:
   - services.yaml
   - ingress.yaml
   - network-policy.yaml
+images:
+  - name: busybox
+    newName: docker.io/busybox
+    newTag: 1.38.0
+  - name: ghcr.io/perminder-klair/subwave-caddy
+    newName: ghcr.io/perminder-klair/subwave-caddy
+    newTag: 1.8.0
+  - name: ghcr.io/perminder-klair/subwave-web
+    newName: ghcr.io/perminder-klair/subwave-web
+    newTag: 1.8.0
+  - name: ghcr.io/perminder-klair/subwave-controller
+    newName: ghcr.io/perminder-klair/subwave-controller
+    newTag: 1.8.0
+  - name: ghcr.io/perminder-klair/subwave-broadcast
+    newName: ghcr.io/perminder-klair/subwave-broadcast
+    newTag: 1.8.0
+  - name: ghcr.io/perminder-klair/subwave-analyzer
+    newName: ghcr.io/perminder-klair/subwave-analyzer
+    newTag: 1.8.0
