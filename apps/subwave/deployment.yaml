@@ -6,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: subwave
   annotations:
-    homelab.oisd.io/root-container-justification: SUB/WAVE init prepares shared state and the Pocket TTS cache; controller reads root-only Icecast secrets; broadcast renders Icecast configuration with DAC_OVERRIDE, then drops to its bundled user.
+    homelab.oisd.io/root-container-justification: SUB/WAVE controller reads root-only Icecast secrets; broadcast renders Icecast configuration with DAC_OVERRIDE, then drops to its bundled user.
 spec:
   replicas: 1
   strategy:
@@ -45,8 +45,7 @@ spec:
                 tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 32 >> /var/sub-wave/secrets.env;
                 printf '\n' >> /var/sub-wave/secrets.env;
               fi;
-              chmod 600 /var/sub-wave/secrets.env;
-              chmod 0770 /var/cache/pocket-tts
+              chmod 600 /var/sub-wave/secrets.env
           resources:
             requests:
               cpu: 5m
@@ -63,8 +62,6 @@ spec:
           volumeMounts:
             - name: state
               mountPath: /var/sub-wave
-            - name: pocket-tts-cache
-              mountPath: /var/cache/pocket-tts
       containers:
         - name: caddy
           image: ghcr.io/perminder-klair/subwave-caddy:1.8.0@sha256:c9c7963523d1708d0013af9e6414bd601083fc763de7d383ae919fca797f40d0
@@ -179,8 +176,6 @@ spec:
               value: /sounds
             - name: ANALYZE_URL
               value: http://analyzer:8080
-            - name: TTS_HEAVY_URL
-              value: http://127.0.0.1:8081
             - name: ICECAST_STATUS_URL
               value: http://broadcast:7702/status-json.xsl
             - name: ICECAST_ADMIN_URL
@@ -318,83 +313,7 @@ spec:
           volumeMounts:
             - name: state
               mountPath: /var/sub-wave
-        - name: tts-heavy
-          image: ghcr.io/perminder-klair/subwave-tts-heavy:1.8.0@sha256:c43dbef2ae886721476eae63d79edaf3dccea078e10248150878afe24e1a0af7
-          imagePullPolicy: IfNotPresent
-          command: [uvicorn]
-          args: [server:app, --host, 0.0.0.0, --port, "8081"]
-          ports:
-            - name: tts-heavy
-              containerPort: 8081
-              protocol: TCP
-          env:
-            - name: TTS_HEAVY_DEVICE
-              value: cpu
-            - name: TTS_HEAVY_ENGINES
-              value: pocket-tts
-            - name: POCKET_TTS_VOICE
-              value: estelle
-          startupProbe:
-            exec:
-              command:
-                - /opt/server/venv/bin/python
-                - -c
-                - >-
-                  import json, sys, urllib.request;
-                  status = json.load(urllib.request.urlopen("http://127.0.0.1:8081/health", timeout=5));
-                  sys.exit(0 if "pocket-tts" in status.get("engines", []) else 1)
-            # Upstream reports a 30-60 second model load. Five minutes also
-            # covers the first model download without hiding a stuck worker.
-            periodSeconds: 10
-            timeoutSeconds: 6
-            failureThreshold: 30
-          readinessProbe:
-            exec:
-              command:
-                - /opt/server/venv/bin/python
-                - -c
-                - >-
-                  import json, sys, urllib.request;
-                  status = json.load(urllib.request.urlopen("http://127.0.0.1:8081/health", timeout=5));
-                  sys.exit(0 if "pocket-tts" in status.get("engines", []) else 1)
-            periodSeconds: 10
-            timeoutSeconds: 6
-            failureThreshold: 3
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: tts-heavy
-            periodSeconds: 30
-            timeoutSeconds: 5
-            failureThreshold: 3
-          resources:
-            # The measured radio load is about 3,600 TTS characters per day.
-            # Reserve half a core for this intermittent work and allow the two
-            # cores documented by Pocket TTS during synthesis.
-            requests:
-              cpu: 500m
-              # Language weights are 225-641 MiB. This leaves working memory
-              # for PyTorch while the 4 GiB limit remains an OOM tripwire.
-              memory: 2Gi
-            limits:
-              cpu: 2000m
-              memory: 4Gi
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 10001
-            runAsGroup: 10001
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: [ALL]
-          volumeMounts:
-            - name: state
-              mountPath: /var/sub-wave
-            - name: pocket-tts-cache
-              mountPath: /opt/pocket-tts/hf-cache
       volumes:
         - name: state
           persistentVolumeClaim:
             claimName: subwave-state
-        - name: pocket-tts-cache
-          persistentVolumeClaim:
-            claimName: subwave-pocket-tts-cache

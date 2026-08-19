@@ -1,13 +1,11 @@
 # SUB/WAVE
 
 SUB/WAVE 1.8.0 runs as one Deployment with Caddy, web, controller, broadcast,
-the lean analyzer, and the CPU-only Pocket TTS sidecar. The images are
-digest-pinned. Caddy is the only
+and the lean analyzer. The images are digest-pinned. Caddy is the only
 ingress backend and the only service exposed to Tailscale at
 <https://wave.ison-mirfak.ts.net>. The service names and ports match the
 upstream Caddy/controller configuration: `caddy:80`, `web:7700`,
-`controller:7701`, `broadcast:7702`, and `analyzer:8080`. Pocket TTS uses
-loopback port `8081` because the analyzer already owns port `8080` in the pod.
+`controller:7701`, `broadcast:7702`, and `analyzer:8080`.
 
 The shared `subwave-state` Longhorn PVC stores station state. The init
 container creates `ADMIN_USER=admin` and a random `ADMIN_PASS` in
@@ -34,21 +32,8 @@ Deployment. Keep the output private. No credential is stored in Git.
 4. Complete station setup and verify `/api/health` reports `on-air`.
 
 Automatic operation starts only after this onboarding and the Music stack
-setup are complete. Chatterbox and the Docker-socket proxy are intentionally
+setup are complete. Heavy TTS and the Docker-socket proxy are intentionally
 not deployed.
-
-## Pocket TTS
-
-The sidecar loads only Pocket TTS on CPU and uses `estelle` as its default
-voice. Select `pocket-tts` for the applicable personas or as the default TTS
-engine in SUB/WAVE settings. The first start downloads model weights. A 5 GiB
-Longhorn volume keeps that cache across pod replacements. Current language
-weights range from about 225 MiB for English to 641 MiB for French.
-
-SUB/WAVE 1.8.0 calls Pocket TTS without a language selector. Pocket TTS then
-loads its default English model, not the separate `french_24l` model. The
-sidecar enables the supported upstream integration, but this release cannot
-guarantee native French pronunciation through Pocket TTS.
 
 The policy allows the standard 9router port `20128`. If the instance uses a
 different non-HTTP private port, add that port to `network-policy.yaml`.
