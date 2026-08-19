@@ -26,4 +26,4 @@ images:
     newTag: 0.63.2
   - name: slskd/slskd
     newName: docker.io/slskd/slskd
-    newTag: 0.25.1
+    newTag: 0.26.0
