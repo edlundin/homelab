@@ -1,10 +1,11 @@
 # Music stack
 
 This namespace runs qBittorrent, Prowlarr, FlareSolverr, Lidarr, Navidrome,
-and slskd. All six applications run as UID/GID `1000`. qBittorrent, Lidarr,
-Navidrome, and slskd access the NFS export, which must have matching ownership
-and permissions before downloads start. Create `multimedia/Downloads/music`
-and `multimedia/Downloads/slskd/{complete,incomplete}` on the export before the
+slskd, and Soularr. All seven applications run as UID/GID `1000`.
+qBittorrent, Lidarr, Navidrome, slskd, and Soularr access the NFS export,
+which must have matching ownership and permissions before downloads start.
+Create `multimedia/Downloads/music` and
+`multimedia/Downloads/slskd/{complete,incomplete}` on the export before the
 first sync.
 
 NFS is mounted directly by the Pods. The NAS is `610n1r0`, with export
@@ -13,7 +14,8 @@ on the allowed LAN path. qBittorrent and Lidarr mount the export at `/nas`; use
 `/nas/multimedia/Downloads` for downloads and `/nas/multimedia/Music` as the
 Lidarr root folder. This common mount keeps imports as atomic moves or
 hardlinks. Navidrome mounts the same export read-only and scans
-`/nas/multimedia/Music`.
+`/nas/multimedia/Music`. Soularr mounts the completed slskd directory at the
+same path used by Lidarr and slskd.
 
 Internal service URLs are:
 
@@ -23,6 +25,10 @@ Internal service URLs are:
 - Lidarr: `http://lidarr.music.svc.cluster.local:8686`
 - Navidrome: `http://navidrome.music.svc.cluster.local:4533`
 - slskd: `http://slskd.music.svc.cluster.local:5030`
+
+Soularr has no Service or ingress. Its upstream web UI has no authentication
+and exposes its Lidarr and slskd API keys, so this deployment disables it.
+Soularr reads its sealed configuration and runs every five minutes.
 
 The CPU and memory budgets are conservative starting bounds for one replica
 per service. Review actual usage before increasing them.
@@ -57,6 +63,12 @@ per service. Review actual usage before increasing them.
    Enter the Soulseek network username and password in the slskd options.
    Completed files use `/nas/multimedia/Downloads/slskd/complete`; partial
    files use `/nas/multimedia/Downloads/slskd/incomplete`.
+6. Confirm that slskd shows **Connected**. In Lidarr, monitor one wanted album
+   that is missing from the library. Soularr processes one missing album per
+   scan for the initial end-to-end test. The flow is Digarr to Lidarr, Soularr
+   to slskd, then Lidarr import from the shared NFS path. Increase
+   `number_of_albums_to_grab` in the sealed Soularr configuration only after
+   the first import succeeds.
 
 The services are ClusterIP-only. FlareSolverr has no external ingress and
 accepts requests only from Prowlarr. qBittorrent peer ports and the slskd

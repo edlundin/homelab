@@ -15,6 +15,22 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: soularr-data
+  namespace: music
+  labels:
+    app.kubernetes.io/name: soularr
+  annotations:
+    homelab.oisd.io/storage-basis: A 1.8Ki configuration and small denylist state need far less than 1Gi; 1Gi is the smallest Longhorn tripwire used for this workload.
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
   name: prowlarr-config
   namespace: music
   labels:

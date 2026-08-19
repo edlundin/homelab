@@ -4,6 +4,7 @@ resources:
   - service-accounts.yaml
   - persistent-volume-claims.yaml
   - slskd-sealed-secret.yaml
+  - soularr-sealed-secret.yaml
   - deployments.yaml
   - services.yaml
   - ingresses.yaml
@@ -27,3 +28,6 @@ images:
   - name: slskd/slskd
     newName: docker.io/slskd/slskd
     newTag: 0.26.0
+  - name: mrusse/soularr
+    newName: ghcr.io/mrusse/soularr
+    newTag: 1.2.2

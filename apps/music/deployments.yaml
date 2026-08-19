@@ -555,3 +555,98 @@ spec:
             server: 192.168.2.1
             path: /srv/nfs/raid
             readOnly: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: soularr
+  namespace: music
+  labels:
+    app.kubernetes.io/name: soularr
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: soularr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: soularr
+      annotations:
+        homelab.oisd.io/request-basis: The initial workload is one missing album per scan; 50m CPU and 128Mi memory are starting requests to remeasure after the first import.
+        homelab.oisd.io/limit-basis: 500m CPU and 512Mi memory are tripwires above the measured music automation workload.
+    spec:
+      serviceAccountName: soularr
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: soularr
+          image: mrusse/soularr:1.2.2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: Europe/Paris
+            - name: SCRIPT_INTERVAL
+              value: "300"
+            - name: WEBUI_ENABLED
+              value: "false"
+          startupProbe:
+            exec:
+              command: [/bin/sh, -c, "ps aux | grep -q '[r]un.sh'"]
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            exec:
+              command: [/bin/sh, -c, "ps aux | grep -q '[r]un.sh'"]
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command: [/bin/sh, -c, "ps aux | grep -q '[r]un.sh'"]
+            periodSeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /data/config.ini
+              subPath: config.ini
+              readOnly: true
+            - name: downloads
+              mountPath: /nas/multimedia/Downloads/slskd/complete
+              subPath: multimedia/Downloads/slskd/complete
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: soularr-data
+        - name: config
+          secret:
+            secretName: soularr-config
+        - name: downloads
+          nfs:
+            server: 192.168.2.1
+            path: /srv/nfs/raid
+            readOnly: false
