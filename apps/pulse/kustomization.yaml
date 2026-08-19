@@ -7,4 +7,5 @@ resources:
   - external-secret-tls.yaml
 images:
   - name: rcourtman/pulse
-    newTag: 6.1.2
+    newTag: 6.2.1
+    newName: rcourtman/pulse
