@@ -1,10 +1,11 @@
 # Music stack
 
-This namespace runs qBittorrent, Prowlarr, FlareSolverr, Lidarr, and
-Navidrome. All five applications run as UID/GID `1000`. qBittorrent, Lidarr,
-and Navidrome access the NFS export, which must have matching ownership and
-permissions before downloads start. Create `multimedia/Downloads/music` on
-the export before the first sync.
+This namespace runs qBittorrent, Prowlarr, FlareSolverr, Lidarr, Navidrome,
+and slskd. All six applications run as UID/GID `1000`. qBittorrent, Lidarr,
+Navidrome, and slskd access the NFS export, which must have matching ownership
+and permissions before downloads start. Create `multimedia/Downloads/music`
+and `multimedia/Downloads/slskd/{complete,incomplete}` on the export before the
+first sync.
 
 NFS is mounted directly by the Pods. The NAS is `610n1r0`, with export
 `/srv/nfs/raid`. Pods connect to the NAS through `192.168.2.1` so mounts stay
@@ -21,6 +22,7 @@ Internal service URLs are:
 - FlareSolverr: `http://flaresolverr.music.svc.cluster.local:8191`
 - Lidarr: `http://lidarr.music.svc.cluster.local:8686`
 - Navidrome: `http://navidrome.music.svc.cluster.local:4533`
+- slskd: `http://slskd.music.svc.cluster.local:5030`
 
 The CPU and memory budgets are conservative starting bounds for one replica
 per service. Review actual usage before increasing them.
@@ -44,7 +46,20 @@ per service. Review actual usage before increasing them.
 4. Open Navidrome at <https://navidrome.ison-mirfak.ts.net> and create its
    first administrator. Its music folder is already
    `/nas/multimedia/Music`.
+5. Open slskd at <https://slskd.ison-mirfak.ts.net>. The username is `admin`.
+   Read the generated password locally with:
+
+   ```sh
+   kubectl -n music get secret slskd-credentials \
+     -o jsonpath='{.data.SLSKD_PASSWORD}' | base64 -d
+   ```
+
+   Enter the Soulseek network username and password in the slskd options.
+   Completed files use `/nas/multimedia/Downloads/slskd/complete`; partial
+   files use `/nas/multimedia/Downloads/slskd/incomplete`.
 
 The services are ClusterIP-only. FlareSolverr has no external ingress and
-accepts requests only from Prowlarr. qBittorrent peer ports are not exposed by
-a Service. Digarr and SUB/WAVE are documented in their own operator README.
+accepts requests only from Prowlarr. qBittorrent peer ports and the slskd
+Soulseek listen port `50300` are not exposed by a Service. slskd can use
+indirect connections, but a firewalled peer can remain unavailable. Digarr
+and SUB/WAVE are documented in their own operator README.

@@ -32,6 +32,8 @@ spec:
       ports:
         - protocol: TCP
           port: 8686
+        - protocol: TCP
+          port: 5030
     - to:
         - ipBlock:
             cidr: 100.64.0.0/10

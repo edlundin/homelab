@@ -438,3 +438,120 @@ spec:
             server: 192.168.2.1
             path: /srv/nfs/raid
             readOnly: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slskd
+  namespace: music
+  labels:
+    app.kubernetes.io/name: slskd
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: slskd
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: slskd
+      annotations:
+        homelab.oisd.io/request-basis: Music pods measured at 1-3m CPU and 28-317Mi memory; 100m and 256Mi are initial scheduling requests for the first transfer test.
+        homelab.oisd.io/limit-basis: One CPU and 1Gi memory are tripwires above the measured music workload; remeasure slskd after a completed transfer.
+    spec:
+      serviceAccountName: slskd
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: slskd
+          image: slskd/slskd:0.25.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 5030
+              protocol: TCP
+            - name: soulseek
+              containerPort: 50300
+              protocol: TCP
+          env:
+            - name: SLSKD_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: slskd-credentials
+                  key: SLSKD_USERNAME
+            - name: SLSKD_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: slskd-credentials
+                  key: SLSKD_PASSWORD
+            - name: SLSKD_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: slskd-credentials
+                  key: SLSKD_API_KEY
+            - name: SLSKD_JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: slskd-credentials
+                  key: SLSKD_JWT_KEY
+            - name: SLSKD_REMOTE_CONFIGURATION
+              value: "true"
+            - name: SLSKD_REMOTE_FILE_MANAGEMENT
+              value: "false"
+            - name: SLSKD_DOWNLOADS_DIR
+              value: /nas/multimedia/Downloads/slskd/complete
+            - name: SLSKD_INCOMPLETE_DIR
+              value: /nas/multimedia/Downloads/slskd/incomplete
+          startupProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: config
+              mountPath: /app
+            - name: downloads
+              mountPath: /nas/multimedia/Downloads/slskd
+              subPath: multimedia/Downloads/slskd
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: slskd-config
+        - name: downloads
+          nfs:
+            server: 192.168.2.1
+            path: /srv/nfs/raid
+            readOnly: false

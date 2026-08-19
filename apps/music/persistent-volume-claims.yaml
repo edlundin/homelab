@@ -53,3 +53,19 @@ spec:
   resources:
     requests:
       storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: slskd-config
+  namespace: music
+  labels:
+    app.kubernetes.io/name: slskd
+  annotations:
+    homelab.oisd.io/storage-basis: Existing music configuration uses 5-8Mi; 2Gi keeps downloads on NFS and leaves configuration and log headroom.
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 2Gi

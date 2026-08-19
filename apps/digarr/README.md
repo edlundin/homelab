@@ -34,3 +34,20 @@ Spotify callback URL:
 The policies allow the standard 9router port `20128` on the tailnet and LAN.
 If the instance uses another private port, add that port to
 `extra/network-policy.yaml` before setup.
+
+## slskd target
+
+After slskd is configured, open **Settings > Targets** and add an slskd target
+with URL `http://slskd.music.svc.cluster.local:5030`. Read its generated API
+key locally with:
+
+```sh
+kubectl -n music get secret slskd-credentials \
+  -o jsonpath='{.data.SLSKD_API_KEY}' | base64 -d
+```
+
+Link the slskd target to the existing Lidarr target. Both services see
+completed downloads at `/nas/multimedia/Downloads/slskd/complete`, so no
+remote path translation is required. For the first test, approve one
+recommendation with **Selected albums** monitoring and select the combined
+Lidarr and slskd action. Keep the API key out of Git.

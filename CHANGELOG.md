@@ -2,7 +2,8 @@
 
 ## 2026-08-19
 
-- **fix**: Enable Digarr field encryption with a persistent sealed key so saved API and OAuth credentials are not stored as plaintext. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **feat**: Add slskd as a Soulseek download target for Digarr and Lidarr, with NAS storage, Tailscale access, sealed credentials, and automated image updates. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Enable Digarr field encryption with a persistent sealed key so saved API and OAuth credentials are not stored as plaintext. ([695f90b](https://github.com/edlundin/homelab/commit/695f90b9bf33d3725b648c95a27c599a0350d50d))
 - **feat**: Add an internal FlareSolverr proxy for Prowlarr, automate all 13 radio-stack images through Argo CD Image Updater, and repair Pulse image write-back. ([200ec0f](https://github.com/edlundin/homelab/commit/200ec0f0ad149b4dc1d8e84a01fd2450face18b4))
 - **fix**: Expose host CPU features, including SSE4.2, to both K3s agent VMs so Bun-based workloads can run without the `qemu64` CPU incompatibility. ([88cbbef](https://github.com/edlundin/homelab/commit/88cbbef184c7e247f9109ab9e3df457f6fecd435))
 
