@@ -68,6 +68,10 @@ spec:
       port: 7702
       targetPort: broadcast
       protocol: TCP
+    - name: liquidsoap
+      port: 1234
+      targetPort: liquidsoap
+      protocol: TCP
   selector:
     app.kubernetes.io/name: subwave
 ---

@@ -224,6 +224,9 @@ spec:
             - name: broadcast
               containerPort: 7702
               protocol: TCP
+            - name: liquidsoap
+              containerPort: 1234
+              protocol: TCP
           env:
             - name: TZ
               value: Europe/Paris
