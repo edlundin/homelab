@@ -2,7 +2,8 @@
 
 ## 2026-08-20
 
-- **feat**: Provision `k3s-agent-2` with GTX 1070 passthrough and NVIDIA driver sources/packages, deploy the NVIDIA device plugin, and expose a GPU-backed Chatterbox Turbo TTS service. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Allow the NVIDIA device plugin to run on the dedicated GPU node without Node Feature Discovery labels. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **feat**: Provision `k3s-agent-2` with GTX 1070 passthrough and NVIDIA driver sources/packages, deploy the NVIDIA device plugin, and expose a GPU-backed Chatterbox Turbo TTS service. ([0a130a8](https://github.com/edlundin/homelab/commit/0a130a8))
 - **fix**: Ensure Terraform-managed VMs and containers receive the managed SSH public key alongside configured keys for account access. ([1323836](https://github.com/edlundin/homelab/commit/1323836))
 - **chore**: Remove the unused Pocket TTS sidecar, persistent model cache, and image-update tracking after returning SUB/WAVE to Piper. ([03a4de1](https://github.com/edlundin/homelab/commit/03a4de15d02b20e0d2e97fbfd320181899ef8922))
 - **fix**: Expand the Lidarr PVC from 2Gi to 6Gi and the MusicGrabber PVC from 1Gi to 3Gi based on measured full-volume usage, restoring storage headroom for music acquisition. ([f8f1b3c](https://github.com/edlundin/homelab/commit/f8f1b3c))

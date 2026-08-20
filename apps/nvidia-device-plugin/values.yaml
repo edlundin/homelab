@@ -6,7 +6,7 @@ deviceListStrategy: envvar
 nodeSelector:
   kubernetes.io/hostname: k3s-agent-2
 
-affinity: {}
+affinity: null
 nfd:
   enabled: false
 gfd:
