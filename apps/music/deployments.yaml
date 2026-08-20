@@ -672,6 +672,7 @@ spec:
       annotations:
         homelab.oisd.io/request-basis: Idle v4.0.2 measured at 2.2m CPU and 146Mi memory; 25m and 256Mi cover the measured idle workload.
         homelab.oisd.io/limit-basis: Upstream requires 2Gi shared memory for Spotify playlists over 100 tracks; 3Gi covers that plus the measured 146Mi process and 854Mi headroom. Browser-import CPU has not been measured, so it has no speculative limit.
+        homelab.oisd.io/search-concurrency-basis: Five is MusicGrabber's enforced maximum and reduces provider admission blocking for the measured 1,599-track import.
         homelab.oisd.io/root-container-justification: The entrypoint needs root to create UID/GID 1000, chown persistent data, and then use gosu to start MusicGrabber as UID/GID 1000.
     spec:
       serviceAccountName: musicgrabber
@@ -706,6 +707,8 @@ spec:
               value: "false"
             - name: ENABLE_MUSICBRAINZ
               value: "true"
+            - name: SEARCH_CONCURRENCY
+              value: "5"
             - name: SOURCE_SOULSEEK_ENABLED
               value: "true"
             - name: SLSKD_URL

@@ -102,7 +102,15 @@ python3 apps/music/scripts/exportify_to_musicgrabber.py \
 ```
 
 Upload `Liked_Songs.musicgrabber.txt` in **Bulk Import**, review the detected
-tracks, and start the import. Use a watched Spotify playlist with **Append**
+tracks, and start the import. The server continues the import after the browser
+tab closes. MusicGrabber v4.0.2 does not restore the active import panel after a
+page reload; use `GET /api/bulk-imports` to find the import ID and
+`GET /api/bulk-import/<id>/status` to read its progress. The Queue shows only
+tracks that the sequential bulk worker has already searched and queued; pending
+bulk tracks are stored separately in the database. Search admission uses the
+upstream maximum concurrency of five for the measured 1,599-track import.
+
+Use a watched Spotify playlist with **Append**
 sync for playlists that must keep receiving new tracks.
 
 spotDL is not part of this stack. It uses Spotify only for metadata and gets

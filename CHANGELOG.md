@@ -2,7 +2,8 @@
 
 ## 2026-08-21
 
-- **fix**: Improve worker scheduling with preempting GPU workload priority, measured LowNodeUtilization rebalancing, and scheduler-visible resource requests. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **perf**: Set MusicGrabber `SEARCH_CONCURRENCY=5` for the measured 1,599-track bulk import and document its background progress endpoints and queue behavior. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Improve worker scheduling with preempting GPU workload priority, measured LowNodeUtilization rebalancing, and scheduler-visible resource requests. ([37dae51](https://github.com/edlundin/homelab/commit/37dae51))
 
 ## 2026-08-20
 
