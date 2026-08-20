@@ -40,6 +40,8 @@ spec:
               value: "1"
             - name: NVIDIA_DRIVER_CAPABILITIES
               value: compute,utility
+            - name: LD_LIBRARY_PATH
+              value: /usr/lib/x86_64-linux-gnu/nvidia/current:/usr/local/cuda/lib64
           resources:
             requests:
               cpu: "2"
