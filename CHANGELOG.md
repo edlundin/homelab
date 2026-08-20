@@ -2,7 +2,8 @@
 
 ## 2026-08-20
 
-- **chore**: Remove the unused Pocket TTS sidecar, persistent model cache, and image-update tracking after returning SUB/WAVE to Piper. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **chore**: Remove the unused Pocket TTS sidecar, persistent model cache, and image-update tracking after returning SUB/WAVE to Piper. ([03a4de1](https://github.com/edlundin/homelab/commit/03a4de15d02b20e0d2e97fbfd320181899ef8922))
+- **fix**: Expand the Lidarr PVC from 2Gi to 6Gi and the MusicGrabber PVC from 1Gi to 3Gi based on measured full-volume usage, restoring storage headroom for music acquisition. ([pending](https://github.com/edlundin/homelab/commit/pending))
 
 ## 2026-08-19
 

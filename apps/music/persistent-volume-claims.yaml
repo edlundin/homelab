@@ -49,12 +49,14 @@ metadata:
   namespace: music
   labels:
     app.kubernetes.io/name: lidarr
+  annotations:
+    homelab.oisd.io/storage-basis: /config measured 1.9Gi, including 1.7Gi of MediaCover data; 6Gi triples the prior allocation and leaves about 4Gi of headroom.
 spec:
   accessModes: [ReadWriteOnce]
   storageClassName: longhorn
   resources:
     requests:
-      storage: 2Gi
+      storage: 6Gi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -94,10 +96,10 @@ metadata:
   labels:
     app.kubernetes.io/name: musicgrabber
   annotations:
-    homelab.oisd.io/storage-basis: A new v4.0.2 SQLite database measured 4Ki; 1Gi is the smallest Longhorn tripwire used for this workload.
+    homelab.oisd.io/storage-basis: /data measured 957Mi, including 947Mi in .trash; 3Gi triples the prior allocation and leaves about 2Gi of headroom.
 spec:
   accessModes: [ReadWriteOnce]
   storageClassName: longhorn
   resources:
     requests:
-      storage: 1Gi
+      storage: 3Gi
