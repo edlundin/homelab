@@ -72,6 +72,13 @@ spec:
       ports:
         - protocol: TCP
           port: 4533
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: chatterbox
+      ports:
+        - protocol: TCP
+          port: 8004
     - ports:
         - protocol: TCP
           port: 80

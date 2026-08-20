@@ -29,11 +29,16 @@ Deployment. Keep the output private. No credential is stored in Git.
 3. Configure the OpenAI-compatible provider with the user's 9router base URL
    ending in `/v1`, the API key from its dashboard, and an exact model from
    `GET https://<9router-host>/v1/models`. Do not use ChatGPT Pro credentials.
-4. Complete station setup and verify `/api/health` reports `on-air`.
+4. Under the cloud TTS settings, enable the `openai-compatible` provider with
+   base URL `http://chatterbox.chatterbox.svc.cluster.local:8004/v1`, model
+   `chatterbox`, no API key, and a voice returned by voice discovery, such as
+   `Elena.wav`.
+5. Select the cloud TTS engine for the station or its personas.
+6. Complete station setup and verify `/api/health` reports `on-air`.
 
 Automatic operation starts only after this onboarding and the Music stack
-setup are complete. Heavy TTS and the Docker-socket proxy are intentionally
-not deployed.
+setup are complete. Chatterbox runs as the separate GPU service on
+`k3s-agent-2`; the Docker-socket proxy is intentionally not deployed.
 
 The policy allows the standard 9router port `20128`. If the instance uses a
 different non-HTTP private port, add that port to `network-policy.yaml`.
