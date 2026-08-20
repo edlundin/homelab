@@ -24,8 +24,11 @@ data "local_file" "sealed-secret-keys" {
 }
 
 locals {
-  managed_ssh_public_key = "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAINSUWgarmqMSeEgVBdoaeRfza29D2QrOFImshC4qTUDnAAAABHNzaDo= edlundin@macbookpro.ison-mirfak.ts.net"
-  ssh_public_keys        = distinct(concat(var.ssh_public_keys, [local.managed_ssh_public_key]))
+  managed_ssh_public_keys = [
+    "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAINSUWgarmqMSeEgVBdoaeRfza29D2QrOFImshC4qTUDnAAAABHNzaDo= edlundin@macbookpro.ison-mirfak.ts.net",
+    "sk-ecdsa-sha2-nistp256@openssh.com AAAAInNrLWVjZHNhLXNoYTItbmlzdHAyNTZAb3BlbnNzaC5jb20AAAAIbmlzdHAyNTYAAABBBJXgxwWv9PjmZABLdidh2gtV3upEJ3baomK6Jr6X3jMCbJXfrdtBS69DlfqjzLz/mtanUFvCo8yuvHwDq5b9Y0cAAAASYmV0YS5yb290c2hlbGwuY29t iphone-17-pro-max",
+  ]
+  ssh_public_keys = distinct(concat(var.ssh_public_keys, local.managed_ssh_public_keys))
 
   debian_13_lxc_template_filename      = "debian-13-standard_13.1-2_amd64.tar.zst"
   debian_13_lxc_template_path          = "${var.diskimages_storage}:vztmpl/${local.debian_13_lxc_template_filename}"
