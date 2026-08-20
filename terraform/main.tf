@@ -61,6 +61,12 @@ locals {
   }
 
   k3s_agent_count = 2
+  k3s_agent_vm_ids = [
+    for index in range(local.k3s_agent_count) : local.k3s_vm_id_start + local.k3s_master_count + index
+  ]
+  gpu_agent_index = 1
+  gpu_agent_vm_id = local.k3s_agent_vm_ids[local.gpu_agent_index]
+  gpu_pci_id      = "0000:10:00"
   k3s_agent_config = {
     node_name        = var.proxmox_node_name
     started          = true
@@ -402,7 +408,7 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
   count = local.k3s_agent_count
 
   node_name = var.proxmox_node_name
-  vm_id     = local.k3s_vm_id_start + local.k3s_master_count + count.index
+  vm_id     = local.k3s_agent_vm_ids[count.index]
   started   = local.k3s_master_config.started
   name      = "k3s-agent-${count.index + 1}"
   on_boot   = local.k3s_agent_config.on_boot
@@ -422,8 +428,8 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
     }
 
 
-    user_data_file_id = proxmox_virtual_environment_file.user_data_cloud_config.id
     meta_data_file_id = proxmox_virtual_environment_file.meta_data_cloud_config_k3s_agent[count.index].id
+    user_data_file_id = local.k3s_agent_vm_ids[count.index] == local.gpu_agent_vm_id ? proxmox_virtual_environment_file.nvidia_user_data_cloud_config.id : proxmox_virtual_environment_file.user_data_cloud_config.id
   }
 
   cpu {
@@ -452,12 +458,21 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
     enabled = true
   }
 
+  dynamic "hostpci" {
+    for_each = local.k3s_agent_vm_ids[count.index] == local.gpu_agent_vm_id ? [true] : []
+
+    content {
+      device = "hostpci0"
+      id     = local.gpu_pci_id
+      pcie   = false
+    }
+  }
+
   # Prevent Terraform from recreating container on changes
   lifecycle {
     ignore_changes = [
       disk[0],
       initialization[0].user_account,
-      initialization[0].user_data_file_id,
       initialization[0].meta_data_file_id,
       network_device[0],
     ]
@@ -813,6 +828,73 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
       - qemu-guest-agent
       - curl
       - neovim
+
+    runcmd:
+      - curl -fsSL https://tailscale.com/install.sh | sh
+      - echo 'net.ipv4.ip_forward = 1' | tee -a /etc/sysctl.d/99-tailscale.conf
+      - tailscale up --auth-key=${var.tailscale_authkey}
+      - systemctl enable --now qemu-guest-agent
+      - systemctl enable --now iscsid
+      - systemctl reload ssh
+      - systemctl reload sshd
+      - echo "done" > /tmp/cloud-config.done
+    EOF
+  }
+}
+
+resource "proxmox_virtual_environment_file" "nvidia_user_data_cloud_config" {
+  content_type = "snippets"
+  datastore_id = var.diskimages_storage
+  node_name    = var.proxmox_node_name
+
+  source_raw {
+    file_name = "nvidia-user-data-cloud-config.yaml"
+    data      = <<-EOF
+    #cloud-config
+    manage_etc_hosts: true
+    timezone: Europe/Paris
+
+    users:
+      - name: root
+        lock_passwd: true
+        shell: /bin/bash
+        ssh_authorized_keys: [${join(",", [for k in local.ssh_public_keys : k])}]
+
+    ssh_pwauth: false
+
+    write_files:
+      - path: /etc/ssh/sshd_config.d/99-cloudinit-root.conf
+        permissions: "0644"
+        owner: "root:root"
+        content: |
+          PermitRootLogin prohibit-password
+          PasswordAuthentication no
+          PubkeyAuthentication yes
+          ChallengeResponseAuthentication no
+          UsePAM yes
+
+    package_update: true
+    package_upgrade: true
+    package_reboot_if_required: true
+
+    apt:
+      sources:
+        debian:
+          source: "deb http://deb.debian.org/debian trixie main contrib non-free non-free-firmware"
+          filename: "debian-non-free.list"
+        debian-security:
+          source: "deb http://deb.debian.org/debian-security trixie-security main contrib non-free non-free-firmware"
+          filename: "debian-security-non-free.list"
+
+    packages:
+      - open-iscsi
+      - nfs-common
+      - qemu-guest-agent
+      - curl
+      - neovim
+      - linux-headers-amd64
+      - nvidia-kernel-dkms
+      - nvidia-driver
 
     runcmd:
       - curl -fsSL https://tailscale.com/install.sh | sh

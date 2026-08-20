@@ -1,0 +1,22 @@
+runtimeClassName: nvidia
+failOnInitError: true
+migStrategy: none
+deviceListStrategy: envvar
+
+nodeSelector:
+  kubernetes.io/hostname: k3s-agent-2
+
+affinity: {}
+nfd:
+  enabled: false
+gfd:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 16Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
