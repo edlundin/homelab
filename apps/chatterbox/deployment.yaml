@@ -22,6 +22,7 @@ spec:
       runtimeClassName: nvidia
       nodeSelector:
         kubernetes.io/hostname: k3s-agent-2
+      priorityClassName: gpu-workload
       securityContext:
         seccompProfile:
           type: RuntimeDefault
@@ -84,4 +85,3 @@ spec:
         - name: cache
           persistentVolumeClaim:
             claimName: chatterbox-cache
-

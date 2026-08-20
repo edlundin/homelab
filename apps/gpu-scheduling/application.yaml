@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gpu-scheduling
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - repoURL: https://kubernetes-sigs.github.io/descheduler
+      chart: descheduler
+      targetRevision: 0.36.0
+      helm:
+        valueFiles:
+          - $values/apps/gpu-scheduling/descheduler-values.yaml
+    - repoURL: https://github.com/edlundin/homelab.git
+      targetRevision: HEAD
+      ref: values
+    - repoURL: https://github.com/edlundin/homelab.git
+      targetRevision: HEAD
+      path: apps/gpu-scheduling
+      directory:
+        exclude: "{application.yaml,descheduler-values.yaml}"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true

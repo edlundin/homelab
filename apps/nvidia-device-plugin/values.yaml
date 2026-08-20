@@ -6,6 +6,12 @@ deviceListStrategy: envvar
 nodeSelector:
   kubernetes.io/hostname: k3s-agent-2
 
+tolerations:
+  - key: CriticalAddonsOnly
+    operator: Exists
+  - key: nvidia.com/gpu
+    operator: Exists
+
 affinity: null
 nfd:
   enabled: false
@@ -19,4 +25,3 @@ resources:
   limits:
     cpu: 100m
     memory: 64Mi
-

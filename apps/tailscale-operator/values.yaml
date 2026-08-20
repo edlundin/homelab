@@ -7,6 +7,11 @@ operatorConfig:
     repository: tailscale/k8s-operator
     tag: "v1.102.3"
   hostname: "tailscale-operator"
+  # kubectl top measured 77Mi and 2m CPU; 128Mi and 10m cover the operator.
+  resources:
+    requests:
+      cpu: 10m
+      memory: 128Mi
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:

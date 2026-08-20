@@ -7,6 +7,11 @@ auth:
   existingSecretPasswordKey: password
 
 master:
+  # kubectl top measured 38Mi and 18m CPU for redis; 64Mi and 25m cover it.
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
   persistence:
     enabled: true
     size: 1Gi

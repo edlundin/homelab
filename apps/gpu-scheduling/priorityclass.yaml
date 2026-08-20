@@ -1,0 +1,9 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: gpu-workload
+# Above the default priority (0) and below existing longhorn-critical (1000000000).
+value: 100000000
+globalDefault: false
+preemptionPolicy: PreemptLowerPriority
+description: GPU workloads can preempt lower-priority pods when agent 2 lacks requested capacity.

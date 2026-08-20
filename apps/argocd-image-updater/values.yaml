@@ -3,3 +3,9 @@ config:
 image:
   repository: quay.io/argoprojlabs/argocd-image-updater
   tag: v1.3.0
+
+# kubectl top measured 49Mi and 2m CPU; 64Mi and 10m cover the observed use.
+resources:
+  requests:
+    cpu: 10m
+    memory: 64Mi
