@@ -24,6 +24,9 @@ data "local_file" "sealed-secret-keys" {
 }
 
 locals {
+  managed_ssh_public_key = "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAINSUWgarmqMSeEgVBdoaeRfza29D2QrOFImshC4qTUDnAAAABHNzaDo= edlundin@macbookpro.ison-mirfak.ts.net"
+  ssh_public_keys        = distinct(concat(var.ssh_public_keys, [local.managed_ssh_public_key]))
+
   debian_13_lxc_template_filename      = "debian-13-standard_13.1-2_amd64.tar.zst"
   debian_13_lxc_template_path          = "${var.diskimages_storage}:vztmpl/${local.debian_13_lxc_template_filename}"
   debian_13_lxc_template_sha           = "5aec4ab2ac5c16c7c8ecb87bfeeb10213abe96db6b85e2463585cea492fc861d7c390b3f9c95629bf690b95e9dfe1037207fc69c0912429605f208d5cb2621f8"
@@ -695,7 +698,7 @@ resource "proxmox_virtual_environment_container" "service" {
     hostname = "${var.proxmox_node_name}-${each.key}"
 
     user_account {
-      keys = var.ssh_public_keys
+      keys = local.ssh_public_keys
     }
 
     dns {
@@ -784,7 +787,7 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
       - name: root
         lock_passwd: true
         shell: /bin/bash
-        ssh_authorized_keys: [${join(",", [for k in var.ssh_public_keys : k])}]
+        ssh_authorized_keys: [${join(",", [for k in local.ssh_public_keys : k])}]
 
     ssh_pwauth: false
 
