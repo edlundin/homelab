@@ -471,6 +471,7 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
       device = "hostpci0"
       id     = local.gpu_pci_id
       pcie   = false
+      rombar = true
     }
   }
 
@@ -479,6 +480,7 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
     ignore_changes = [
       disk[0],
       initialization[0].user_account,
+      initialization[0].user_data_file_id,
       initialization[0].meta_data_file_id,
       network_device[0],
     ]
@@ -770,6 +772,12 @@ resource "proxmox_virtual_environment_container" "service" {
   features {
     nesting = each.value.nesting
     keyctl  = each.value.keyctl
+  }
+
+  lifecycle {
+    ignore_changes = [
+      initialization[0].user_account,
+    ]
   }
 }
 
