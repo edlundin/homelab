@@ -235,6 +235,7 @@ resource "proxmox_virtual_environment_vm" "k3s_master_init" {
 
   memory {
     dedicated = local.k3s_master_config.memory
+    floating  = local.k3s_master_config.memory
   }
 
   disk {
@@ -347,6 +348,7 @@ resource "proxmox_virtual_environment_vm" "k3s_masters" {
 
   memory {
     dedicated = local.k3s_master_config.memory
+    floating  = local.k3s_master_config.memory
   }
 
   disk {
@@ -442,6 +444,7 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
 
   memory {
     dedicated = local.k3s_agent_config.memory
+    floating  = local.k3s_agent_config.memory
   }
 
   disk {
