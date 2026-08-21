@@ -1,0 +1,34 @@
+version: "3"
+
+tasks:
+  default:
+    desc: List available Terraform commands
+    cmds:
+      - task --list
+
+  init:
+    desc: Initialize Terraform
+    cmds:
+      - fnox exec -- terraform init
+
+  fmt:
+    desc: Check Terraform formatting
+    cmds:
+      - terraform fmt -check
+
+  validate:
+    desc: Validate Terraform configuration
+    deps: [fmt]
+    cmds:
+      - terraform validate -no-color
+
+  plan:
+    desc: Create a Terraform execution plan
+    deps: [validate]
+    cmds:
+      - fnox exec -- terraform plan
+
+  apply:
+    desc: Apply the Terraform configuration
+    cmds:
+      - fnox exec -- terraform apply

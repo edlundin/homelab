@@ -845,7 +845,8 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
 
     users:
       - name: root
-        lock_passwd: true
+        hashed_passwd: ${var.root_password_hash}
+        lock_passwd: false
         shell: /bin/bash
         ssh_authorized_keys: [${join(",", [for k in local.ssh_public_keys : k])}]
 
@@ -901,7 +902,8 @@ resource "proxmox_virtual_environment_file" "nvidia_user_data_cloud_config" {
 
     users:
       - name: root
-        lock_passwd: true
+        hashed_passwd: ${var.root_password_hash}
+        lock_passwd: false
         shell: /bin/bash
         ssh_authorized_keys: [${join(",", [for k in local.ssh_public_keys : k])}]
 

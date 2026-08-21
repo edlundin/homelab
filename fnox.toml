@@ -1,0 +1,7 @@
+[providers.protonpass]
+type = "proton-pass"
+vault = "HomeLab"
+agent_reason = "Load Terraform root password hash"
+
+[secrets]
+TF_VAR_root_password_hash = { provider = "protonpass", value = "Proxmox Default Root Login/password_hash" }

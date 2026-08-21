@@ -2,6 +2,11 @@ variable "proxmox_endpoint" { type = string }
 variable "proxmox_node_name" { type = string }
 variable "proxmox_username" { type = string }
 variable "proxmox_password" { type = string }
+variable "root_password_hash" {
+  description = "Hashed root password for console access"
+  type        = string
+  sensitive   = true
+}
 variable "proxmox_insecure" {
   type    = bool
   default = false
