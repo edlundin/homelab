@@ -116,3 +116,20 @@ spec:
       protocol: TCP
   selector:
     app.kubernetes.io/name: musicgrabber
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: soulsync
+  namespace: music
+  labels:
+    app.kubernetes.io/name: soulsync
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8008
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: soulsync

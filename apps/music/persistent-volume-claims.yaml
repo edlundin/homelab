@@ -103,3 +103,19 @@ spec:
   resources:
     requests:
       storage: 3Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: soulsync-data
+  namespace: music
+  labels:
+    app.kubernetes.io/name: soulsync
+  annotations:
+    homelab.oisd.io/storage-basis: MusicGrabber control data is measured at about 198Mi; 3Gi is a trial tripwire with about 2.8Gi headroom for SoulSync DB and config.
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 3Gi

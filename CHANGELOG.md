@@ -2,10 +2,11 @@
 
 ## 2026-08-21
 
+- **feat**: Add SoulSync as a parallel Spotify-to-Soulseek/Navidrome trial with private Tailscale access, persistent configuration, NFS storage, and isolated network access. ([pending](https://github.com/edlundin/homelab/commit/pending))
 - **fix**: Label `k3s-agent-1` and `k3s-agent-2` as topology zone `nietzsche`, label node `610n1r0` as zone `sarasate` through Terraform, and require two Traefik replicas to spread across those physical failure domains. ([997ae32](https://github.com/edlundin/homelab/commit/997ae32))
 - **fix**: Preserve the GPU ROM BAR and ignore managed cloud-init SSH user-data drift so Terraform does not replace K3s VMs and LXC containers. ([0ef6219](https://github.com/edlundin/homelab/commit/0ef6219))
 - **fix**: Add the Rootshell FIDO2 public SSH key to Terraform-managed VM and container access. ([cd3b600](https://github.com/edlundin/homelab/commit/cd3b600))
-- **fix**: Use the dedicated `homelab_oisd` SSH key for Ansible and Terraform, add account-scoped authorized-key bootstrapping, silence Python interpreter discovery warnings, and persist the updated Terraform state. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Use the dedicated `homelab_oisd` SSH key for Ansible and Terraform, add account-scoped authorized-key bootstrapping, silence Python interpreter discovery warnings, and persist the updated Terraform state. ([bc0d870](https://github.com/edlundin/homelab/commit/bc0d870))
 - **perf**: Set MusicGrabber `SEARCH_CONCURRENCY=5` for the measured 1,599-track bulk import and document its background progress endpoints and queue behavior. ([e4f9251](https://github.com/edlundin/homelab/commit/e4f9251))
 - **fix**: Improve worker scheduling with preempting GPU workload priority, measured LowNodeUtilization rebalancing, and scheduler-visible resource requests. ([37dae51](https://github.com/edlundin/homelab/commit/37dae51))
 

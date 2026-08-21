@@ -99,3 +99,20 @@ spec:
         name: http
   tls:
     - hosts: [musicgrabber]
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: soulsync
+  namespace: music
+  labels:
+    app.kubernetes.io/name: soulsync
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: soulsync
+      port:
+        name: http
+  tls:
+    - hosts: [soulsync]

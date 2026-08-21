@@ -1,10 +1,11 @@
 # Music stack
 
 This namespace runs qBittorrent, Prowlarr, FlareSolverr, Lidarr, Navidrome,
-slskd, Soularr, and MusicGrabber. All eight applications run as UID/GID
-`1000`. qBittorrent, Lidarr, Navidrome, slskd, Soularr, and MusicGrabber
-access the NFS export, which must have matching ownership and permissions
-before downloads start.
+slskd, Soularr, MusicGrabber, and SoulSync. SoulSync is a parallel trial
+stack alongside the existing MusicGrabber flow. SoulSync and the non-root
+services run as UID/GID `1000`. qBittorrent, Lidarr, Navidrome, slskd, Soularr,
+MusicGrabber, and SoulSync access the NFS export, which must have matching
+ownership and permissions before downloads start.
 Create `multimedia/Downloads/music` and
 `multimedia/Downloads/slskd/{complete,incomplete}` on the export before the
 first sync.
@@ -29,6 +30,7 @@ Internal service URLs are:
 - Navidrome: `http://navidrome.music.svc.cluster.local:4533`
 - slskd: `http://slskd.music.svc.cluster.local:5030`
 - MusicGrabber: `http://musicgrabber.music.svc.cluster.local:8080`
+- SoulSync: `http://soulsync.music.svc.cluster.local:8008`
 
 Soularr has no Service or ingress. Its upstream web UI has no authentication
 and exposes its Lidarr and slskd API keys, so this deployment disables it.
@@ -79,6 +81,27 @@ browser-based Spotify import must be measured before adding a CPU limit.
    download staging.
    Keep **Convert audio** disabled. MusicGrabber then preserves native lossless
    files and does not put lossy audio in a FLAC container.
+8. Open SoulSync at <https://soulsync.ison-mirfak.ts.net> for the parallel
+   trial. Configure its slskd service as
+   `http://slskd.music.svc.cluster.local:5030`, with downloads at
+   `/app/downloads`. Get the existing slskd API key with this command, and
+   enter it in SoulSync:
+
+   ```sh
+   kubie exec OISD music kubectl get secret slskd-credentials \
+     -o jsonpath='{.data.SLSKD_API_KEY}' | base64 --decode
+   ```
+
+   Configure at least one folder that you are willing to expose as a
+   share in slskd before the first download. Soulseek can ban accounts that do
+   not share files. Configure SoulSync's transfer or music path as
+   `/app/Transfer`, and its Navidrome service as
+   `http://navidrome.music.svc.cluster.local:4533`. The Spotify OAuth callback
+   is `https://soulsync.ison-mirfak.ts.net/callback`.
+
+   Do not enable automatic mirror for the same playlist in both apps. Start
+   with one small playlist and Soulseek first. YouTube PO-token support is
+   unconfirmed; test full downloads before relying on it.
 
 The services are ClusterIP-only. FlareSolverr has no external ingress and
 accepts requests only from Prowlarr. qBittorrent peer ports and the slskd
