@@ -2,7 +2,8 @@
 
 ## 2026-08-21
 
-- **chore**: Remove MusicGrabber, Lidarr, Soularr, Prowlarr, FlareSolverr, and qBittorrent with their dedicated services, storage, access, and network resources, leaving SoulSync, slskd, and Navidrome as the music stack. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **feat**: Track the Longhorn manager and UI images with Argo CD Image Updater so stable semantic-version releases write back into the chart values and drive automatic Longhorn upgrades. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **chore**: Remove MusicGrabber, Lidarr, Soularr, Prowlarr, FlareSolverr, and qBittorrent with their dedicated services, storage, access, and network resources, leaving SoulSync, slskd, and Navidrome as the music stack. ([ede6263](https://github.com/edlundin/homelab/commit/ede6263))
 - **feat**: Add SoulSync as a parallel Spotify-to-Soulseek/Navidrome trial with private Tailscale access, persistent configuration, NFS storage, and isolated network access. ([fc68448](https://github.com/edlundin/homelab/commit/fc68448))
 - **fix**: Label `k3s-agent-1` and `k3s-agent-2` as topology zone `nietzsche`, label node `610n1r0` as zone `sarasate` through Terraform, and require two Traefik replicas to spread across those physical failure domains. ([997ae32](https://github.com/edlundin/homelab/commit/997ae32))
 - **fix**: Preserve the GPU ROM BAR and ignore managed cloud-init SSH user-data drift so Terraform does not replace K3s VMs and LXC containers. ([0ef6219](https://github.com/edlundin/homelab/commit/0ef6219))
