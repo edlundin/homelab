@@ -4,33 +4,14 @@ resources:
   - service-accounts.yaml
   - persistent-volume-claims.yaml
   - slskd-sealed-secret.yaml
-  - soularr-sealed-secret.yaml
   - deployments.yaml
   - services.yaml
   - ingresses.yaml
   - network-policy.yaml
 images:
-  - name: lscr.io/linuxserver/qbittorrent
-    newName: lscr.io/linuxserver/qbittorrent
-    newTag: 5.2.3_v2.0.14-ls472
-  - name: lscr.io/linuxserver/prowlarr
-    newName: lscr.io/linuxserver/prowlarr
-    newTag: 2.5.2.5491-ls156
-  - name: ghcr.io/flaresolverr/flaresolverr
-    newName: ghcr.io/flaresolverr/flaresolverr
-    newTag: v3.5.0
-  - name: lscr.io/linuxserver/lidarr
-    newName: lscr.io/linuxserver/lidarr
-    newTag: 3.1.0.4875-ls39
   - name: deluan/navidrome
     newName: docker.io/deluan/navidrome
     newTag: 0.63.2
   - name: slskd/slskd
     newName: docker.io/slskd/slskd
     newTag: 0.26.0
-  - name: mrusse/soularr
-    newName: ghcr.io/mrusse/soularr
-    newTag: 1.2.2
-  - name: g33kphr33k/musicgrabber
-    newName: docker.io/g33kphr33k/musicgrabber
-    newTag: 4.0.2

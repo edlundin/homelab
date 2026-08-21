@@ -1,62 +1,3 @@
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: qbittorrent-config
-  namespace: music
-  labels:
-    app.kubernetes.io/name: qbittorrent
-spec:
-  accessModes: [ReadWriteOnce]
-  storageClassName: longhorn
-  resources:
-    requests:
-      storage: 2Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: soularr-data
-  namespace: music
-  labels:
-    app.kubernetes.io/name: soularr
-  annotations:
-    homelab.oisd.io/storage-basis: A 1.8Ki configuration and small denylist state need far less than 1Gi; 1Gi is the smallest Longhorn tripwire used for this workload.
-spec:
-  accessModes: [ReadWriteOnce]
-  storageClassName: longhorn
-  resources:
-    requests:
-      storage: 1Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: prowlarr-config
-  namespace: music
-  labels:
-    app.kubernetes.io/name: prowlarr
-spec:
-  accessModes: [ReadWriteOnce]
-  storageClassName: longhorn
-  resources:
-    requests:
-      storage: 2Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: lidarr-config
-  namespace: music
-  labels:
-    app.kubernetes.io/name: lidarr
-  annotations:
-    homelab.oisd.io/storage-basis: /config measured 1.9Gi, including 1.7Gi of MediaCover data; 6Gi triples the prior allocation and leaves about 4Gi of headroom.
-spec:
-  accessModes: [ReadWriteOnce]
-  storageClassName: longhorn
-  resources:
-    requests:
-      storage: 6Gi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -91,28 +32,12 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: musicgrabber-data
-  namespace: music
-  labels:
-    app.kubernetes.io/name: musicgrabber
-  annotations:
-    homelab.oisd.io/storage-basis: /data measured 957Mi, including 947Mi in .trash; 3Gi triples the prior allocation and leaves about 2Gi of headroom.
-spec:
-  accessModes: [ReadWriteOnce]
-  storageClassName: longhorn
-  resources:
-    requests:
-      storage: 3Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
   name: soulsync-data
   namespace: music
   labels:
     app.kubernetes.io/name: soulsync
   annotations:
-    homelab.oisd.io/storage-basis: MusicGrabber control data is measured at about 198Mi; 3Gi is a trial tripwire with about 2.8Gi headroom for SoulSync DB and config.
+    homelab.oisd.io/storage-basis: SoulSync control data is measured at about 198Mi; 3Gi is a trial tripwire with about 2.8Gi headroom for the database and config.
 spec:
   accessModes: [ReadWriteOnce]
   storageClassName: longhorn

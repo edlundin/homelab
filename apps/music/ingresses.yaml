@@ -1,57 +1,6 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: qbittorrent
-  namespace: music
-  labels:
-    app.kubernetes.io/name: qbittorrent
-spec:
-  ingressClassName: tailscale
-  defaultBackend:
-    service:
-      name: qbittorrent
-      port:
-        name: http
-  tls:
-    - hosts: [qbittorrent]
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: prowlarr
-  namespace: music
-  labels:
-    app.kubernetes.io/name: prowlarr
-spec:
-  ingressClassName: tailscale
-  defaultBackend:
-    service:
-      name: prowlarr
-      port:
-        name: http
-  tls:
-    - hosts: [prowlarr]
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: lidarr
-  namespace: music
-  labels:
-    app.kubernetes.io/name: lidarr
-spec:
-  ingressClassName: tailscale
-  defaultBackend:
-    service:
-      name: lidarr
-      port:
-        name: http
-  tls:
-    - hosts: [lidarr]
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
   name: navidrome
   namespace: music
   labels:
@@ -82,23 +31,6 @@ spec:
         name: http
   tls:
     - hosts: [slskd]
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: musicgrabber
-  namespace: music
-  labels:
-    app.kubernetes.io/name: musicgrabber
-spec:
-  ingressClassName: tailscale
-  defaultBackend:
-    service:
-      name: musicgrabber
-      port:
-        name: http
-  tls:
-    - hosts: [musicgrabber]
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
