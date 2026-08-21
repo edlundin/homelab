@@ -2,6 +2,8 @@
 
 ## 2026-08-21
 
+- **fix**: Label `k3s-agent-1` and `k3s-agent-2` as topology zone `nietzsche`, label node `610n1r0` as zone `sarasate` through Terraform, and require two Traefik replicas to spread across those physical failure domains. ([pending](https://github.com/edlundin/homelab/commit/pending))
+
 - **fix**: Add the Rootshell FIDO2 public SSH key to Terraform-managed VM and container access. ([pending](https://github.com/edlundin/homelab/commit/pending))
 - **perf**: Set MusicGrabber `SEARCH_CONCURRENCY=5` for the measured 1,599-track bulk import and document its background progress endpoints and queue behavior. ([e4f9251](https://github.com/edlundin/homelab/commit/e4f9251))
 - **fix**: Improve worker scheduling with preempting GPU workload priority, measured LowNodeUtilization rebalancing, and scheduler-visible resource requests. ([37dae51](https://github.com/edlundin/homelab/commit/37dae51))

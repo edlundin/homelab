@@ -677,6 +677,37 @@ resource "null_resource" "k3s_agents_api_endpoint_config" {
   }
 }
 
+resource "null_resource" "k3s_worker_topology_labels" {
+  depends_on = [
+    null_resource.k3s_agents_setup,
+    null_resource.k3s_master_init_setup,
+  ]
+
+  triggers = {
+    agent_ids    = join(",", [for agent in proxmox_virtual_environment_vm.k3s_agents : agent.id])
+    nietzsche    = "k3s-agent-1,k3s-agent-2"
+    sarasate     = "610n1r0"
+    topology_key = "topology.kubernetes.io/zone"
+  }
+
+  connection {
+    type  = "ssh"
+    user  = "root"
+    agent = true
+    host  = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "set -euo pipefail",
+      "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml",
+      "kubectl wait --for=condition=Ready nodes/k3s-agent-1 nodes/k3s-agent-2 nodes/610n1r0 --timeout=600s",
+      "kubectl label node k3s-agent-1 k3s-agent-2 topology.kubernetes.io/zone=nietzsche --overwrite",
+      "kubectl label node 610n1r0 topology.kubernetes.io/zone=sarasate --overwrite",
+    ]
+  }
+}
+
 resource "null_resource" "install_sealed_secrets" {
   depends_on = [
     null_resource.k3s_master_init_setup,
