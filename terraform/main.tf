@@ -14,8 +14,9 @@ provider "proxmox" {
   insecure = var.proxmox_insecure
 
   ssh {
-    agent            = true
-    agent_forwarding = true
+    agent            = false
+    agent_forwarding = false
+    private_key      = file(pathexpand("~/.ssh/homelab_oisd"))
   }
 }
 
@@ -27,6 +28,7 @@ locals {
   managed_ssh_public_keys = [
     "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAINSUWgarmqMSeEgVBdoaeRfza29D2QrOFImshC4qTUDnAAAABHNzaDo= edlundin@macbookpro.ison-mirfak.ts.net",
     "sk-ecdsa-sha2-nistp256@openssh.com AAAAInNrLWVjZHNhLXNoYTItbmlzdHAyNTZAb3BlbnNzaC5jb20AAAAIbmlzdHAyNTYAAABBBJXgxwWv9PjmZABLdidh2gtV3upEJ3baomK6Jr6X3jMCbJXfrdtBS69DlfqjzLz/mtanUFvCo8yuvHwDq5b9Y0cAAAASYmV0YS5yb290c2hlbGwuY29t iphone-17-pro-max",
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIILe1CvyHOfvzhCREQnSdf9ChnMm0B6z5nD+bEzhgVkP homelab_oisd",
   ]
   ssh_public_keys = distinct(concat(var.ssh_public_keys, local.managed_ssh_public_keys))
 

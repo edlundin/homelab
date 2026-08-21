@@ -1,0 +1,21 @@
+---
+- name: Update authorized keys for the connected account
+  hosts: hosts
+  gather_facts: true
+
+  tasks:
+    - name: Ensure the SSH directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_facts['user_dir'] }}/.ssh"
+        state: directory
+        owner: "{{ ansible_facts['user_uid'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: "0700"
+
+    - name: Install the managed authorized keys
+      ansible.builtin.copy:
+        src: ../files/authorized_keys
+        dest: "{{ ansible_facts['user_dir'] }}/.ssh/authorized_keys"
+        owner: "{{ ansible_facts['user_uid'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: "0600"
