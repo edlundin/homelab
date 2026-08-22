@@ -311,7 +311,11 @@ spec:
             - name: nas
               mountPath: /app/Transfer
               subPath: multimedia/Music
+            - name: atomic-staging
+              mountPath: /app/.soulsync_atomic_staging
       volumes:
+        - name: atomic-staging
+          emptyDir: {}
         - name: data
           persistentVolumeClaim:
             claimName: soulsync-data
