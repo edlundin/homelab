@@ -1,8 +1,12 @@
 # Changelog
 
+## 2026-08-22
+
+- **fix**: Raise the SoulSync Kubernetes memory limit from 2Gi to 5Gi after measured OOM kills, restoring headroom for the music workload. ([pending](https://github.com/edlundin/homelab/commit/pending))
+
 ## 2026-08-21
 
-- **feat**: Track the Longhorn manager and UI images with Argo CD Image Updater so stable semantic-version releases write back into the chart values and drive automatic Longhorn upgrades. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **feat**: Track the Longhorn manager and UI images with Argo CD Image Updater so stable semantic-version releases write back into the chart values and drive automatic Longhorn upgrades. ([385bdb5](https://github.com/edlundin/homelab/commit/385bdb5))
 - **chore**: Remove MusicGrabber, Lidarr, Soularr, Prowlarr, FlareSolverr, and qBittorrent with their dedicated services, storage, access, and network resources, leaving SoulSync, slskd, and Navidrome as the music stack. ([ede6263](https://github.com/edlundin/homelab/commit/ede6263))
 - **feat**: Add SoulSync as a parallel Spotify-to-Soulseek/Navidrome trial with private Tailscale access, persistent configuration, NFS storage, and isolated network access. ([fc68448](https://github.com/edlundin/homelab/commit/fc68448))
 - **fix**: Label `k3s-agent-1` and `k3s-agent-2` as topology zone `nietzsche`, label node `610n1r0` as zone `sarasate` through Terraform, and require two Traefik replicas to spread across those physical failure domains. ([997ae32](https://github.com/edlundin/homelab/commit/997ae32))

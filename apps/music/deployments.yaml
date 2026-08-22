@@ -237,7 +237,7 @@ spec:
         homelab.oisd.io/non-root-basis: The upstream entrypoint detects UID 1000 and skips the root/gosu path.
         homelab.oisd.io/probe-basis: Upstream Compose start_period is 60s; the repository startup probe uses a 10s period, 5s timeout, and 30 failures.
         homelab.oisd.io/request-basis: These 500m CPU and 512Mi memory reservations mirror SoulSync upstream Compose bounds pending measurement.
-        homelab.oisd.io/limit-basis: These 2000m CPU and 2Gi memory limits mirror SoulSync upstream Compose bounds pending measurement.
+        homelab.oisd.io/limit-basis: The 2000m CPU limit retains the upstream bound. The user-selected 5Gi memory tripwire follows an OOM kill at 2Gi and a measured 828Mi within two minutes of restart during concurrent downloads.
     spec:
       serviceAccountName: soulsync
       automountServiceAccountToken: false
@@ -297,7 +297,7 @@ spec:
               memory: 512Mi
             limits:
               cpu: 2000m
-              memory: 2Gi
+              memory: 5Gi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
