@@ -95,6 +95,14 @@ spec:
           manifestTargets:
             kustomize:
               name: g33kphr33k/musicgrabber
+        - alias: soulsync
+          imageName: docker.io/boulderbadgedad/soulsync:3.x
+          commonUpdateSettings:
+            updateStrategy: semver
+            allowTags: regexp:^[0-9]+\.[0-9]+\.[0-9]+$
+          manifestTargets:
+            kustomize:
+              name: boulderbadgedad/soulsync
     - namePattern: digarr
       writeBackConfig:
         method: git:secret:argocd/argocd-image-updater-github

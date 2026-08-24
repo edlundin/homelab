@@ -15,3 +15,6 @@ images:
   - name: slskd/slskd
     newName: docker.io/slskd/slskd
     newTag: 0.26.0
+  - name: boulderbadgedad/soulsync
+    newName: docker.io/boulderbadgedad/soulsync
+    newTag: 3.2.2

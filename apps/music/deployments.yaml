@@ -251,7 +251,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: soulsync
-          image: docker.io/boulderbadgedad/soulsync:3.2.2@sha256:a1e2f71c011e43ec175442e65069fa5b755792d6b1f7deebd25acd7f9d4c7e20
+          image: boulderbadgedad/soulsync:3.2.2
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
