@@ -22,7 +22,7 @@ images:
     newTag: 1.9.0
   - name: ghcr.io/perminder-klair/subwave-broadcast
     newName: ghcr.io/perminder-klair/subwave-broadcast
-    newTag: 1.9.0
+    newTag: 1.10.0
   - name: ghcr.io/perminder-klair/subwave-analyzer
     newName: ghcr.io/perminder-klair/subwave-analyzer
     newTag: 1.9.0
