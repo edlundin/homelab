@@ -19,7 +19,7 @@ images:
     newTag: 1.10.0
   - name: ghcr.io/perminder-klair/subwave-controller
     newName: ghcr.io/perminder-klair/subwave-controller
-    newTag: 1.10.0
+    newTag: 1.11.0
   - name: ghcr.io/perminder-klair/subwave-broadcast
     newName: ghcr.io/perminder-klair/subwave-broadcast
     newTag: 1.11.0
