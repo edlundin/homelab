@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-08-27
+
+- **feat**: Make SUB/WAVE use the heavy CLAP/Demucs analyzer, track its releases with Argo CD Image Updater, and set a 1Gi memory request with a 6Gi memory limit. ([pending](https://github.com/edlundin/homelab/commit/pending))
+
 ## 2026-08-22
 
 - **fix**: Raise the SoulSync Kubernetes memory limit from 2Gi to 5Gi after measured OOM kills, restoring headroom for the music workload. ([pending](https://github.com/edlundin/homelab/commit/pending))

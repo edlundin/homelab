@@ -1,8 +1,8 @@
 # SUB/WAVE
 
 SUB/WAVE 1.8.0 runs as one Deployment with Caddy, web, controller, broadcast,
-and the lean analyzer. The images are digest-pinned. Caddy is the only
-ingress backend and the only service exposed to Tailscale at
+and the heavy analyzer with CLAP and Demucs. The images are digest-pinned.
+Caddy is the only ingress backend and the only service exposed to Tailscale at
 <https://wave.ison-mirfak.ts.net>. The service names and ports match the
 upstream Caddy/controller configuration: `caddy:80`, `web:7700`,
 `controller:7701`, `broadcast:7702`, and `analyzer:8080`.
