@@ -2,7 +2,8 @@
 
 ## 2026-08-27
 
-- **feat**: Make SUB/WAVE use the heavy CLAP/Demucs analyzer, track its releases with Argo CD Image Updater, and set a 1Gi memory request with a 6Gi memory limit. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Raise the SUB/WAVE controller upstream timeout from 120s to 600s after heavy CPU analysis took up to 7m20s, and raise analyzer CPU request/limit from 100m/1 core to 1/4 cores after 999m saturation and 75% throttled periods. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **feat**: Make SUB/WAVE use the heavy CLAP/Demucs analyzer, track its releases with Argo CD Image Updater, and set a 1Gi memory request with a 6Gi memory limit. ([0548ebc](https://github.com/edlundin/homelab/commit/0548ebc))
 
 ## 2026-08-22
 

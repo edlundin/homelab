@@ -18,6 +18,10 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: subwave
+      annotations:
+        homelab.oisd.io/analyzer-request-basis: The heavy analyzer used its full one-core limit during the audio backfill, so it reserves one CPU.
+        homelab.oisd.io/analyzer-limit-basis: Four CPUs let CLAP and Demucs use the node's measured spare capacity without consuming all eight allocatable CPUs; 6Gi remains above the observed 2362Mi memory use.
+        homelab.oisd.io/analyzer-timeout-basis: The 600000ms request deadline exceeds the measured 7m20s CPU analysis and replaces the upstream 120s default that aborted active tracks.
     spec:
       serviceAccountName: subwave
       automountServiceAccountToken: false
@@ -176,6 +180,8 @@ spec:
               value: /sounds
             - name: ANALYZE_URL
               value: http://analyzer:8080
+            - name: ANALYZE_REQUEST_TIMEOUT_MS
+              value: "600000"
             - name: ICECAST_STATUS_URL
               value: http://broadcast:7702/status-json.xsl
             - name: ICECAST_ADMIN_URL
@@ -298,10 +304,10 @@ spec:
             failureThreshold: 3
           resources:
             requests:
-              cpu: 100m
+              cpu: 1000m
               memory: 1Gi
             limits:
-              cpu: 1000m
+              cpu: 4000m
               memory: 6Gi
           securityContext:
             runAsNonRoot: true

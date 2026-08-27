@@ -7,6 +7,10 @@ Caddy is the only ingress backend and the only service exposed to Tailscale at
 upstream Caddy/controller configuration: `caddy:80`, `web:7700`,
 `controller:7701`, `broadcast:7702`, and `analyzer:8080`.
 
+The controller allows 10 minutes for each heavy analysis request. The analyzer
+reserves one CPU and can use up to four CPUs so CPU-only CLAP and Demucs work
+does not hit the upstream 120-second request deadline.
+
 The shared `subwave-state` Longhorn PVC stores station state. The init
 container creates `ADMIN_USER=admin` and a random `ADMIN_PASS` in
 `/var/sub-wave/secrets.env` only when that file has no admin password. Retrieve
