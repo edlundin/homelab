@@ -1,13 +1,17 @@
 # Changelog
 
+## 2026-08-29
+
+- **fix**: Exclude SUB/WAVE from GPU descheduler LowNodeUtilization eviction so long-running audio fingerprint backfills survive the analyzer's high CPU use. ([pending](https://github.com/edlundin/homelab/commit/pending))
+
 ## 2026-08-27
 
-- **fix**: Raise the SUB/WAVE controller upstream timeout from 600s to 3 hours (10,800,000 ms) after the 600-second deadline still interrupted heavy audio fingerprinting, and raise analyzer CPU request/limit from 100m/1 core to 1/4 cores after 999m saturation and 75% throttled periods. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Raise the SUB/WAVE controller upstream timeout from 600s to 3 hours (10,800,000 ms) after the 600-second deadline still interrupted heavy audio fingerprinting, and raise analyzer CPU request/limit from 100m/1 core to 1/4 cores after 999m saturation and 75% throttled periods. ([1f7cd48](https://github.com/edlundin/homelab/commit/1f7cd48))
 - **feat**: Make SUB/WAVE use the heavy CLAP/Demucs analyzer, track its releases with Argo CD Image Updater, and set a 1Gi memory request with a 6Gi memory limit. ([0548ebc](https://github.com/edlundin/homelab/commit/0548ebc))
 
 ## 2026-08-22
 
-- **fix**: Raise the SoulSync Kubernetes memory limit from 2Gi to 5Gi after measured OOM kills, restoring headroom for the music workload. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Raise the SoulSync Kubernetes memory limit from 2Gi to 5Gi after measured OOM kills, restoring headroom for the music workload. ([0b21c5f](https://github.com/edlundin/homelab/commit/0b21c5f))
 
 ## 2026-08-21
 
