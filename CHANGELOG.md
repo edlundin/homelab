@@ -3,7 +3,8 @@
 ## 2026-08-29
 
 - **fix**: Use the official Pulse Helm chart and its stable-release channel so Argo CD tracks the latest v6 release while excluding `-rc` prereleases. ([d52a123](https://github.com/edlundin/homelab/commit/d52a123))
-- **fix**: Upgrade Longhorn as one coordinated chart release, remove unsafe manager/UI image overrides, and preserve Pulse's recovered Longhorn PV binding. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Upgrade Longhorn as one coordinated chart release, remove unsafe manager/UI image overrides, and preserve Pulse's recovered Longhorn PV binding. ([41ae5be](https://github.com/edlundin/homelab/commit/41ae5be))
+- **fix**: Complete the staged Longhorn upgrade on the 1.12 line and track coordinated patch releases without allowing automatic minor-version jumps. ([pending](https://github.com/edlundin/homelab/commit/pending))
 - **fix**: Exclude SUB/WAVE from GPU descheduler LowNodeUtilization eviction so long-running audio fingerprint backfills survive the analyzer's high CPU use. ([76db769](https://github.com/edlundin/homelab/commit/76db769))
 
 ## 2026-08-27
