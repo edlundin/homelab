@@ -11,5 +11,5 @@ spec:
   labels: {}
   name: weekly-backup
   parameters: {}
-  retain: 7
+  retain: 4
   task: backup

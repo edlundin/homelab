@@ -2,7 +2,8 @@
 
 ## 2026-08-29
 
-- **fix**: Migrate Navidrome, SUB/WAVE, Pulse, and Chatterbox to measured smaller Longhorn PVCs with new v2 claim names, reducing overprovisioned storage while preserving workload data. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Reduce Longhorn weekly-backup retention from 7 to 4 snapshots to limit backup storage growth while retaining four weekly recovery points. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Migrate Navidrome, SUB/WAVE, Pulse, and Chatterbox to measured smaller Longhorn PVCs with new v2 claim names, reducing overprovisioned storage while preserving workload data. ([753f515](https://github.com/edlundin/homelab/commit/753f515))
 - **fix**: Rename the K3s worker identity from `610n1r0` to `sarasate` across CoreDNS, Digarr node selection, descheduler documentation, and Terraform topology labeling. ([437f78a](https://github.com/edlundin/homelab/commit/437f78a))
 - **fix**: Use the official Pulse Helm chart and its stable-release channel so Argo CD tracks the latest v6 release while excluding `-rc` prereleases. ([d52a123](https://github.com/edlundin/homelab/commit/d52a123))
 - **fix**: Upgrade Longhorn as one coordinated chart release, remove unsafe manager/UI image overrides, and preserve Pulse's recovered Longhorn PV binding. ([41ae5be](https://github.com/edlundin/homelab/commit/41ae5be))
