@@ -11,7 +11,7 @@ spec:
   project: default
   source:
     repoURL: https://charts.longhorn.io
-    targetRevision: 1.10.2
+    targetRevision: 1.11.3
     chart: longhorn
     helm:
       values: |
@@ -23,6 +23,9 @@ spec:
         defaultSettings:
           backupTarget: s3://homelab-backups@garage/
           backupTargetCredentialSecret: longhorn-backup-secret
+          # Based on 10 healthy V1 volumes, each currently single-replica;
+          # one engine upgrade per node limits concurrent exposure.
+          concurrentAutomaticEngineUpgradePerNodeLimit: 1
 
         ingress:
           enabled: true

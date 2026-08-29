@@ -4,6 +4,7 @@ metadata:
   name: pulse-data
   namespace: pulse
 spec:
+  volumeName: pvc-63496e34-0e6b-4877-88b1-105110155ee1
   accessModes:
     - ReadWriteOnce
   resources:
