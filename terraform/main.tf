@@ -688,7 +688,7 @@ resource "null_resource" "k3s_worker_topology_labels" {
   triggers = {
     agent_ids    = join(",", [for agent in proxmox_virtual_environment_vm.k3s_agents : agent.id])
     nietzsche    = "k3s-agent-1,k3s-agent-2"
-    sarasate     = "610n1r0"
+    sarasate     = "sarasate"
     topology_key = "topology.kubernetes.io/zone"
   }
 
@@ -703,9 +703,9 @@ resource "null_resource" "k3s_worker_topology_labels" {
     inline = [
       "set -euo pipefail",
       "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml",
-      "kubectl wait --for=condition=Ready nodes/k3s-agent-1 nodes/k3s-agent-2 nodes/610n1r0 --timeout=600s",
+      "kubectl wait --for=condition=Ready nodes/k3s-agent-1 nodes/k3s-agent-2 nodes/sarasate --timeout=600s",
       "kubectl label node k3s-agent-1 k3s-agent-2 topology.kubernetes.io/zone=nietzsche --overwrite",
-      "kubectl label node 610n1r0 topology.kubernetes.io/zone=sarasate --overwrite",
+      "kubectl label node sarasate topology.kubernetes.io/zone=sarasate --overwrite",
     ]
   }
 }

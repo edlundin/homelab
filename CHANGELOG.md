@@ -2,9 +2,10 @@
 
 ## 2026-08-29
 
+- **fix**: Rename the K3s worker identity from `610n1r0` to `sarasate` across CoreDNS, Digarr node selection, descheduler documentation, and Terraform topology labeling. ([pending](https://github.com/edlundin/homelab/commit/pending))
 - **fix**: Use the official Pulse Helm chart and its stable-release channel so Argo CD tracks the latest v6 release while excluding `-rc` prereleases. ([d52a123](https://github.com/edlundin/homelab/commit/d52a123))
 - **fix**: Upgrade Longhorn as one coordinated chart release, remove unsafe manager/UI image overrides, and preserve Pulse's recovered Longhorn PV binding. ([41ae5be](https://github.com/edlundin/homelab/commit/41ae5be))
-- **fix**: Complete the staged Longhorn upgrade on the 1.12 line and track coordinated patch releases without allowing automatic minor-version jumps. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Complete the staged Longhorn upgrade on the 1.12 line and track coordinated patch releases without allowing automatic minor-version jumps. ([9e40d07](https://github.com/edlundin/homelab/commit/9e40d07))
 - **fix**: Exclude SUB/WAVE from GPU descheduler LowNodeUtilization eviction so long-running audio fingerprint backfills survive the analyzer's high CPU use. ([76db769](https://github.com/edlundin/homelab/commit/76db769))
 
 ## 2026-08-27

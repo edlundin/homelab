@@ -23,7 +23,7 @@ spec:
         app.kubernetes.io/component: app
     spec:
       nodeSelector:
-        kubernetes.io/hostname: 610n1r0
+        kubernetes.io/hostname: sarasate
       serviceAccountName: digarr
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 45
