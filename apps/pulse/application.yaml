@@ -17,7 +17,20 @@ spec:
     syncOptions:
       - CreateNamespace=true
   sources:
-    # Git source for manifests
+    - repoURL: https://rcourtman.github.io/Pulse
+      chart: pulse
+      targetRevision: "6.*"
+      helm:
+        valueFiles:
+          - $values/apps/pulse/values.yaml
     - repoURL: https://github.com/edlundin/homelab.git
-      targetRevision: master
+      targetRevision: HEAD
+      ref: values
+    # Keep only the custom resources from Git. The Application itself must not
+    # be included in its own source. The chart owns the workload, while Git
+    # keeps the existing pulse Service name for the ingress backends.
+    - repoURL: https://github.com/edlundin/homelab.git
+      targetRevision: HEAD
       path: apps/pulse
+      directory:
+        include: "{external-secret-tls.yaml,ingress.yaml,pvc.yaml,service.yaml,tailscale-ingress.yaml}"

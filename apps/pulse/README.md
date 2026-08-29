@@ -4,9 +4,13 @@ Pulse provides real-time monitoring for Proxmox VE, Proxmox Backup Server, and D
 
 ## Installation
 
-Deployed via raw Kubernetes manifests synced by Argo CD:
-- **Image**: rcourtman/pulse:6.1.2
+Deployed via the official Pulse Helm chart synced by Argo CD:
+- **Chart**: `pulse` from `https://rcourtman.github.io/Pulse`
+- **Version**: latest stable `6.x` chart (`-rc` prereleases are excluded)
 - **Namespace**: pulse
+
+The chart appVersion controls the Pulse image. The existing `pulse-data` PVC
+is retained through `persistence.existingClaim`.
 
 Before the first v6 deployment, create an encrypted backup from **Settings → System → Recovery → Create Backup**. The existing `/data` PVC is retained during the upgrade.
 
@@ -74,7 +78,7 @@ Configure in **Settings → Alerts → Email/Webhook Destinations**
 
 ### Network Discovery
 Default: 192.168.0.0/16 (home networks)
-To customize, update `DISCOVERY_SUBNET` in application.yaml
+To customize, update `DISCOVERY_SUBNET` in values.yaml.
 
 ## Storage
 

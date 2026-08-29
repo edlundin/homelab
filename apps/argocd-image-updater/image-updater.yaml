@@ -204,20 +204,6 @@ spec:
             helm:
               name: image.repository
               tag: image.tag
-    - namePattern: pulse
-      writeBackConfig:
-        method: git:secret:argocd/argocd-image-updater-github
-        gitConfig:
-          writeBackTarget: kustomization:/apps/pulse
-      images:
-        - alias: pulse
-          imageName: rcourtman/pulse:6.x
-          commonUpdateSettings:
-            updateStrategy: semver
-            allowTags: regexp:^[0-9]+\.[0-9]+\.[0-9]+$
-          manifestTargets:
-            kustomize:
-              name: rcourtman/pulse
     - namePattern: searxng
       writeBackConfig:
         method: git:secret:argocd/argocd-image-updater-github
