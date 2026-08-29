@@ -84,4 +84,4 @@ spec:
       volumes:
         - name: cache
           persistentVolumeClaim:
-            claimName: chatterbox-cache
+            claimName: chatterbox-cache-v2

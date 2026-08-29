@@ -10,7 +10,7 @@ image:
 
 persistence:
   enabled: true
-  existingClaim: pulse-data
+  existingClaim: pulse-data-v2
 
 service:
   type: ClusterIP

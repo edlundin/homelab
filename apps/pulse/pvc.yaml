@@ -1,13 +1,14 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pulse-data
+  name: pulse-data-v2
   namespace: pulse
+  annotations:
+    homelab.oisd.io/storage-basis: Restored Pulse files use 288Mi; 2Gi leaves 1.6Gi usable headroom for history and configuration.
 spec:
-  volumeName: pvc-63496e34-0e6b-4877-88b1-105110155ee1
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: 2Gi
   storageClassName: longhorn

@@ -1,13 +1,15 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: subwave-state
+  name: subwave-state-v2
   namespace: subwave
   labels:
     app.kubernetes.io/name: subwave
+  annotations:
+    homelab.oisd.io/storage-basis: Live SUB/WAVE state uses 74Mi; 5Gi leaves 4.8Gi usable headroom for station data.
 spec:
   accessModes: [ReadWriteOnce]
   storageClassName: longhorn
   resources:
     requests:
-      storage: 20Gi
+      storage: 5Gi
