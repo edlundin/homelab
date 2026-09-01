@@ -5,7 +5,7 @@ SearXNG is a free internet metasearch engine which aggregates results from vario
 ## Deployment
 
 This SearXNG instance is deployed on the K3s cluster and accessible at:
-- **URL**: https://search.oisd.io
+- **URL**: https://search.oisd.dev
 
 ## Components
 
@@ -13,7 +13,7 @@ This SearXNG instance is deployed on the K3s cluster and accessible at:
 - **Deployment**: SearXNG application pods (2 replicas for HA)
 - **Service**: ClusterIP service in `searxng` namespace
 - **External Service**: Routes traffic from `traefik` namespace to SearXNG service
-- **IngressRoute**: HTTPS ingress configuration for `search.oisd.io`
+- **IngressRoute**: HTTPS ingress configuration for `search.oisd.dev`
 
 ## Configuration
 
@@ -52,7 +52,7 @@ This SearXNG instance is deployed on the K3s cluster and accessible at:
 - **Main Service**: `searxng.searxng.svc.cluster.local:8080`
 - **External Service**: `searxng-external.traefik.svc.cluster.local:8080` 
 - **Redis Cache**: `redis.redis.svc.cluster.local:6379`
-- **Ingress**: `search.oisd.io` (HTTPS with wildcard TLS)
+- **Ingress**: `search.oisd.dev` (HTTPS with wildcard TLS)
 - **Middlewares**: `default-chain` (security headers + rate limiting)
 
 ## Monitoring

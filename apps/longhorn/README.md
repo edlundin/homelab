@@ -25,7 +25,7 @@ Longhorn should be deployed after Garage for backup functionality:
   - Storage class: `longhorn` 
   - Default storage class for PVCs
 - **External access**: Management UI available through Traefik ingress
-  - Management UI: `https://longhorn.oisd.io`
+  - Management UI: `https://longhorn.oisd.dev`
 
 ## Setup Process
 
@@ -187,7 +187,7 @@ kubectl exec -n longhorn-system deployment/longhorn-ui -- curl -I http://garage-
 
 ### Performance Monitoring
 
-Access the Longhorn UI at `https://longhorn.oisd.io` to monitor:
+Access the Longhorn UI at `https://longhorn.oisd.dev` to monitor:
 - Volume performance metrics
 - Node resource usage
 - Backup job status and history

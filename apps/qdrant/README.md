@@ -111,7 +111,7 @@ curl -H "api-key: YOUR_API_KEY" http://qdrant:6333/collections
 # Basic auth + API key required
 curl -u admin:password \
   -H "api-key: YOUR_API_KEY" \
-  https://qdrant.oisd.io/collections
+  https://qdrant.oisd.dev/collections
 ```
 
 ## Collection Initialization
@@ -155,10 +155,10 @@ kubectl get pv | grep qdrant
 ### Test basic auth middleware
 ```bash
 # Should return 401 without auth
-curl https://qdrant.oisd.io/
+curl https://qdrant.oisd.dev/
 
 # Should succeed with auth
-curl -u admin:password https://qdrant.oisd.io/
+curl -u admin:password https://qdrant.oisd.dev/
 ```
 
 ## Backup and Restore

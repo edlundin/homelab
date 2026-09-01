@@ -9,7 +9,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`proxy.oisd.io`)
+    - match: Host(`proxy.oisd.dev`)
       kind: Rule
       services:
         - name: api@internal

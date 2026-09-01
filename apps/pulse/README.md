@@ -20,14 +20,14 @@ kubectl apply -f application.yaml
 
 ## Access
 
-- **URL**: https://pulse.oisd.io
+- **URL**: https://pulse.oisd.dev
 - **Tailscale URL**: https://pulse.ison-mirfak.ts.net
 - **Port**: 7655
 - **Ingress**: Traefik with cert-manager TLS and private Tailscale access
 
 ## Initial Setup
 
-1. Access https://pulse.oisd.io on first launch
+1. Access https://pulse.oisd.dev on first launch
 2. Complete the mandatory security setup wizard
 3. Create admin username and password
 4. Generate API tokens for automation (Settings → Security → API tokens)

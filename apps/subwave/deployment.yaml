@@ -6,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: subwave
   annotations:
-    homelab.oisd.io/root-container-justification: SUB/WAVE controller reads root-only Icecast secrets; broadcast renders Icecast configuration with DAC_OVERRIDE, then drops to its bundled user.
+    homelab.oisd.dev/root-container-justification: SUB/WAVE controller reads root-only Icecast secrets; broadcast renders Icecast configuration with DAC_OVERRIDE, then drops to its bundled user.
 spec:
   replicas: 1
   strategy:
@@ -19,9 +19,9 @@ spec:
       labels:
         app.kubernetes.io/name: subwave
       annotations:
-        homelab.oisd.io/analyzer-request-basis: The heavy analyzer used its full one-core limit during the audio backfill, so it reserves one CPU.
-        homelab.oisd.io/analyzer-limit-basis: Four CPUs let CLAP and Demucs use the node's measured spare capacity without consuming all eight allocatable CPUs; 6Gi remains above the observed 2362Mi memory use.
-        homelab.oisd.io/analyzer-timeout-basis: The requested 10800000ms three-hour tripwire replaces the 600000ms deadline that interrupted heavy fingerprinting; completed CPU analysis was measured at 7m20s.
+        homelab.oisd.dev/analyzer-request-basis: The heavy analyzer used its full one-core limit during the audio backfill, so it reserves one CPU.
+        homelab.oisd.dev/analyzer-limit-basis: Four CPUs let CLAP and Demucs use the node's measured spare capacity without consuming all eight allocatable CPUs; 6Gi remains above the observed 2362Mi memory use.
+        homelab.oisd.dev/analyzer-timeout-basis: The requested 10800000ms three-hour tripwire replaces the 600000ms deadline that interrupted heavy fingerprinting; completed CPU analysis was measured at 7m20s.
     spec:
       serviceAccountName: subwave
       automountServiceAccountToken: false

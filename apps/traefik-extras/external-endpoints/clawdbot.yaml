@@ -19,7 +19,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`clawd.oisd.io`)
+    - match: Host(`clawd.oisd.dev`)
       kind: Rule
       services:
         - name: nietzsche-clawdbot-external

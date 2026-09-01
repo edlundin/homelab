@@ -4,7 +4,7 @@ metadata:
   name: pulse-data-v2
   namespace: pulse
   annotations:
-    homelab.oisd.io/storage-basis: Restored Pulse files use 288Mi; 2Gi leaves 1.6Gi usable headroom for history and configuration.
+    homelab.oisd.dev/storage-basis: Restored Pulse files use 288Mi; 2Gi leaves 1.6Gi usable headroom for history and configuration.
 spec:
   accessModes:
     - ReadWriteOnce

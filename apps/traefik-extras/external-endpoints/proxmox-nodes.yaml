@@ -19,7 +19,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`nietzsche.oisd.io`)
+    - match: Host(`nietzsche.oisd.dev`)
       kind: Rule
       services:
         - name: nietzsche-proxmox-node-external

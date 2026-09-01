@@ -15,7 +15,7 @@ kubectl apply -f application.yaml
 
 ## Access
 
-- **URL**: https://n8n.oisd.io
+- **URL**: https://n8n.oisd.dev
 - **Ingress**: Traefik with automatic TLS via cert-manager
 - **Public Webhooks**: Exposed via Tailscale Funnel for external services
 
@@ -23,7 +23,7 @@ kubectl apply -f application.yaml
 
 Webhooks are exposed in two ways:
 
-1. **Internal (Traefik)**: https://n8n.oisd.io/webhook/* - for use within your network
+1. **Internal (Traefik)**: https://n8n.oisd.dev/webhook/* - for use within your network
 2. **Public (Tailscale Funnel)**: https://n8n-webhook-funnel-n8n.{tailnet}.ts.net/webhook/* - for external services
 
 The Tailscale Funnel ingress allows external services (like GitHub, Stripe, etc.) to send webhooks directly to n8n without requiring VPN access.

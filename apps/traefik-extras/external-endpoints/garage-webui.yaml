@@ -19,7 +19,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`s3.oisd.io`)
+    - match: Host(`s3.oisd.dev`)
       kind: Rule
       services:
         - name: nietzsche-s3-external

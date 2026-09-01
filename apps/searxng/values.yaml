@@ -6,7 +6,7 @@ workload:
       containers:
         main:
           env:
-            BASE_URL: "https://search.oisd.io"
+            BASE_URL: "https://search.oisd.dev"
           # kubectl top measured 176Mi and 1m CPU; 256Mi and 10m cover the pod.
           resources:
             requests:
@@ -23,7 +23,7 @@ ingress:
   main:
     enabled: true
     hosts:
-    - host: search.oisd.io
+    - host: search.oisd.dev
       paths:
       - path: /
         pathType: Prefix

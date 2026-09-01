@@ -1,5 +1,5 @@
 ---
-# Certificate for wildcard oisd.io domain
+# Certificate for wildcard oisd.dev domain
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -11,11 +11,11 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-    - "oisd.io"
-    - "*.oisd.io"
+    - "oisd.dev"
+    - "*.oisd.dev"
 
 ---
-# Certificate for wildcard bos.oisd.io domain
+# Certificate for wildcard bos.oisd.dev domain
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -27,11 +27,11 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-    - "bos.oisd.io"
-    - "*.bos.oisd.io"
+    - "bos.oisd.dev"
+    - "*.bos.oisd.dev"
 
 ---
-# Certificate for wildcard s3.oisd.io domain
+# Certificate for wildcard s3.oisd.dev domain
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -43,8 +43,8 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-    - "s3.oisd.io"
-    - "*.s3.oisd.io"
+    - "s3.oisd.dev"
+    - "*.s3.oisd.dev"
 
 ---
 # ClusterIssuer for Let's Encrypt production with Cloudflare DNS
@@ -66,12 +66,12 @@ spec:
               key: api-token
         selector:
           dnsNames:
-            - "oisd.io"
-            - "*.oisd.io"
-            - "bos.oisd.io"
-            - "*.bos.oisd.io"
-            - "s3.oisd.io"
-            - "*.s3.oisd.io"
+            - "oisd.dev"
+            - "*.oisd.dev"
+            - "bos.oisd.dev"
+            - "*.bos.oisd.dev"
+            - "s3.oisd.dev"
+            - "*.s3.oisd.dev"
 
 ---
 # ClusterIssuer for Let's Encrypt staging (for testing)
@@ -93,9 +93,9 @@ spec:
               key: api-token
         selector:
           dnsNames:
-            - "oisd.io"
-            - "*.oisd.io"
-            - "bos.oisd.io"
-            - "*.bos.oisd.io"
-            - "s3.oisd.io"
-            - "*.s3.oisd.io"
+            - "oisd.dev"
+            - "*.oisd.dev"
+            - "bos.oisd.dev"
+            - "*.bos.oisd.dev"
+            - "s3.oisd.dev"
+            - "*.s3.oisd.dev"

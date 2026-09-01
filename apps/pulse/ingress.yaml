@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`pulse.oisd.io`)
+    - match: Host(`pulse.oisd.dev`)
       kind: Rule
       services:
         - name: pulse

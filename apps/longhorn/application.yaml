@@ -32,7 +32,7 @@ spec:
         ingress:
           enabled: true
           ingressClassName: traefik
-          host: longhorn.oisd.io
+          host: longhorn.oisd.dev
           tls: true
           tlsSecret: wildcard-tls-oisd
           annotations:

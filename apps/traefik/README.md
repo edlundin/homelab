@@ -52,7 +52,7 @@ kubectl get svc -n traefik
 
 ### 3. Access Dashboard
 
-- **URL**: `https://proxy.oisd.io`
+- **URL**: `https://proxy.oisd.dev`
 - **Authentication**: Basic auth (admin/admin - change this!)
 - **Features**: View routes, services, middlewares, and metrics
 
@@ -118,7 +118,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: myapp.oisd.io
+    - host: myapp.oisd.dev
       http:
         paths:
           - path: /
@@ -130,7 +130,7 @@ spec:
                   number: 80
   tls:
     - hosts:
-        - myapp.oisd.io
+        - myapp.oisd.dev
       secretName: wildcard-tls-oisd
 ```
 
@@ -174,7 +174,7 @@ kubectl get ingress -A
 
 ### Dashboard Metrics
 
-Access the dashboard at `https://proxy.oisd.io` to view:
+Access the dashboard at `https://proxy.oisd.dev` to view:
 - **Routes**: All configured ingress routes
 - **Services**: Backend service health
 - **Middlewares**: Applied request/response processors  

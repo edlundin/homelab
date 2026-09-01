@@ -10,7 +10,7 @@ spec:
     - websecure
   routes:
     # Webhook route - direct to webhook service
-    - match: Host(`n8n.oisd.io`) && (PathPrefix(`/webhook`) || PathPrefix(`/webhook-test`) || PathPrefix(`/webhook-waiting`))
+    - match: Host(`n8n.oisd.dev`) && (PathPrefix(`/webhook`) || PathPrefix(`/webhook-test`) || PathPrefix(`/webhook-waiting`))
       kind: Rule
       priority: 10
       services:
@@ -20,7 +20,7 @@ spec:
         - name: default-chain
           namespace: traefik
     # Main UI route - direct to main service
-    - match: Host(`n8n.oisd.io`)
+    - match: Host(`n8n.oisd.dev`)
       kind: Rule
       priority: 5
       services:

@@ -51,7 +51,7 @@ kubectl get applications -n argocd
 
 ### 3. Access ArgoCD UI
 
-- **URL**: https://argocd.oisd.io
+- **URL**: https://argocd.oisd.dev
 - **Username**: `admin`
 - **Password**: Get with `task get-argocd-password`
 

@@ -117,8 +117,8 @@ spec:
       labels:
         app.kubernetes.io/name: slskd
       annotations:
-        homelab.oisd.io/request-basis: Music pods measured at 1-3m CPU and 28-317Mi memory; 100m and 256Mi are initial scheduling requests for the first transfer test.
-        homelab.oisd.io/limit-basis: One CPU and 1Gi memory are tripwires above the measured music workload; remeasure slskd after a completed transfer.
+        homelab.oisd.dev/request-basis: Music pods measured at 1-3m CPU and 28-317Mi memory; 100m and 256Mi are initial scheduling requests for the first transfer test.
+        homelab.oisd.dev/limit-basis: One CPU and 1Gi memory are tripwires above the measured music workload; remeasure slskd after a completed transfer.
     spec:
       serviceAccountName: slskd
       automountServiceAccountToken: false
@@ -234,10 +234,10 @@ spec:
       labels:
         app.kubernetes.io/name: soulsync
       annotations:
-        homelab.oisd.io/non-root-basis: The upstream entrypoint detects UID 1000 and skips the root/gosu path.
-        homelab.oisd.io/probe-basis: Upstream Compose start_period is 60s; the repository startup probe uses a 10s period, 5s timeout, and 30 failures.
-        homelab.oisd.io/request-basis: These 500m CPU and 512Mi memory reservations mirror SoulSync upstream Compose bounds pending measurement.
-        homelab.oisd.io/limit-basis: The 2000m CPU limit retains the upstream bound. The user-selected 5Gi memory tripwire follows an OOM kill at 2Gi and a measured 828Mi within two minutes of restart during concurrent downloads.
+        homelab.oisd.dev/non-root-basis: The upstream entrypoint detects UID 1000 and skips the root/gosu path.
+        homelab.oisd.dev/probe-basis: Upstream Compose start_period is 60s; the repository startup probe uses a 10s period, 5s timeout, and 30 failures.
+        homelab.oisd.dev/request-basis: These 500m CPU and 512Mi memory reservations mirror SoulSync upstream Compose bounds pending measurement.
+        homelab.oisd.dev/limit-basis: The 2000m CPU limit retains the upstream bound. The user-selected 5Gi memory tripwire follows an OOM kill at 2Gi and a measured 828Mi within two minutes of restart during concurrent downloads.
     spec:
       serviceAccountName: soulsync
       automountServiceAccountToken: false

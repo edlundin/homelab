@@ -9,7 +9,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`argocd.oisd.io`)
+    - match: Host(`argocd.oisd.dev`)
       kind: Rule
       services:
         - name: argocd-server

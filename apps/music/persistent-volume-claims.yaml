@@ -7,7 +7,7 @@ metadata:
   labels:
     app.kubernetes.io/name: navidrome
   annotations:
-    homelab.oisd.io/storage-basis: Live Navidrome data uses 121Mi; 2Gi leaves 1.8Gi usable headroom for the database and indexes.
+    homelab.oisd.dev/storage-basis: Live Navidrome data uses 121Mi; 2Gi leaves 1.8Gi usable headroom for the database and indexes.
 spec:
   accessModes: [ReadWriteOnce]
   storageClassName: longhorn
@@ -23,7 +23,7 @@ metadata:
   labels:
     app.kubernetes.io/name: slskd
   annotations:
-    homelab.oisd.io/storage-basis: Existing music configuration uses 5-8Mi; 2Gi keeps downloads on NFS and leaves configuration and log headroom.
+    homelab.oisd.dev/storage-basis: Existing music configuration uses 5-8Mi; 2Gi keeps downloads on NFS and leaves configuration and log headroom.
 spec:
   accessModes: [ReadWriteOnce]
   storageClassName: longhorn
@@ -39,7 +39,7 @@ metadata:
   labels:
     app.kubernetes.io/name: soulsync
   annotations:
-    homelab.oisd.io/storage-basis: SoulSync control data is measured at about 198Mi; 3Gi is a trial tripwire with about 2.8Gi headroom for the database and config.
+    homelab.oisd.dev/storage-basis: SoulSync control data is measured at about 198Mi; 3Gi is a trial tripwire with about 2.8Gi headroom for the database and config.
 spec:
   accessModes: [ReadWriteOnce]
   storageClassName: longhorn

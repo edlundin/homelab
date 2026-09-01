@@ -9,7 +9,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`qdrant.oisd.io`)
+    - match: Host(`qdrant.oisd.dev`)
       kind: Rule
       services:
         - name: qdrant

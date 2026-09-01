@@ -19,7 +19,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`dns.oisd.io`)
+    - match: Host(`dns.oisd.dev`)
       kind: Rule
       services:
         - name: adguardhome-external

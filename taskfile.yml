@@ -27,7 +27,7 @@ tasks:
             - echo "Waiting for ArgoCD installer job to complete..."
             - kubectl wait --for=condition=complete --timeout=600s job/argocd-installer -n argocd
             - echo "ArgoCD deployed successfully!"
-            - echo 'Access ArgoCD at https://argocd.oisd.io'
+            - echo 'Access ArgoCD at https://argocd.oisd.dev'
             - echo "Get admin password with kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d"
 
     bootstrap-apps:

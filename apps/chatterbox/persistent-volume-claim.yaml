@@ -4,7 +4,7 @@ metadata:
   name: chatterbox-cache-v2
   namespace: chatterbox
   annotations:
-    homelab.oisd.io/storage-basis: Live Hugging Face cache uses 3.8Gi; 6Gi leaves 2.1Gi usable headroom for model growth.
+    homelab.oisd.dev/storage-basis: Live Hugging Face cache uses 3.8Gi; 6Gi leaves 2.1Gi usable headroom for model growth.
 spec:
   accessModes:
     - ReadWriteOnce

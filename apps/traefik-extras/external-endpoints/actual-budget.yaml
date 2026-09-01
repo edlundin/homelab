@@ -19,7 +19,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`budget.oisd.io`)
+    - match: Host(`budget.oisd.dev`)
       kind: Rule
       services:
         - name: nietzsche-actual-budget-external

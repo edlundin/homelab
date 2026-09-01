@@ -19,7 +19,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`api.bos.oisd.io`)
+    - match: Host(`api.bos.oisd.dev`)
       kind: Rule
       services:
         - name: nietzsche-wirebos-external

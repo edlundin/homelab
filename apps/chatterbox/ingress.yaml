@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`tts.oisd.io`)
+    - match: Host(`tts.oisd.dev`)
       kind: Rule
       services:
         - name: chatterbox

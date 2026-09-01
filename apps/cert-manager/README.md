@@ -17,7 +17,7 @@ This directory manages the deployment of cert-manager and its certificate resour
 2. **Helm** manages the cert-manager controller, CRDs, and webhooks in the `cert-manager` namespace.
 3. **Custom resources** (Certificates, ClusterIssuers) are applied by ArgoCD after the controller is available.
 4. **Secrets** are referenced by ClusterIssuers for DNS-01 challenges (e.g., Cloudflare API tokens).
-5. **Wildcard certificates** are issued for all required domains (e.g., `*.oisd.io`, `*.bos.oisd.io`, `*.s3.oisd.io`) and stored as Kubernetes secrets for use by Ingress controllers like Traefik.
+5. **Wildcard certificates** are issued for all required domains (e.g., `*.oisd.dev`, `*.bos.oisd.dev`, `*.s3.oisd.dev`) and stored as Kubernetes secrets for use by Ingress controllers like Traefik.
 
 ## Managing Certificates
 - To add or update a certificate or issuer, edit `cert-manager.yaml` and sync the ArgoCD application.
