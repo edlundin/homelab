@@ -7,12 +7,20 @@ workload:
         main:
           env:
             BASE_URL: "https://search.oisd.dev"
+            # Protect upstream engines from abusive or automated clients.
+            SEARXNG_LIMITER:
+              value: "true"
+            SEARXNG_VALKEY_URL:
+              valueFrom:
+                secretKeyRef:
+                  name: searxng-redis
+                  key: redis_url
           # kubectl top measured 176Mi and 1m CPU; 256Mi and 10m cover the pod.
           resources:
             requests:
               cpu: 10m
               memory: 256Mi
-# Disable Redis entirely for initial deployment
+# Use the existing Redis deployment as SearXNG's Valkey-compatible limiter backend.
 cnpg:
   redis:
     enabled: false

@@ -30,7 +30,7 @@ This SearXNG instance is deployed on the K3s cluster and accessible at:
 - Privacy-focused search with no user tracking
 - Aggregates results from multiple search engines
 - Google-backed search autocomplete
-- Rate limiting and security headers via Traefik middleware chain
+- Per-client rate limiting through SearXNG's Valkey-backed limiter
 - Health checks for reliability
 - TLS termination with wildcard certificate
 
@@ -39,13 +39,13 @@ This SearXNG instance is deployed on the K3s cluster and accessible at:
 - Brave, DuckDuckGo, Google, Bing, Startpage, Wikipedia
 - Disabled engines: Yahoo, Wikidata, Karama, currency converter (for performance)
 
-## Redis Cache
+## Request Limiter Backend
 
-- **Backend**: Standalone Redis 7 Alpine with persistent storage
+- **Backend**: Existing standalone Redis 7 Alpine deployment
 - **Connection**: `redis://redis.redis.svc.cluster.local:6379/0`
-- **Benefits**: Faster search results, reduced load on search engines
-- **Storage**: 1Gi persistent volume with AOF persistence
-- **Database**: Uses Redis database 0
+- **Purpose**: Tracks client request rates and blocks abusive traffic before it reaches upstream engines
+- **Storage**: 1Gi persistent volume
+- **Database**: Uses Redis database 0 via the Valkey-compatible protocol
 
 ## Networking
 
@@ -67,6 +67,6 @@ The deployment uses the `latest` tag and will be updated automatically by ArgoCD
 
 - HTTPS only via TLS redirect and wildcard certificate
 - Security headers via Traefik middleware (XSS protection, content sniffing prevention, etc.)
-- Rate limiting (50 requests/second average, 100 burst)
+- Per-client request limiting backed by Redis/Valkey
 - No user tracking or profiling
 - Container security hardening (non-root, dropped capabilities)
