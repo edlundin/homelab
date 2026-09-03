@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-03
+
+- **fix**: Use the valid TrueCharts scalar syntax for the SearXNG limiter environment variable so Argo CD can render and deploy the limiter-backed configuration. ([pending](https://github.com/edlundin/homelab/commit/pending))
+
 ## 2026-09-01
 
 - **fix**: Migrate homelab service hosts, wildcard certificates, and DNS configuration to `oisd.dev`. ([pending](https://github.com/edlundin/homelab/commit/pending))

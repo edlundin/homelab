@@ -8,8 +8,7 @@ workload:
           env:
             BASE_URL: "https://search.oisd.dev"
             # Protect upstream engines from abusive or automated clients.
-            SEARXNG_LIMITER:
-              value: "true"
+            SEARXNG_LIMITER: "true"
             SEARXNG_VALKEY_URL:
               valueFrom:
                 secretKeyRef:
