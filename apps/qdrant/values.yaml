@@ -8,7 +8,7 @@ replicaCount: 1
 image:
   repository: qdrant/qdrant
   # Use a specific version tag or comment out to use chart default
-  tag: "v1.19.0"
+  tag: "v1.19.1"
   pullPolicy: IfNotPresent
 service:
   type: ClusterIP
