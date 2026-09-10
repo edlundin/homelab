@@ -25,4 +25,4 @@ images:
     newTag: 1.15.0
   - name: ghcr.io/perminder-klair/subwave-analyzer
     newName: ghcr.io/perminder-klair/subwave-analyzer-heavy
-    newTag: 1.14.0
+    newTag: 1.15.0
