@@ -11,7 +11,7 @@ resources:
 images:
   - name: deluan/navidrome
     newName: docker.io/deluan/navidrome
-    newTag: 0.63.2
+    newTag: 0.64.0
   - name: slskd/slskd
     newName: docker.io/slskd/slskd
     newTag: 0.26.0
