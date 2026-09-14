@@ -9,7 +9,7 @@ resources:
 images:
   - name: ghcr.io/iuliandita/digarr
     newName: ghcr.io/iuliandita/digarr
-    newTag: 1.15.1-debian
+    newTag: 1.16.0-debian
   - name: postgres
     newName: docker.io/postgres
     newTag: 17-alpine
