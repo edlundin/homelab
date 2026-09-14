@@ -10,10 +10,10 @@ workload:
             # Protect upstream engines from abusive or automated clients.
             SEARXNG_LIMITER: "true"
             SEARXNG_VALKEY_URL:
-              valueFrom:
-                secretKeyRef:
-                  name: searxng-redis
-                  key: redis_url
+              secretKeyRef:
+                name: searxng-redis
+                key: redis_url
+                expandObjectName: false
           # kubectl top measured 176Mi and 1m CPU; 256Mi and 10m cover the pod.
           resources:
             requests:
