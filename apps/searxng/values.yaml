@@ -44,5 +44,5 @@ persistence:
     objectName: searxng-config
     mountPath: /etc/searxng
 image:
-  tag: latest@sha256:e26403691d3cf1f8860ae9ddde9d024e639b1f44f5dbb00b1b2c17ad79c03780
+  tag: latest@sha256:4c2cf334c3c18c6055fba7768bf9b25a9e3e3efd3c40538b39a33c123d7be407
   repository: docker.io/searxng/searxng
