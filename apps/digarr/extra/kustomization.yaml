@@ -13,4 +13,4 @@ images:
   - name: postgres
     newName: docker.io/postgres
     newTag: 17-alpine
-    digest: sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73
+    digest: sha256:9beea1b7f176d67e49e23092c63db9e98db32b303ce1b510749379ef46a3dcdd
