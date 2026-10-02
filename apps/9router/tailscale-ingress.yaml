@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: 9router
+  namespace: 9router
+  labels:
+    app.kubernetes.io/name: 9router
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: 9router
+      port:
+        number: 20128
+  tls:
+    - hosts:
+        - aiproxy

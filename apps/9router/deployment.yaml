@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 9router
+  namespace: 9router
+  labels:
+    app.kubernetes.io/name: 9router
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: 9router
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: 9router
+    spec:
+      serviceAccountName: 9router
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: 9router
+          image: decolua/9router:0.5.95
+          imagePullPolicy: IfNotPresent
+          # Skip the image's root-only chown entrypoint; fsGroup grants PVC access.
+          command: ["node", "custom-server.js"]
+          ports:
+            - name: http
+              containerPort: 20128
+              protocol: TCP
+          env:
+            - name: DATA_DIR
+              value: /app/data
+            - name: PORT
+              value: "20128"
+            - name: HOSTNAME
+              value: 0.0.0.0
+            - name: HOME
+              value: /app/data-home
+            - name: AUTH_COOKIE_SECURE
+              value: "true"
+            - name: INITIAL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: 9router-initial-password
+                  key: password
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 5
+            failureThreshold: 24
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: 9router-data
