@@ -22,9 +22,13 @@ The user chose this saved archive for cutover, accepting that changes made after
 it was created may be missing. The old VM is now unreachable, so a fresh final
 copy could not be made. The archive has been restored to the k3s PVC; all six
 restored files hash-match the archive. The k3s pod is healthy, and
-`https://budget.ison-mirfak.ts.net/login` returns HTTP 200.
+`https://budget.ison-mirfak.ts.net/login`,
+`https://budget.oisd.dev/login`, and `https://budger.oisd.dev/login` return HTTP
+200. The Actual Budget and Traefik extras Argo CD Applications are Synced and
+Healthy at commit `dc6020a`.
 
-The `budget.oisd.dev` route still points to the old VM until the prepared
-GitOps changes are pushed and synced. The `budger.oisd.dev` alias is also
-configured to route to the k3s service after that cutover. Keep the VM intact
-until the new service and a Longhorn restore have been verified.
+The old Actual Budget VM still times out over SSH and direct HTTP, so its
+container could not be stopped. The k3s service is the active instance. Do not
+use or route traffic to the old VM if it becomes reachable; it may contain
+changes that are absent from the selected archive and current k3s data. Keep it
+isolated until it can be safely retired.
