@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - service-account.yaml
+  - pvc.yaml
+  - deployment.yaml
+  - service.yaml
+  - tailscale-ingress.yaml
+  - network-policy.yaml
+images:
+  - name: docker.io/actualbudget/actual-server
+    newName: docker.io/actualbudget/actual-server
+    newTag: latest-alpine
+    digest: sha256:67b1b5e9584e3e143b4f5c41e52b4506ed9cdd1072392d5ab5369f2d4fd0bffd

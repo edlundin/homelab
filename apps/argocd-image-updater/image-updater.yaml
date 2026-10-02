@@ -103,6 +103,46 @@ spec:
           manifestTargets:
             kustomize:
               name: boulderbadgedad/soulsync
+    - namePattern: qbittorrent
+      writeBackConfig:
+        method: git:secret:argocd/argocd-image-updater-github
+        gitConfig:
+          writeBackTarget: kustomization:/apps/qbittorrent
+      images:
+        - alias: qbittorrent
+          imageName: docker.io/linuxserver/qbittorrent:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+          manifestTargets:
+            kustomize:
+              name: docker.io/linuxserver/qbittorrent
+    - namePattern: 9router
+      writeBackConfig:
+        method: git:secret:argocd/argocd-image-updater-github
+        gitConfig:
+          writeBackTarget: kustomization:/apps/9router
+      images:
+        - alias: 9router
+          imageName: docker.io/decolua/9router:0.5.x
+          commonUpdateSettings:
+            updateStrategy: semver
+            allowTags: regexp:^0\.5\.[0-9]+$
+          manifestTargets:
+            kustomize:
+              name: decolua/9router
+    - namePattern: actual-budget
+      writeBackConfig:
+        method: git:secret:argocd/argocd-image-updater-github
+        gitConfig:
+          writeBackTarget: kustomization:/apps/actual-budget
+      images:
+        - alias: actual-budget
+          imageName: docker.io/actualbudget/actual-server:latest-alpine
+          commonUpdateSettings:
+            updateStrategy: digest
+          manifestTargets:
+            kustomize:
+              name: docker.io/actualbudget/actual-server
     - namePattern: digarr
       writeBackConfig:
         method: git:secret:argocd/argocd-image-updater-github
