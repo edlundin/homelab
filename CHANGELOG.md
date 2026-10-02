@@ -2,6 +2,7 @@
 
 ## 2026-10-02
 
+- **feat**: Run qBittorrent on Sarasate in K3s using RAID5 NFS storage with peer traffic on port 6881, verify the VueTorrent v2.36.1 release checksum, and serve the UI over HTTPS at torrent.ison-mirfak.ts.net and torrent.oisd.dev. ([pending](https://github.com/edlundin/homelab/commit/pending))
 - **feat**: Deploy 9router with persistent storage, public and tailnet HTTPS access, and instructions for importing Seneca's backup. ([pending](https://github.com/edlundin/homelab/commit/pending))
 
 ## 2026-09-03

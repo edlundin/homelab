@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: qbittorrent
+  namespace: qbittorrent
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: qbittorrent
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: tailscale-system
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik
+      ports:
+        - port: 8080
+          protocol: TCP
+    - ports:
+        - port: 6881
+          protocol: TCP
+        - port: 6881
+          protocol: UDP
+  # BitTorrent trackers and peers can use arbitrary destination ports.
+  egress:
+    - {}

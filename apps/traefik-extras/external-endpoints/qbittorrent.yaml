@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: qbittorrent-cluster
+  namespace: traefik
+spec:
+  type: ExternalName
+  externalName: qbittorrent.qbittorrent.svc.cluster.local
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: qbittorrent-ingress
+  namespace: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`torrent.oisd.dev`)
+      kind: Rule
+      services:
+        - name: qbittorrent-cluster
+          port: 8080
+          scheme: http
+  tls:
+    secretName: wildcard-tls-oisd
