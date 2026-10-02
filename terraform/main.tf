@@ -50,11 +50,12 @@ locals {
 
   k3s_vm_id_start = 100
 
+  # Keep the former server VMs stopped until the two-node cluster is verified.
   k3s_master_count = 3
   k3s_master_config = {
     node_name        = var.proxmox_node_name
-    started          = true
-    on_boot          = true
+    started          = false
+    on_boot          = false
     os_template_path = local.debian_13_lxc_template_path
     os_type          = "debian"
     cores            = 2
@@ -69,13 +70,12 @@ locals {
   k3s_agent_vm_ids = [
     for index in range(local.k3s_agent_count) : local.k3s_vm_id_start + local.k3s_master_count + index
   ]
-  gpu_agent_index = 1
-  gpu_agent_vm_id = local.k3s_agent_vm_ids[local.gpu_agent_index]
-  gpu_pci_id      = "0000:10:00"
+  gpu_agent_index      = 1
+  gpu_agent_vm_id      = local.k3s_agent_vm_ids[local.gpu_agent_index]
+  gpu_pci_id           = "0000:10:00"
+  k3s_join_server_host = "192.168.2.1"
   k3s_agent_config = {
     node_name        = var.proxmox_node_name
-    started          = true
-    on_boot          = true
     os_template_path = local.debian_13_lxc_template_path
     os_type          = "debian"
     cores            = 6
@@ -416,9 +416,9 @@ resource "proxmox_virtual_environment_vm" "k3s_agents" {
 
   node_name = var.proxmox_node_name
   vm_id     = local.k3s_agent_vm_ids[count.index]
-  started   = local.k3s_master_config.started
+  started   = count.index == local.gpu_agent_index
   name      = "k3s-agent-${count.index + 1}"
-  on_boot   = local.k3s_agent_config.on_boot
+  on_boot   = count.index == local.gpu_agent_index
 
   initialization {
     datastore_id = var.diskimages_storage
@@ -505,7 +505,7 @@ resource "null_resource" "k3s_agents_setup" {
 
   provisioner "remote-exec" {
     inline = [
-      "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${var.k3s_version}' K3S_URL='https://${var.k3s_api_server_host}:6443' K3S_TOKEN='${var.k3s_token}' sh -",
+      "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${var.k3s_version}' K3S_URL='https://${count.index == local.gpu_agent_index ? local.k3s_join_server_host : var.k3s_api_server_host}:6443' K3S_TOKEN='${var.k3s_token}' sh -",
       "sleep 10"
     ]
 
@@ -673,7 +673,7 @@ resource "null_resource" "k3s_agents_api_endpoint_config" {
   provisioner "remote-exec" {
     inline = [
       "set -euo pipefail",
-      "umask 077; printf '%s\n' \"K3S_TOKEN='${var.k3s_token}'\" \"K3S_URL='https://${var.k3s_api_server_host}:6443'\" >/etc/systemd/system/k3s-agent.service.env; chmod 0600 /etc/systemd/system/k3s-agent.service.env",
+      "umask 077; printf '%s\n' \"K3S_TOKEN='${var.k3s_token}'\" \"K3S_URL='https://${count.index == local.gpu_agent_index ? local.k3s_join_server_host : var.k3s_api_server_host}:6443'\" >/etc/systemd/system/k3s-agent.service.env; chmod 0600 /etc/systemd/system/k3s-agent.service.env",
       "systemctl daemon-reload",
     ]
   }
@@ -991,21 +991,13 @@ resource "proxmox_virtual_environment_file" "meta_data_cloud_config_k3s_agent" {
 
 # Outputs
 output "k3s_master_ips" {
-  value = concat(
-    [regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)],
-    [for master in proxmox_virtual_environment_vm.k3s_masters : regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", master.initialization[0].ip_config[0].ipv4[0].address)]
-  )
-  description = "IP addresses of K3s master nodes"
+  value       = [local.k3s_join_server_host]
+  description = "IP address of the active K3s server on sarasate"
 }
 
 output "k3s_agent_ips" {
-  value       = [for agent in proxmox_virtual_environment_vm.k3s_agents : agent.initialization[0].ip_config[0].ipv4[0].address]
-  description = "IP addresses of K3s agent nodes"
-}
-
-output "kubeconfig_command" {
-  value       = "scp root@${var.k3s_kubeconfig_source_host}:/etc/rancher/k3s/k3s.yaml ~/.kube/k3s-config && sed -i 's/127.0.0.1/${var.k3s_api_server_host}/g' ~/.kube/k3s-config"
-  description = "Command to download and configure kubeconfig"
+  value       = [proxmox_virtual_environment_vm.k3s_agents[local.gpu_agent_index].initialization[0].ip_config[0].ipv4[0].address]
+  description = "IP address of the active GPU agent VM"
 }
 
 output "cluster_info" {
@@ -1015,18 +1007,9 @@ output "cluster_info" {
     K3s Cluster Deployed Successfully!
     ====================================
 
-    Masters: ${local.k3s_master_count} nodes
-    Agents:  ${local.k3s_agent_count} nodes
+    Active server: sarasate (${local.k3s_join_server_host})
+    Active agent:  k3s-agent-2 (VM ${local.gpu_agent_vm_id})
+    Retired Proxmox VMs 100-103 remain stopped for rollback.
     K3s Version: ${var.k3s_version}
-
-    Next steps:
-    1. Get kubeconfig:
-       scp root@${var.k3s_kubeconfig_source_host}:/etc/rancher/k3s/k3s.yaml ~/.kube/k3s-config && sed -i 's/127.0.0.1/${var.k3s_api_server_host}/g' ~/.kube/k3s-config
-
-    2. Set KUBECONFIG:
-       export KUBECONFIG=~/.kube/k3s-config
-
-    3. Verify cluster:
-       kubectl get nodes
   EOT
 }

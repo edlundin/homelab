@@ -2,6 +2,7 @@
 
 ## 2026-10-02
 
+- **feat**: Switch K3s operations to a two-node active topology with a direct server endpoint, and increase Longhorn's default replica count to two. ([pending](https://github.com/edlundin/homelab/commit/pending))
 - **feat**: Retain two weekly Longhorn backups and add daily Actual Budget backups with three retained copies. ([pending](https://github.com/edlundin/homelab/commit/pending))
 - **feat**: Migrate Actual Budget to k3s from the saved full-server archive and route the tailnet and public budget hosts to the restored service. ([bd16749](https://github.com/edlundin/homelab/commit/bd16749c4e03931e2fb0a4c72445650ef625e045))
 - **feat**: Enable Argo CD Image Updater for Actual Budget, qBittorrent, and 9router with write-back to their image pins. ([dc6020a](https://github.com/edlundin/homelab/commit/dc6020a14ac9a0f9b94ecb037a857f26ae5cf3bf))

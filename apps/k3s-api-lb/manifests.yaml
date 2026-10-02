@@ -39,9 +39,7 @@ data:
         k3sapi:
           loadBalancer:
             servers:
-              - address: 192.168.2.100:6443
-              - address: 192.168.2.101:6443
-              - address: 192.168.2.102:6443
+              - address: 192.168.2.1:6443
 
 ---
 apiVersion: apps/v1
@@ -50,7 +48,7 @@ metadata:
   name: haproxy
   namespace: k3s-api-lb
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: haproxy
