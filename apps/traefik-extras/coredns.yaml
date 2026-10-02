@@ -32,8 +32,4 @@ data:
     import /etc/coredns/custom/*.server
   NodeHosts: |
     192.168.2.1 sarasate
-    192.168.2.100 k3s-master-1
-    192.168.2.101 k3s-master-2
-    192.168.2.102 k3s-master-3
-    192.168.2.103 k3s-agent-1
-    192.168.2.104 k3s-agent-2
+    192.168.2.104 spinoza

@@ -20,10 +20,6 @@ provider "proxmox" {
   }
 }
 
-data "local_file" "sealed-secret-keys" {
-  filename = "secrets/sealed-secrets-keys.yaml"
-}
-
 locals {
   managed_ssh_public_keys = [
     "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAINSUWgarmqMSeEgVBdoaeRfza29D2QrOFImshC4qTUDnAAAABHNzaDo= edlundin@macbookpro.ison-mirfak.ts.net",
@@ -48,42 +44,29 @@ locals {
   swap_size       = 512
   network_gateway = "192.168.2.254"
 
-  k3s_vm_id_start = 100
-
-  # Keep the former server VMs stopped until the two-node cluster is verified.
-  k3s_master_count = 3
-  k3s_master_config = {
-    node_name        = var.proxmox_node_name
-    started          = false
-    on_boot          = false
-    os_template_path = local.debian_13_lxc_template_path
-    os_type          = "debian"
-    cores            = 2
-    memory           = 4096
-    swap             = local.swap_size
-    disk_size        = 20
-    dns_servers      = local.dns_servers
-    gateway_ipv4     = local.network_gateway
+  # Sarasate runs the only k3s server. Terraform manages its Proxmox peer.
+  k3s_server_host = "192.168.2.1"
+  k3s_node = {
+    vm_id        = 104
+    name         = "spinoza"
+    ipv4_address = "192.168.2.104/24"
+    zone         = "nietzsche"
+    cores        = 4
+    sockets      = 2
+    memory       = 20480
+    disk_size    = 200
   }
-
-  k3s_agent_count = 2
-  k3s_agent_vm_ids = [
-    for index in range(local.k3s_agent_count) : local.k3s_vm_id_start + local.k3s_master_count + index
-  ]
-  gpu_agent_index      = 1
-  gpu_agent_vm_id      = local.k3s_agent_vm_ids[local.gpu_agent_index]
-  gpu_pci_id           = "0000:10:00"
-  k3s_join_server_host = "192.168.2.1"
-  k3s_agent_config = {
-    node_name        = var.proxmox_node_name
-    os_template_path = local.debian_13_lxc_template_path
-    os_type          = "debian"
-    cores            = 6
-    memory           = 10240
-    swap             = local.swap_size
-    disk_size        = 40
-    dns_servers      = local.dns_servers
-    gateway_ipv4     = local.network_gateway
+  k3s_gpu = {
+    pci_id = "0000:10:00"
+    packages = [
+      "gnupg",
+      "linux-headers-cloud-amd64",
+      "nvidia-kernel-dkms",
+      "nvidia-driver",
+    ]
+    container_toolkit_package = "nvidia-container-toolkit"
+    debian_source             = "deb http://deb.debian.org/debian trixie main contrib non-free non-free-firmware"
+    debian_security_source    = "deb http://deb.debian.org/debian-security trixie-security main contrib non-free non-free-firmware"
   }
 
   service_containers = {
@@ -145,25 +128,6 @@ locals {
     #   ipv4_address     = "192.168.2.200/24"
     #   gateway_ipv4     = local.network_gateway
     # },
-    # "actual-budget" = {
-    #   node_name        = var.proxmox_node_name
-    #   vm_id            = 103
-    #   start_at_boot    = true
-    #   started          = true
-    #   os_template_path = local.debian_13_lxc_template_path
-    #   os_type          = "debian"
-    #   unprivileged     = true
-    #   nesting          = true
-    #   keyctl           = false
-    #   description      = "Actual Budget private instance"
-    #   cores            = 2
-    #   memory           = 2048
-    #   swap             = local.swap_size
-    #   disk_size        = 4
-    #   dns_servers      = local.dns_servers
-    #   ipv4_address     = "192.168.2.103/24"
-    #   gateway_ipv4     = local.network_gateway
-    # },
     # "karakeep" = {
     #   node_name        = var.proxmox_node_name
     #   vm_id            = 104
@@ -205,39 +169,41 @@ locals {
   }
 }
 
-# First K3s Master (Initialize cluster)
-resource "proxmox_virtual_environment_vm" "k3s_master_init" {
+# The only Proxmox k3s node; Sarasate's server is managed outside Terraform.
+resource "proxmox_virtual_environment_vm" "k3s_node" {
   node_name = var.proxmox_node_name
-  vm_id     = local.k3s_vm_id_start
-  started   = local.k3s_master_config.started
-  name      = "k3s-master-1"
-  on_boot   = local.k3s_master_config.on_boot
+  vm_id     = local.k3s_node.vm_id
+  name      = local.k3s_node.name
+  started   = true
+  on_boot   = true
 
   initialization {
     datastore_id = var.diskimages_storage
 
     dns {
-      servers = local.k3s_master_config.dns_servers
+      servers = local.dns_servers
     }
 
     ip_config {
       ipv4 {
-        address = "192.168.2.${local.k3s_vm_id_start}/24"
+        address = local.k3s_node.ipv4_address
         gateway = local.network_gateway
       }
     }
 
-    user_data_file_id = proxmox_virtual_environment_file.user_data_cloud_config.id
-    meta_data_file_id = proxmox_virtual_environment_file.meta_data_cloud_config_k3s_master[0].id
+    meta_data_file_id = proxmox_virtual_environment_file.k3s_node_meta_data.id
+    user_data_file_id = proxmox_virtual_environment_file.k3s_node_user_data.id
   }
 
   cpu {
-    cores = local.k3s_master_config.cores
+    cores   = local.k3s_node.cores
+    sockets = local.k3s_node.sockets
+    type    = "host"
   }
 
   memory {
-    dedicated = local.k3s_master_config.memory
-    floating  = local.k3s_master_config.memory
+    dedicated = local.k3s_node.memory
+    floating  = 0
   }
 
   disk {
@@ -246,7 +212,7 @@ resource "proxmox_virtual_environment_vm" "k3s_master_init" {
     interface    = "virtio0"
     iothread     = true
     discard      = "on"
-    size         = local.k3s_master_config.disk_size
+    size         = local.k3s_node.disk_size
   }
 
   network_device {
@@ -257,484 +223,22 @@ resource "proxmox_virtual_environment_vm" "k3s_master_init" {
     enabled = true
   }
 
-  # Prevent Terraform from recreating container on changes
+  # GPU support is added to the node, not tied to a separate VM role.
+  hostpci {
+    device = "hostpci0"
+    id     = local.k3s_gpu.pci_id
+    pcie   = false
+    rombar = true
+  }
+
   lifecycle {
     ignore_changes = [
       disk[0],
       initialization[0].user_account,
+      # Changing cloud-init after first boot must not replace the running node.
       initialization[0].user_data_file_id,
       initialization[0].meta_data_file_id,
       network_device[0],
-    ]
-  }
-}
-
-# Install K3s on first master (using null_resource to avoid container recreation)
-resource "null_resource" "k3s_master_init_setup" {
-  depends_on = [proxmox_virtual_environment_vm.k3s_master_init]
-
-  triggers = {
-    container_id = proxmox_virtual_environment_vm.k3s_master_init.id
-    k3s_version  = var.k3s_version
-  }
-
-  connection {
-    type  = "ssh"
-    user  = "root"
-    agent = true
-    host  = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "set -euo pipefail",
-
-      "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${var.k3s_version}' INSTALL_K3S_EXEC='server --cluster-init --disable traefik --write-kubeconfig-mode=600 --tls-san ${var.k3s_api_server_host} --node-taint CriticalAddonsOnly=true:NoExecute' K3S_TOKEN='${var.k3s_token}' sh -",
-
-      # Wait for k3s service to be active
-      "echo 'Waiting for any Node objects to appear...'",
-      "for i in {1..60}; do",
-      "  if kubectl get nodes --no-headers 2>/dev/null | grep -q .; then",
-      "    echo 'Nodes found.'",
-      "    break",
-      "  fi",
-      "sleep 5",
-      "done",
-
-      # If no nodes after ~5 minutes, fail with diagnostics
-      "if ! kubectl get nodes --no-headers 2>/dev/null | grep -q .; then",
-      "  echo 'ERROR: No Node resources found after waiting. Check cluster creation, kubeconfig, and permissions.'",
-      "  kubectl cluster-info || true",
-      "  exit 1",
-      "fi",
-
-      # Wait for node to be Ready
-      "echo 'Waiting for node to become Ready...'",
-      "kubectl wait --for=condition=Ready node --all --timeout=300s",
-      "echo 'Node is Ready'",
-    ]
-  }
-}
-
-#Additional K3s Masters
-resource "proxmox_virtual_environment_vm" "k3s_masters" {
-  count = local.k3s_master_count - 1
-
-  node_name = var.proxmox_node_name
-  vm_id     = local.k3s_vm_id_start + count.index + 1
-  started   = local.k3s_master_config.started
-  name      = "k3s-master-${count.index + 2}"
-  on_boot   = local.k3s_master_config.on_boot
-
-  initialization {
-    datastore_id = var.diskimages_storage
-
-    dns {
-      servers = local.k3s_master_config.dns_servers
-    }
-
-    ip_config {
-      ipv4 {
-        address = "192.168.2.${local.k3s_vm_id_start + count.index + 1}/24"
-        gateway = local.network_gateway
-      }
-    }
-
-    user_data_file_id = proxmox_virtual_environment_file.user_data_cloud_config.id
-    meta_data_file_id = proxmox_virtual_environment_file.meta_data_cloud_config_k3s_master[count.index + 1].id
-  }
-
-  cpu {
-    cores = local.k3s_master_config.cores
-  }
-
-  memory {
-    dedicated = local.k3s_master_config.memory
-    floating  = local.k3s_master_config.memory
-  }
-
-  disk {
-    datastore_id = var.diskimages_storage
-    import_from  = proxmox_virtual_environment_download_file.debian_13_genericcloud.id
-    interface    = "virtio0"
-    iothread     = true
-    discard      = "on"
-    size         = local.k3s_master_config.disk_size
-  }
-
-  network_device {
-    bridge = "vmbr0"
-  }
-
-  agent {
-    enabled = true
-  }
-
-  # Prevent Terraform from recreating container on changes
-  lifecycle {
-    ignore_changes = [
-      disk[0],
-      initialization[0].user_account,
-      initialization[0].user_data_file_id,
-      initialization[0].meta_data_file_id,
-      network_device[0],
-    ]
-  }
-}
-
-# Install K3s on additional masters
-resource "null_resource" "k3s_masters_setup" {
-  count = local.k3s_master_count - 1
-
-  depends_on = [
-    proxmox_virtual_environment_vm.k3s_masters,
-    null_resource.k3s_master_init_setup
-  ]
-
-  triggers = {
-    container_id = proxmox_virtual_environment_vm.k3s_masters[count.index].id
-    k3s_version  = var.k3s_version
-  }
-
-  connection {
-    type = "ssh"
-    user = "root"
-    host = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_masters[count.index].initialization[0].ip_config[0].ipv4[0].address)[0]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${var.k3s_version}' INSTALL_K3S_EXEC='server --server https://${var.k3s_api_server_host}:6443 --tls-san ${var.k3s_api_server_host} --node-taint CriticalAddonsOnly=true:NoExecute' K3S_TOKEN='${var.k3s_token}' sh -"
-    ]
-
-  }
-}
-
-# K3s Agent Nodes
-resource "proxmox_virtual_environment_vm" "k3s_agents" {
-  count = local.k3s_agent_count
-
-  node_name = var.proxmox_node_name
-  vm_id     = local.k3s_agent_vm_ids[count.index]
-  started   = count.index == local.gpu_agent_index
-  name      = "k3s-agent-${count.index + 1}"
-  on_boot   = count.index == local.gpu_agent_index
-
-  initialization {
-    datastore_id = var.diskimages_storage
-
-    dns {
-      servers = local.k3s_agent_config.dns_servers
-    }
-
-    ip_config {
-      ipv4 {
-        address = "192.168.2.${local.k3s_vm_id_start + local.k3s_master_count + count.index}/24"
-        gateway = local.network_gateway
-      }
-    }
-
-
-    meta_data_file_id = proxmox_virtual_environment_file.meta_data_cloud_config_k3s_agent[count.index].id
-    user_data_file_id = local.k3s_agent_vm_ids[count.index] == local.gpu_agent_vm_id ? proxmox_virtual_environment_file.nvidia_user_data_cloud_config.id : proxmox_virtual_environment_file.user_data_cloud_config.id
-  }
-
-  cpu {
-    cores = local.k3s_agent_config.cores
-    type  = "host"
-  }
-
-  memory {
-    dedicated = local.k3s_agent_config.memory
-    floating  = local.k3s_agent_config.memory
-  }
-
-  disk {
-    datastore_id = var.diskimages_storage
-    import_from  = proxmox_virtual_environment_download_file.debian_13_genericcloud.id
-    interface    = "virtio0"
-    iothread     = true
-    discard      = "on"
-    size         = local.k3s_agent_config.disk_size
-  }
-
-  network_device {
-    bridge = "vmbr0"
-  }
-
-  agent {
-    enabled = true
-  }
-
-  dynamic "hostpci" {
-    for_each = local.k3s_agent_vm_ids[count.index] == local.gpu_agent_vm_id ? [true] : []
-
-    content {
-      device = "hostpci0"
-      id     = local.gpu_pci_id
-      pcie   = false
-      rombar = true
-    }
-  }
-
-  # Prevent Terraform from recreating container on changes
-  lifecycle {
-    ignore_changes = [
-      disk[0],
-      initialization[0].user_account,
-      initialization[0].user_data_file_id,
-      initialization[0].meta_data_file_id,
-      network_device[0],
-    ]
-  }
-}
-
-# Install K3s on agents
-resource "null_resource" "k3s_agents_setup" {
-  count = local.k3s_agent_count
-
-  depends_on = [
-    proxmox_virtual_environment_vm.k3s_agents,
-    null_resource.k3s_master_init_setup
-  ]
-
-  triggers = {
-    container_id = proxmox_virtual_environment_vm.k3s_agents[count.index].id
-    k3s_version  = var.k3s_version
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${var.k3s_version}' K3S_URL='https://${count.index == local.gpu_agent_index ? local.k3s_join_server_host : var.k3s_api_server_host}:6443' K3S_TOKEN='${var.k3s_token}' sh -",
-      "sleep 10"
-    ]
-
-    connection {
-      type = "ssh"
-      user = "root"
-      host = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_agents[count.index].initialization[0].ip_config[0].ipv4[0].address)[0]
-    }
-  }
-}
-
-resource "null_resource" "k3s_master_init_dns_config" {
-  depends_on = [null_resource.k3s_master_init_setup]
-
-  triggers = {
-    container_id = proxmox_virtual_environment_vm.k3s_master_init.id
-    dns_servers  = join(",", local.dns_servers)
-    api_host     = var.k3s_api_server_host
-  }
-
-  connection {
-    type  = "ssh"
-    user  = "root"
-    agent = true
-    host  = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "set -euo pipefail",
-      "install -d -m 0755 /etc/rancher/k3s",
-      "install -d -m 0755 /etc/rancher/k3s/config.yaml.d",
-      "printf '%s\n' ${join(" ", formatlist("'nameserver %s'", local.dns_servers))} 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
-      "printf '%s\n' 'resolv-conf: /etc/rancher/k3s/resolv.conf' >/etc/rancher/k3s/config.yaml",
-      "printf '%s\n' 'tls-san:' '  - ${var.k3s_api_server_host}' >/etc/rancher/k3s/config.yaml.d/10-api-lb.yaml",
-    ]
-  }
-}
-
-resource "null_resource" "k3s_master_init_service_config" {
-  depends_on = [null_resource.k3s_master_init_dns_config]
-
-  triggers = {
-    container_id    = proxmox_virtual_environment_vm.k3s_master_init.id
-    kubeconfig_mode = "0600"
-  }
-
-  connection {
-    type  = "ssh"
-    user  = "root"
-    agent = true
-    host  = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "set -euo pipefail",
-      "install -d -m 0755 /etc/systemd/system/k3s.service.d",
-      "printf '%s\n' '[Service]' 'ExecStart=' 'ExecStart=/usr/local/bin/k3s server --cluster-init --disable traefik --write-kubeconfig-mode=600 --node-taint CriticalAddonsOnly=true:NoExecute' >/etc/systemd/system/k3s.service.d/10-api-lb.conf",
-      "chmod 0600 /etc/rancher/k3s/k3s.yaml",
-      "systemctl daemon-reload",
-    ]
-  }
-}
-
-resource "null_resource" "k3s_masters_dns_config" {
-  count = local.k3s_master_count - 1
-
-  depends_on = [null_resource.k3s_masters_setup]
-
-  triggers = {
-    container_id = proxmox_virtual_environment_vm.k3s_masters[count.index].id
-    dns_servers  = join(",", local.dns_servers)
-    api_host     = var.k3s_api_server_host
-  }
-
-  connection {
-    type = "ssh"
-    user = "root"
-    host = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_masters[count.index].initialization[0].ip_config[0].ipv4[0].address)[0]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "set -euo pipefail",
-      "install -d -m 0755 /etc/rancher/k3s",
-      "install -d -m 0755 /etc/rancher/k3s/config.yaml.d",
-      "printf '%s\n' ${join(" ", formatlist("'nameserver %s'", local.dns_servers))} 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
-      "printf '%s\n' 'resolv-conf: /etc/rancher/k3s/resolv.conf' >/etc/rancher/k3s/config.yaml",
-      "printf '%s\n' 'tls-san:' '  - ${var.k3s_api_server_host}' >/etc/rancher/k3s/config.yaml.d/10-api-lb.yaml",
-    ]
-  }
-}
-
-resource "null_resource" "k3s_masters_api_endpoint_config" {
-  count = local.k3s_master_count - 1
-
-  depends_on = [null_resource.k3s_masters_dns_config]
-
-  triggers = {
-    container_id = proxmox_virtual_environment_vm.k3s_masters[count.index].id
-    api_host     = var.k3s_api_server_host
-  }
-
-  connection {
-    type = "ssh"
-    user = "root"
-    host = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_masters[count.index].initialization[0].ip_config[0].ipv4[0].address)[0]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "set -euo pipefail",
-      "install -d -m 0755 /etc/systemd/system/k3s.service.d",
-      "printf '%s\n' '[Service]' 'ExecStart=' 'ExecStart=/usr/local/bin/k3s server --server https://${var.k3s_api_server_host}:6443 --disable traefik --node-taint CriticalAddonsOnly=true:NoExecute' >/etc/systemd/system/k3s.service.d/10-api-lb.conf",
-      "systemctl daemon-reload",
-    ]
-  }
-}
-
-resource "null_resource" "k3s_agents_dns_config" {
-  count = local.k3s_agent_count
-
-  depends_on = [null_resource.k3s_agents_setup]
-
-  triggers = {
-    container_id = proxmox_virtual_environment_vm.k3s_agents[count.index].id
-    dns_servers  = join(",", local.dns_servers)
-  }
-
-  connection {
-    type = "ssh"
-    user = "root"
-    host = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_agents[count.index].initialization[0].ip_config[0].ipv4[0].address)[0]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "set -euo pipefail",
-      "install -d -m 0755 /etc/rancher/k3s",
-      "printf '%s\n' ${join(" ", formatlist("'nameserver %s'", local.dns_servers))} 'options timeout:2 attempts:2' >/etc/rancher/k3s/resolv.conf",
-      "printf '%s\n' 'resolv-conf: /etc/rancher/k3s/resolv.conf' >/etc/rancher/k3s/config.yaml",
-    ]
-  }
-}
-
-resource "null_resource" "k3s_agents_api_endpoint_config" {
-  count = local.k3s_agent_count
-
-  depends_on = [null_resource.k3s_agents_dns_config]
-
-  triggers = {
-    container_id     = proxmox_virtual_environment_vm.k3s_agents[count.index].id
-    api_host         = var.k3s_api_server_host
-    k3s_token        = var.k3s_token
-    credentials_mode = "0600"
-  }
-
-  connection {
-    type = "ssh"
-    user = "root"
-    host = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_agents[count.index].initialization[0].ip_config[0].ipv4[0].address)[0]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "set -euo pipefail",
-      "umask 077; printf '%s\n' \"K3S_TOKEN='${var.k3s_token}'\" \"K3S_URL='https://${count.index == local.gpu_agent_index ? local.k3s_join_server_host : var.k3s_api_server_host}:6443'\" >/etc/systemd/system/k3s-agent.service.env; chmod 0600 /etc/systemd/system/k3s-agent.service.env",
-      "systemctl daemon-reload",
-    ]
-  }
-}
-
-resource "null_resource" "k3s_worker_topology_labels" {
-  depends_on = [
-    null_resource.k3s_agents_setup,
-    null_resource.k3s_master_init_setup,
-  ]
-
-  triggers = {
-    agent_ids    = join(",", [for agent in proxmox_virtual_environment_vm.k3s_agents : agent.id])
-    nietzsche    = "k3s-agent-1,k3s-agent-2"
-    sarasate     = "sarasate"
-    topology_key = "topology.kubernetes.io/zone"
-  }
-
-  connection {
-    type  = "ssh"
-    user  = "root"
-    agent = true
-    host  = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "set -euo pipefail",
-      "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml",
-      "kubectl wait --for=condition=Ready nodes/k3s-agent-1 nodes/k3s-agent-2 nodes/sarasate --timeout=600s",
-      "kubectl label node k3s-agent-1 k3s-agent-2 topology.kubernetes.io/zone=nietzsche --overwrite",
-      "kubectl label node sarasate topology.kubernetes.io/zone=sarasate --overwrite",
-    ]
-  }
-}
-
-resource "null_resource" "install_sealed_secrets" {
-  depends_on = [
-    null_resource.k3s_master_init_setup,
-    null_resource.k3s_masters_setup,
-    null_resource.k3s_agents_setup
-  ]
-
-  triggers = {
-    k3s_ready = join(",", [for agent in proxmox_virtual_environment_vm.k3s_agents : agent.id])
-  }
-
-  connection {
-    type = "ssh"
-    user = "root"
-    host = regex("(\\d+\\.\\d+\\.\\d+\\.\\d+)", proxmox_virtual_environment_vm.k3s_master_init.initialization[0].ip_config[0].ipv4[0].address)[0]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml",
-      "kubectl wait --for=condition=Ready nodes --all --timeout=600s",
-      "cat <<EOF | kubectl apply -f -",
-      "${data.local_file.sealed-secret-keys.content}",
-      "EOF",
-      "kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.33.1/controller.yaml",
     ]
   }
 }
@@ -833,64 +337,7 @@ resource "proxmox_virtual_environment_download_file" "debian_13_genericcloud" {
   file_name          = local.debian_13_genericcloud_filename
 }
 
-resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
-  content_type = "snippets"
-  datastore_id = var.diskimages_storage
-  node_name    = var.proxmox_node_name
-
-  source_raw {
-    file_name = "user-data-cloud-config.yaml"
-    data      = <<-EOF
-    #cloud-config
-    manage_etc_hosts: true
-    timezone: Europe/Paris
-
-    users:
-      - name: root
-        hashed_passwd: ${var.root_password_hash}
-        lock_passwd: false
-        shell: /bin/bash
-        ssh_authorized_keys: [${join(",", [for k in local.ssh_public_keys : k])}]
-
-    ssh_pwauth: false
-
-    # Ensure PermitRootLogin is yes (key-only) and disable password authentication
-    # Different distros may already default to key-only if no password is set.
-    write_files:
-      - path: /etc/ssh/sshd_config.d/99-cloudinit-root.conf
-        permissions: "0644"
-        owner: "root:root"
-        content: |
-          PermitRootLogin prohibit-password
-          PasswordAuthentication no
-          PubkeyAuthentication yes
-          ChallengeResponseAuthentication no
-          UsePAM yes
-
-    package_update: true
-    package_upgrade: true
-    package_reboot_if_required: true
-    packages:
-      - open-iscsi
-      - nfs-common
-      - qemu-guest-agent
-      - curl
-      - neovim
-
-    runcmd:
-      - curl -fsSL https://tailscale.com/install.sh | sh
-      - echo 'net.ipv4.ip_forward = 1' | tee -a /etc/sysctl.d/99-tailscale.conf
-      - tailscale up --auth-key=${var.tailscale_authkey}
-      - systemctl enable --now qemu-guest-agent
-      - systemctl enable --now iscsid
-      - systemctl reload ssh
-      - systemctl reload sshd
-      - echo "done" > /tmp/cloud-config.done
-    EOF
-  }
-}
-
-resource "proxmox_virtual_environment_file" "nvidia_user_data_cloud_config" {
+resource "proxmox_virtual_environment_file" "k3s_node_user_data" {
   content_type = "snippets"
   datastore_id = var.diskimages_storage
   node_name    = var.proxmox_node_name
@@ -907,7 +354,7 @@ resource "proxmox_virtual_environment_file" "nvidia_user_data_cloud_config" {
         hashed_passwd: ${var.root_password_hash}
         lock_passwd: false
         shell: /bin/bash
-        ssh_authorized_keys: [${join(",", [for k in local.ssh_public_keys : k])}]
+        ssh_authorized_keys: ${jsonencode(local.ssh_public_keys)}
 
     ssh_pwauth: false
 
@@ -921,6 +368,19 @@ resource "proxmox_virtual_environment_file" "nvidia_user_data_cloud_config" {
           PubkeyAuthentication yes
           ChallengeResponseAuthentication no
           UsePAM yes
+      - path: /etc/rancher/k3s/resolv.conf
+        permissions: "0644"
+        content: |
+          nameserver ${local.dns_servers[0]}
+          nameserver ${local.dns_servers[1]}
+          options timeout:2 attempts:2
+      - path: /etc/rancher/k3s/config.yaml
+        permissions: "0644"
+        content: |
+          resolv-conf: /etc/rancher/k3s/resolv.conf
+          node-name: ${local.k3s_node.name}
+          node-label:
+            - topology.kubernetes.io/zone=${local.k3s_node.zone}
 
     package_update: true
     package_upgrade: true
@@ -929,10 +389,10 @@ resource "proxmox_virtual_environment_file" "nvidia_user_data_cloud_config" {
     apt:
       sources:
         debian:
-          source: "deb http://deb.debian.org/debian trixie main contrib non-free non-free-firmware"
+          source: "${local.k3s_gpu.debian_source}"
           filename: "debian-non-free.list"
         debian-security:
-          source: "deb http://deb.debian.org/debian-security trixie-security main contrib non-free non-free-firmware"
+          source: "${local.k3s_gpu.debian_security_source}"
           filename: "debian-security-non-free.list"
 
     packages:
@@ -941,14 +401,20 @@ resource "proxmox_virtual_environment_file" "nvidia_user_data_cloud_config" {
       - qemu-guest-agent
       - curl
       - neovim
-      - linux-headers-amd64
-      - nvidia-kernel-dkms
-      - nvidia-driver
 
     runcmd:
       - curl -fsSL https://tailscale.com/install.sh | sh
       - echo 'net.ipv4.ip_forward = 1' | tee -a /etc/sysctl.d/99-tailscale.conf
       - tailscale up --auth-key=${var.tailscale_authkey}
+      - apt-get update
+      - DEBIAN_FRONTEND=noninteractive apt-get install -y ${join(" ", local.k3s_gpu.packages)}
+      - |
+        curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --batch --yes --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+        curl -fsSL https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' > /etc/apt/sources.list.d/nvidia-container-toolkit.list
+        apt-get update
+        DEBIAN_FRONTEND=noninteractive apt-get install -y ${local.k3s_gpu.container_toolkit_package}
+      - |
+        curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${var.k3s_version}' K3S_URL='https://${local.k3s_server_host}:6443' K3S_TOKEN='${var.k3s_token}' sh -
       - systemctl enable --now qemu-guest-agent
       - systemctl enable --now iscsid
       - systemctl reload ssh
@@ -958,58 +424,32 @@ resource "proxmox_virtual_environment_file" "nvidia_user_data_cloud_config" {
   }
 }
 
-resource "proxmox_virtual_environment_file" "meta_data_cloud_config_k3s_master" {
-  count        = local.k3s_master_count
+resource "proxmox_virtual_environment_file" "k3s_node_meta_data" {
   content_type = "snippets"
   datastore_id = var.diskimages_storage
   node_name    = var.proxmox_node_name
 
   source_raw {
-    file_name = "meta-data-cloud-config-k3s-master-${count.index + 1}.yaml"
+    file_name = "meta-data-cloud-config-k3s-agent-2.yaml"
     data      = <<-EOF
     #cloud-config
-    local-hostname: k3s-master-${count.index + 1}
+    local-hostname: ${local.k3s_node.name}
     EOF
   }
 }
 
-resource "proxmox_virtual_environment_file" "meta_data_cloud_config_k3s_agent" {
-  count        = local.k3s_agent_count
-  content_type = "snippets"
-  datastore_id = var.diskimages_storage
-  node_name    = var.proxmox_node_name
-
-  source_raw {
-    file_name = "meta-data-cloud-config-k3s-agent-${count.index + 1}.yaml"
-    data      = <<-EOF
-    #cloud-config
-    local-hostname: k3s-agent-${count.index + 1}
-    EOF
-
+output "k3s_nodes" {
+  value = {
+    sarasate = local.k3s_server_host
+    spinoza  = split("/", proxmox_virtual_environment_vm.k3s_node.initialization[0].ip_config[0].ipv4[0].address)[0]
   }
-}
-
-# Outputs
-output "k3s_master_ips" {
-  value       = [local.k3s_join_server_host]
-  description = "IP address of the active K3s server on sarasate"
-}
-
-output "k3s_agent_ips" {
-  value       = [proxmox_virtual_environment_vm.k3s_agents[local.gpu_agent_index].initialization[0].ip_config[0].ipv4[0].address]
-  description = "IP address of the active GPU agent VM"
+  description = "Addresses of the external k3s server and Terraform-managed GPU node"
 }
 
 output "cluster_info" {
   value = <<-EOT
-
-    ====================================
-    K3s Cluster Deployed Successfully!
-    ====================================
-
-    Active server: sarasate (${local.k3s_join_server_host})
-    Active agent:  k3s-agent-2 (VM ${local.gpu_agent_vm_id})
-    Retired Proxmox VMs 100-103 remain stopped for rollback.
-    K3s Version: ${var.k3s_version}
+    Server: sarasate (${local.k3s_server_host}), managed outside Terraform
+    Proxmox node: ${local.k3s_node.name} (VM ${local.k3s_node.vm_id})
+    GPU: ${local.k3s_gpu.pci_id}
   EOT
 }

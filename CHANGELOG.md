@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-03
+
+- **feat**: Model Spinoza as the sole Terraform-managed K3s VM with separate GPU settings, remove retired infrastructure resources, and update node identity references for the Kubernetes migration. ([pending](https://github.com/edlundin/homelab/commit/pending))
+
 ## 2026-10-02
 
 - **feat**: Switch K3s operations to a two-node active topology with a direct server endpoint, and increase Longhorn's default replica count to two. ([pending](https://github.com/edlundin/homelab/commit/pending))

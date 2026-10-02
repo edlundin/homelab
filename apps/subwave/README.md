@@ -42,7 +42,7 @@ Deployment. Keep the output private. No credential is stored in Git.
 
 Automatic operation starts only after this onboarding and the Music stack
 setup are complete. Chatterbox runs as the separate GPU service on
-`k3s-agent-2`; the Docker-socket proxy is intentionally not deployed.
+`spinoza`; the Docker-socket proxy is intentionally not deployed.
 
 The policy allows the standard 9router port `20128`. If the instance uses a
 different non-HTTP private port, add that port to `network-policy.yaml`.

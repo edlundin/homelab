@@ -4,7 +4,7 @@ migStrategy: none
 deviceListStrategy: envvar
 
 nodeSelector:
-  kubernetes.io/hostname: k3s-agent-2
+  topology.kubernetes.io/zone: nietzsche
 
 tolerations:
   - key: CriticalAddonsOnly

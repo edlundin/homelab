@@ -21,7 +21,7 @@ spec:
       automountServiceAccountToken: false
       runtimeClassName: nvidia
       nodeSelector:
-        kubernetes.io/hostname: k3s-agent-2
+        topology.kubernetes.io/zone: nietzsche
       priorityClassName: gpu-workload
       securityContext:
         seccompProfile:

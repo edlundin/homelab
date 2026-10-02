@@ -1,7 +1,10 @@
 variable "proxmox_endpoint" { type = string }
 variable "proxmox_node_name" { type = string }
 variable "proxmox_username" { type = string }
-variable "proxmox_password" { type = string }
+variable "proxmox_password" {
+  type      = string
+  sensitive = true
+}
 variable "root_password_hash" {
   description = "Hashed root password for console access"
   type        = string
@@ -18,20 +21,20 @@ variable "ssh_public_keys" {
 }
 
 variable "diskimages_storage" {
-  description = "Storage name for LXC rootfs"
+  description = "Proxmox datastore for VM disks, cloud-init snippets, and LXC rootfs"
   type        = string
 }
 
-variable "k3s_token" { type = string }
+variable "k3s_token" {
+  type      = string
+  sensitive = true
+}
 variable "k3s_version" {
   type    = string
   default = "v1.36.1+k3s1"
 }
 
-variable "k3s_api_server_host" {
-  description = "Stable k3s API endpoint used for node joins and kubeconfig server"
-  type        = string
-  default     = "k3s-api.ison-mirfak.ts.net"
+variable "tailscale_authkey" {
+  type      = string
+  sensitive = true
 }
-
-variable "tailscale_authkey" { type = string }
