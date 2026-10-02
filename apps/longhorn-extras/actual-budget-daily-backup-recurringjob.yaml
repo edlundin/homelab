@@ -1,15 +1,15 @@
 apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
 metadata:
-  name: weekly-backup
+  name: actual-budget-daily-backup
   namespace: longhorn-system
 spec:
   concurrency: 1
-  cron: "0 3 ? * SUN"
+  cron: "0 2 * * *"
   groups:
-    - default
+    - actual-budget
   labels: {}
-  name: weekly-backup
+  name: actual-budget-daily-backup
   parameters: {}
-  retain: 2
+  retain: 3
   task: backup
