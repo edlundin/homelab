@@ -19,6 +19,7 @@ This SearXNG instance is deployed on the K3s cluster and accessible at:
 
 - **Image**: `searxng/searxng:latest`
 - **Replicas**: 2, spread across physical servers using `topology.kubernetes.io/zone`
+- **Placement**: Each rollout is spread separately using `pod-template-hash`, so replacing old pods preserves one replica per host
 - **Updates**: Rolling updates with `maxUnavailable: 0` and `maxSurge: 1`
 - **Disruptions**: A PodDisruptionBudget keeps at least one replica available during voluntary evictions
 - **Resources**: 

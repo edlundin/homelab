@@ -1,7 +1,8 @@
 # Changelog
 
 ## 2026-10-03
-- **feat**: Configure SearXNG replicas across physical hosts, protect SearXNG and Traefik during drains, and add a two-host Tailscale ingress endpoint with a staged DNS cutover. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **fix**: Preserve replica placement across rollouts, document host-specific Tailscale ingress names, and switch the shared Cloudflare entry point to the verified redundant VIP. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **feat**: Configure SearXNG replicas with host spreading per rollout, protect SearXNG and Traefik during drains, and add a two-host Tailscale ingress endpoint with a staged DNS cutover. ([a62ba3a](https://github.com/edlundin/homelab/commit/a62ba3a7526e652582d0e912e94f8222e5b77614))
 
 - **feat**: Model Spinoza as the sole Terraform-managed K3s VM with separate GPU settings, remove retired infrastructure resources, and update node identity references for the Kubernetes migration. ([pending](https://github.com/edlundin/homelab/commit/pending))
 

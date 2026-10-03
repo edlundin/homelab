@@ -10,6 +10,18 @@ The live node mapping is `sarasate` → zone `sarasate` and `spinoza` → zone
 `nietzsche`. These labels were applied to the nodes; retain them when rebuilding
 or replacing a node. Terraform already configures Spinoza's `nietzsche` label.
 
+The Tailscale machine-name overrides identify the current ingress placement:
+`ingress-two-hosts-0` is `k3s-ingress-spinoza`, and `ingress-two-hosts-1` is
+`k3s-ingress-sarasate`. These overrides are stored in Tailscale, rather than the
+ProxyGroup manifest. Recheck them after rescheduling: pod ordinals are not pinned
+to a particular host. The shared Service remains named `k3s-cluster-ha`, with
+virtual IP `100.99.91.13`.
+
+Cloudflare's DNS-only `oisd.dev` A record now points to `100.99.91.13`;
+`*.oisd.dev` is a CNAME to `oisd.dev`. SearXNG returned HTTPS 200 and the protected
+Traefik dashboard returned 401 through this VIP before the cutover. The old
+`100.98.143.92` endpoint remains available while DNS caches expire.
+
 `traefik-tailscale-ha` forwards HTTP and HTTPS to the existing Traefik pods through
 the Tailscale Service `k3s-cluster-ha`. The existing `traefik-tailscale` endpoint is
 retained during migration. Two Traefik replicas and two SearXNG replicas are also

@@ -15,6 +15,7 @@ Traefik provides ingress controller and load balancer functionality for the Kube
 
 Traefik is deployed using the official Helm chart with:
 - **Replicas**: Two, spread across physical servers using `topology.kubernetes.io/zone`
+- **Placement**: Spreading counts each `pod-template-hash` separately to preserve the host split after a rolling update
 - **Updates and drains**: Rolling updates keep both replicas available; a PodDisruptionBudget preserves one during voluntary evictions
 - **ClusterIP Service**: HTTP (80) and HTTPS (443) are exposed to the tailnet by the Tailscale operator
 - **Dashboard Service**: Internal dashboard on port 9000
