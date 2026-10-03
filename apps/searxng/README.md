@@ -9,7 +9,7 @@ This SearXNG instance is deployed on the K3s cluster and accessible at:
 
 ## Components
 
-- **ConfigMap**: SearXNG configuration with security settings and engine preferences
+- **Secret**: Shared SearXNG configuration with security settings and engine preferences
 - **Deployment**: SearXNG application pods (2 replicas for HA)
 - **Service**: ClusterIP service in `searxng` namespace
 - **External Service**: Routes traffic from `traefik` namespace to SearXNG service
@@ -18,10 +18,12 @@ This SearXNG instance is deployed on the K3s cluster and accessible at:
 ## Configuration
 
 - **Image**: `searxng/searxng:latest`
-- **Replicas**: 2 (for high availability)
+- **Replicas**: 2, spread across physical servers using `topology.kubernetes.io/zone`
+- **Updates**: Rolling updates with `maxUnavailable: 0` and `maxSurge: 1`
+- **Disruptions**: A PodDisruptionBudget keeps at least one replica available during voluntary evictions
 - **Resources**: 
-  - Requests: 256Mi RAM, 100m CPU
-  - Limits: 512Mi RAM, 500m CPU
+  - Requests: 256Mi RAM, 10m CPU
+  - Limits: 2400Mi RAM, 1500m CPU (chart defaults)
 - **Port**: 8080
 - **Security**: Non-root user (977), dropped capabilities, security context
 
@@ -40,6 +42,11 @@ This SearXNG instance is deployed on the K3s cluster and accessible at:
 - Disabled engines: Yahoo, Wikidata, Karama, currency converter (for performance)
 
 ## Request Limiter Backend
+
+Redis remains standalone. The two SearXNG replicas provide application redundancy;
+Redis and the single K3s control-plane server still limit host-failure tolerance.
+The redundant Tailscale entry point and required DNS cutover are documented in
+[Tailscale ingress across two hosts](../tailscale-operator-extras/README.md).
 
 - **Backend**: Existing standalone Redis 7 Alpine deployment
 - **Connection**: `redis://redis.redis.svc.cluster.local:6379/0`

@@ -19,6 +19,10 @@ spec:
         deployment:
           replicas: 2
 
+        podDisruptionBudget:
+          enabled: true
+          minAvailable: 1
+
         # Keep one ingress replica on each physical server.
         topologySpreadConstraints:
           - maxSkew: 1

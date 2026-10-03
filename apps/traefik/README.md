@@ -14,10 +14,15 @@ Traefik provides ingress controller and load balancer functionality for the Kube
 ## Architecture
 
 Traefik is deployed using the official Helm chart with:
-- **LoadBalancer Service**: Exposes HTTP (80) and HTTPS (443) ports
+- **Replicas**: Two, spread across physical servers using `topology.kubernetes.io/zone`
+- **Updates and drains**: Rolling updates keep both replicas available; a PodDisruptionBudget preserves one during voluntary evictions
+- **ClusterIP Service**: HTTP (80) and HTTPS (443) are exposed to the tailnet by the Tailscale operator
 - **Dashboard Service**: Internal dashboard on port 9000
 - **IngressClass**: Set as default ingress class for the cluster
 - **RBAC**: Proper service account and cluster role permissions
+
+The redundant Tailscale entry point and DNS cutover are documented in
+[Tailscale ingress across two hosts](../tailscale-operator-extras/README.md).
 
 ## Deployment Structure
 

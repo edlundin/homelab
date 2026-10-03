@@ -1,0 +1,58 @@
+apiVersion: tailscale.com/v1alpha1
+kind: ProxyClass
+metadata:
+  name: ingress-two-hosts
+spec:
+  statefulSet:
+    pod:
+      labels:
+        homelab.oisd.dev/ingress-group: traefik
+      # The default worker-only class would put both proxies on one server.
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+        - key: CriticalAddonsOnly
+          operator: Exists
+          effect: NoExecute
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: topology.kubernetes.io/zone
+              labelSelector:
+                matchLabels:
+                  homelab.oisd.dev/ingress-group: traefik
+---
+apiVersion: tailscale.com/v1alpha1
+kind: ProxyGroup
+metadata:
+  name: ingress-two-hosts
+spec:
+  type: ingress
+  replicas: 2
+  proxyClass: ingress-two-hosts
+---
+# Keep the existing endpoint until the new VIP is verified and DNS is switched.
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-tailscale-ha
+  namespace: traefik
+  annotations:
+    tailscale.com/hostname: k3s-cluster-ha
+    tailscale.com/proxy-group: ingress-two-hosts
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  ports:
+    - name: web
+      port: 80
+      targetPort: web
+      protocol: TCP
+    - name: websecure
+      port: 443
+      targetPort: websecure
+      protocol: TCP
+  selector:
+    app.kubernetes.io/instance: traefik-traefik
+    app.kubernetes.io/name: traefik
