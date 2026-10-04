@@ -12,16 +12,16 @@ data:
   config.toml: |
     port = 8080
     endpoint = "http://9router.9router.svc.cluster.local:20128/v1"
-    default_model = "gpt-5.4-mini"
+    default_model = "gpt-4.1"
 
     [api_key]
     env = "CHAT_API_KEY"
 
     [[models]]
-    alias = "gpt-5.4-mini"
-    name = "GPT-5.4 Mini"
-    description = "GPT-5.4 Mini through GitHub Copilot via 9router"
-    model = "gh/gpt-5.4-mini"
+    alias = "gpt-4.1"
+    name = "GPT-4.1"
+    description = "GPT-4.1 through GitHub Copilot via 9router"
+    model = "gh/gpt-4.1"
 
     [request.body]
     stream_options = { include_usage = true }
