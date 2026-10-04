@@ -43,8 +43,8 @@ available at:
 - `https://atuin-ai.ison-mirfak.ts.net`
 
 It translates Atuin's OSS AI protocol to the OpenAI-compatible 9router service
-inside the cluster. The `luna` alias selects the upstream model
-`cx/gpt-6-luna`; the model must continue to support tool calling.
+inside the cluster. The `gpt-5.4-mini` alias selects the upstream model
+`gh/gpt-5.4-mini` through GitHub Copilot; the model must continue to support tool calling.
 
 Two credentials are intentionally kept separate:
 
@@ -60,7 +60,7 @@ enabled = true
 endpoint = "https://atuin-ai.ison-mirfak.ts.net"
 endpoint_protocol = "oss"
 api_token = "<AUTH_TOKEN>"
-model = "luna"
+model = "gpt-5.4-mini"
 ```
 
 A ChatGPT subscription is not an OpenAI API credential and cannot be used as
