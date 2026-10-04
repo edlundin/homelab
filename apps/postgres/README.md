@@ -5,10 +5,13 @@ This directory contains the PostgreSQL deployment configuration using the Bitnam
 ## Overview
 
 - **Chart**: Bitnami PostgreSQL
+- **PostgreSQL**: 18.6, pinned by image digest in `values.yaml`
 - **Architecture**: Standalone (single primary instance)
 - **Namespace**: `postgres`
 - **Default Database**: `postgres` (with `postgres` user)
-- **Additional Databases**: `n8n` (with dedicated `n8n` user)
+- **Additional Databases**: `n8n`, `digarr`, and `tandoor`; Atuin creates an
+  isolated `atuin` role and database on this service when its Argo CD
+  application is first synced
 
 ## How it works
 
@@ -196,11 +199,15 @@ kubectl delete pod -n postgres -l app.kubernetes.io/name=postgresql
 
 ## Updates
 
-To update PostgreSQL:
-1. Update `targetRevision` in `application.yaml`
-2. Commit and push changes
-3. ArgoCD will automatically sync the update
-4. **Note**: Major version upgrades may require manual intervention
+Patch updates within PostgreSQL 18 require updating the server image digest in
+`values.yaml` after validating a logical dump and a fresh Longhorn backup.
+Updating the Helm chart version alone does not update the pinned server image.
+
+Never point the existing PVC at a different PostgreSQL major version. For a
+future major upgrade, create and validate `pg_dump`/`pg_dumpall` backups, deploy
+a new data directory with the target major version, restore the databases and
+roles, validate every consumer, and only then retire the old volume. The current
+PVC has `PG_VERSION=18`; its databases were verified on PostgreSQL 18.6.
 
 ## Adding New Databases/Users
 

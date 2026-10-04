@@ -1,6 +1,14 @@
 # Bitnami PostgreSQL settings
 architecture: standalone
 
+# PostgreSQL 18.6. The digest overrides the mutable `latest` tag so Argo CD
+# cannot move the shared data directory across major versions implicitly.
+image:
+    registry: registry-1.docker.io
+    repository: bitnami/postgresql
+    tag: latest
+    digest: sha256:bf4d20622241081d4bb7d9547fbbdf1b2b9759a1f875ad81c8557dad76a0be10
+
 auth:
     # Use existing secrets for passwords
     existingSecret: postgres-password
@@ -89,6 +97,11 @@ primary:
 # Metrics for monitoring
 metrics:
     enabled: true
+    image:
+        registry: registry-1.docker.io
+        repository: bitnami/postgres-exporter
+        tag: latest
+        digest: sha256:31efbed2026b64817b7f2ec54d6b2ec18e007e6229666320e0a45d66134d7ee7
     resources:
         limits:
             cpu: 100m

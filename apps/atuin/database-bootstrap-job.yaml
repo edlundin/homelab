@@ -1,0 +1,99 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: atuin-database-bootstrap
+  namespace: postgres
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-options: Force=true,Replace=true
+  labels:
+    app.kubernetes.io/name: atuin
+    app.kubernetes.io/component: database-bootstrap
+spec:
+  activeDeadlineSeconds: 300
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: atuin
+        app.kubernetes.io/component: database-bootstrap
+    spec:
+      restartPolicy: Never
+      serviceAccountName: atuin-database-bootstrap
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: bootstrap
+          image: postgres:18-alpine@sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873
+          imagePullPolicy: IfNotPresent
+          command: [/bin/sh, -ec]
+          args:
+            - |
+              PGOPTIONS="-c atuin.bootstrap_password=$ATUIN_PASSWORD" \
+                psql -v ON_ERROR_STOP=1 --command="
+                  DO \$\$
+                  BEGIN
+                    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'atuin') THEN
+                      EXECUTE format(
+                        'ALTER ROLE atuin LOGIN PASSWORD %L',
+                        current_setting('atuin.bootstrap_password')
+                      );
+                    ELSE
+                      EXECUTE format(
+                        'CREATE ROLE atuin LOGIN PASSWORD %L',
+                        current_setting('atuin.bootstrap_password')
+                      );
+                    END IF;
+                  END
+                  \$\$;
+                "
+              if [ "$(psql -tAc "SELECT 1 FROM pg_database WHERE datname = 'atuin'")" != "1" ]; then
+                createdb --owner=atuin atuin
+              else
+                psql -v ON_ERROR_STOP=1 --command="ALTER DATABASE atuin OWNER TO atuin"
+              fi
+          env:
+            - name: HOME
+              value: /tmp
+            - name: PGHOST
+              value: postgres-postgresql.postgres.svc.cluster.local
+            - name: PGPORT
+              value: "5432"
+            - name: PGUSER
+              value: postgres
+            - name: PGDATABASE
+              value: postgres
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-password
+                  key: postgres-password
+            - name: ATUIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-atuin-credentials
+                  key: password
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 16Mi

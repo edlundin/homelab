@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atuin-ai
+  namespace: atuin
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+  labels:
+    app.kubernetes.io/name: atuin
+    app.kubernetes.io/component: ai-gateway
+data:
+  config.toml: |
+    port = 8080
+    endpoint = "http://9router.9router.svc.cluster.local:20128/v1"
+    default_model = "luna"
+
+    [api_key]
+    env = "CHAT_API_KEY"
+
+    [[models]]
+    alias = "luna"
+    name = "GPT-6 Luna"
+    description = "GPT-6 Luna through 9router"
+    model = "cx/gpt-6-luna"
+
+    [request.body]
+    stream_options = { include_usage = true }

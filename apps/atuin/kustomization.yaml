@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - service-account.yaml
+  - postgres-atuin-credentials-sealed.yaml
+  - database-bootstrap-job.yaml
+  - external-secret-postgres.yaml
+  - external-secret-tls.yaml
+  - atuin-ai-configmap.yaml
+  - atuin-ai-secrets-sealed.yaml
+  - atuin-ai-deployment.yaml
+  - atuin-ai-service.yaml
+  - atuin-ai-ingress.yaml
+  - atuin-ai-tailscale-ingress.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - tailscale-ingress.yaml
+  - network-policy.yaml
+images:
+  - name: ghcr.io/atuinsh/atuin
+    newName: ghcr.io/atuinsh/atuin
+    newTag: 18.23.0
+  - name: postgres
+    newName: docker.io/postgres
+    newTag: 18-alpine
+    digest: sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873
+  - name: ghcr.io/atuinsh/atuin-ai-server
+    newName: ghcr.io/atuinsh/atuin-ai-server
+    newTag: latest
+    digest: sha256:3d11028588ebfddb0685169e35cbc7121d3577b6eee3831e845fbe5c28e48d92

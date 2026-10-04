@@ -2,6 +2,7 @@
 
 ## 2026-10-04
 
+- **feat**: Deploy Atuin sync and Luna-backed AI through public and tailnet routes on shared PostgreSQL 18, with Argo CD image updates. ([pending](https://github.com/edlundin/homelab/commit/pending))
 - **feat**: Configure 9router web search to use the SearXNG instance and allow the required network access; upstream issue #3756 currently blocks private endpoints. ([#3756](https://github.com/decolua/9router/issues/3756), [pending](https://github.com/edlundin/homelab/commit/pending))
 
 ## 2026-10-03

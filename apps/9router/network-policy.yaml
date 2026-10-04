@@ -18,6 +18,13 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: tailscale-system
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: atuin
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: atuin
+              app.kubernetes.io/component: ai-gateway
       ports:
         - protocol: TCP
           port: 20128

@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atuin-ai
+  namespace: atuin
+  labels:
+    app.kubernetes.io/name: atuin
+    app.kubernetes.io/component: ai-gateway
+  annotations:
+    homelab.oisd.dev/description: Atuin AI protocol gateway backed by 9router
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: atuin
+      app.kubernetes.io/component: ai-gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: atuin
+        app.kubernetes.io/component: ai-gateway
+    spec:
+      serviceAccountName: atuin-ai
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: atuin-ai
+          image: ghcr.io/atuinsh/atuin-ai-server:latest@sha256:3d11028588ebfddb0685169e35cbc7121d3577b6eee3831e845fbe5c28e48d92
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: CHAT_CONFIG
+              value: /etc/atuin-ai/config.toml
+            - name: CHAT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: atuin-ai-secrets
+                  key: CHAT_API_KEY
+            - name: AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: atuin-ai-secrets
+                  key: AUTH_TOKEN
+            - name: HOME
+              value: /tmp
+            - name: ERL_CRASH_DUMP
+              value: /tmp/erl_crash.dump
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          startupProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 2
+            failureThreshold: 30
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/atuin-ai/config.toml
+              subPath: config.toml
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: config
+          configMap:
+            name: atuin-ai
+        - name: tmp
+          emptyDir:
+            sizeLimit: 64Mi
