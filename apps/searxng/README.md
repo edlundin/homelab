@@ -50,7 +50,7 @@ The redundant Tailscale entry point and required DNS cutover are documented in
 [Tailscale ingress across two hosts](../tailscale-operator-extras/README.md).
 
 - **Backend**: Existing standalone Redis 7 Alpine deployment
-- **Connection**: `redis://redis.redis.svc.cluster.local:6379/0`
+- **Connection**: `redis://:<password>@redis-master.redis.svc.cluster.local:6379/0` (password supplied by ExternalSecret)
 - **Purpose**: Tracks client request rates and blocks abusive traffic before it reaches upstream engines
 - **Storage**: 1Gi persistent volume
 - **Database**: Uses Redis database 0 via the Valkey-compatible protocol
@@ -59,7 +59,7 @@ The redundant Tailscale entry point and required DNS cutover are documented in
 
 - **Main Service**: `searxng.searxng.svc.cluster.local:8080`
 - **External Service**: `searxng-external.traefik.svc.cluster.local:8080` 
-- **Redis Cache**: `redis.redis.svc.cluster.local:6379`
+- **Redis Cache**: `redis-master.redis.svc.cluster.local:6379`
 - **Ingress**: `search.oisd.dev` (HTTPS with wildcard TLS)
 - **Middlewares**: `default-chain` (security headers + rate limiting)
 
