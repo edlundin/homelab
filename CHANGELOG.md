@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-04
+
+- **feat**: Configure 9router web search to use the SearXNG instance and allow the required network access; upstream issue #3756 currently blocks private endpoints. ([#3756](https://github.com/decolua/9router/issues/3756), [pending](https://github.com/edlundin/homelab/commit/pending))
+
 ## 2026-10-03
 - **fix**: Preserve replica placement across rollouts, document host-specific Tailscale ingress names, and switch the shared Cloudflare entry point to the verified redundant VIP. ([pending](https://github.com/edlundin/homelab/commit/pending))
 - **feat**: Configure SearXNG replicas with host spreading per rollout, protect SearXNG and Traefik during drains, and add a two-host Tailscale ingress endpoint with a staged DNS cutover. ([a62ba3a](https://github.com/edlundin/homelab/commit/a62ba3a7526e652582d0e912e94f8222e5b77614))
