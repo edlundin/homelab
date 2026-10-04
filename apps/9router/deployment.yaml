@@ -47,9 +47,9 @@ spec:
               value: /app/data-home
             - name: AUTH_COOKIE_SECURE
               value: "true"
-            # Use the cluster-local SearXNG service for 9router's web-search provider.
+            # Use SearXNG's HTTPS hostname, resolved through Tailscale DNS.
             - name: SEARXNG_URL
-              value: http://searxng.searxng.svc.cluster.local:8080/search
+              value: https://search.oisd.dev/search
             - name: INITIAL_PASSWORD
               valueFrom:
                 secretKeyRef:

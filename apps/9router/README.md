@@ -15,13 +15,14 @@ kubie exec OISD 9router kubectl get secret 9router-initial-password -o jsonpath=
 ## Web search
 
 `SEARXNG_URL` points 9router's built-in SearXNG provider at
-`http://searxng.searxng.svc.cluster.local:8080/search`. The 9router NetworkPolicy
-allows TCP/8080 only to the SearXNG application pods in the `searxng` namespace.
+`https://search.oisd.dev/search`. This hostname resolves to the Tailscale ingress
+address inside the cluster. The 9router NetworkPolicy allows outbound TCP/443.
+SearXNG's endpoint is `/search`; `/v1/search` is the 9router API endpoint.
 
 9router 0.5.95 currently rejects administrator-configured private search endpoints
 at runtime because of [upstream issue #3756](https://github.com/decolua/9router/issues/3756).
-The manifest configuration is ready, but `/v1/search` will return
-`502 Blocked URL: internal host` until the fix in
+The HTTPS endpoint returns JSON successfully when called directly, but its
+Tailscale address may still be rejected by 9router's private-address guard until the fix in
 [upstream PR #3793](https://github.com/decolua/9router/pull/3793) ships in a
 9router release.
 
