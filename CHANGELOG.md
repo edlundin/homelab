@@ -2,7 +2,8 @@
 
 ## 2026-10-06
 
-- **feat**: Add a persistent CLIProxyAPI gateway and Oh My CPA dashboard at the ai.oisd.dev and ai.ison-mirfak.ts.net routes alongside the existing 9router service. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **revert**: Remove the CLIProxyAPI gateway and Oh My CPA dashboard deployment and routes. ([pending](https://github.com/edlundin/homelab/commit/pending))
+- **feat**: Add a persistent CLIProxyAPI gateway and Oh My CPA dashboard at the ai.oisd.dev and ai.ison-mirfak.ts.net routes alongside the existing 9router service. ([85d4122](https://github.com/edlundin/homelab/commit/85d4122f0dc2cbe0ff4214b253552cc5c04c0f68))
 
 ## 2026-10-04
 
