@@ -1,0 +1,195 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cliproxyapi
+  namespace: cliproxyapi
+  labels:
+    app.kubernetes.io/name: cliproxyapi
+  annotations:
+    homelab.oisd.dev/description: CLIProxyAPI with the Oh My CPA management and usage dashboard
+spec:
+  # SQLite has one writer, and both processes share a ReadWriteOnce volume.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cliproxyapi
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cliproxyapi
+    spec:
+      serviceAccountName: cliproxyapi
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: initialize-data
+          image: docker.io/eceasy/cli-proxy-api:v8.0.16
+          command: ["/bin/sh", "-ec"]
+          args:
+            - |
+              umask 077
+              mkdir -p /data/cpa/auths /data/cpa/plugins /data/omc
+              if [ ! -e /data/cpa/config.yaml ]; then
+                cp /initial-config/config.yaml /data/cpa/config.yaml.tmp
+                printf '\nmanagement:\n  allow-remote: false\n  disable-control-panel: true\n  secret-key: "%s"\naccess:\n  api-keys:\n    - "%s"\n' \
+                  "$MANAGEMENT_KEY" "$INITIAL_API_KEY" >> /data/cpa/config.yaml.tmp
+                mv /data/cpa/config.yaml.tmp /data/cpa/config.yaml
+              fi
+          env:
+            - name: MANAGEMENT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cliproxyapi-credentials
+                  key: management-key
+            - name: INITIAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cliproxyapi-credentials
+                  key: initial-api-key
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: initial-config
+              mountPath: /initial-config
+              readOnly: true
+      containers:
+        - name: cliproxyapi
+          image: docker.io/eceasy/cli-proxy-api:v8.0.16
+          command: ["/CLIProxyAPI/CLIProxyAPI"]
+          args: ["-config", "/data/config.yaml"]
+          workingDir: /data
+          ports:
+            - name: api
+              containerPort: 8317
+          env:
+            - name: HOME
+              value: /data
+            - name: TZ
+              value: Europe/Paris
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: api
+            periodSeconds: 5
+            failureThreshold: 24
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: api
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: api
+            periodSeconds: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+              subPath: cpa
+            - name: tmp
+              mountPath: /tmp
+        - name: oh-my-cpa
+          image: docker.io/wiziscool/oh-my-cpa:v0.1.2
+          ports:
+            - name: dashboard
+              containerPort: 8080
+          env:
+            - name: OMCPA_CPA_BASE_URL
+              value: http://127.0.0.1:8317
+            - name: OMCPA_CPA_MANAGEMENT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cliproxyapi-credentials
+                  key: management-key
+            - name: OMCPA_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cliproxyapi-credentials
+                  key: master-key
+            - name: OMCPA_DATA_DIR
+              value: /data
+            - name: OMCPA_BASE_PATH
+              value: /omc
+            - name: OMCPA_PUBLIC_URL
+              value: https://ai.oisd.dev/omc
+            # Only the ingress namespaces can reach this pod. Trust their
+            # forwarding headers from the cluster pod CIDR, including new nodes.
+            - name: OMCPA_TRUSTED_PROXY_CIDRS
+              value: 10.42.0.0/16
+            - name: TZ
+              value: Europe/Paris
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /omc/api/healthz
+              port: dashboard
+            periodSeconds: 5
+            failureThreshold: 24
+          readinessProbe:
+            httpGet:
+              path: /omc/api/healthz
+              port: dashboard
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /omc/api/healthz
+              port: dashboard
+            periodSeconds: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+              subPath: omc
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: cliproxyapi-data
+        - name: initial-config
+          configMap:
+            name: cliproxyapi-initial-config
+        - name: tmp
+          emptyDir: {}

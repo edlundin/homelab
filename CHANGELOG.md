@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-06
+
+- **feat**: Add a persistent CLIProxyAPI gateway and Oh My CPA dashboard at the ai.oisd.dev and ai.ison-mirfak.ts.net routes alongside the existing 9router service. ([pending](https://github.com/edlundin/homelab/commit/pending))
+
 ## 2026-10-04
 
 - **fix**: Use the supported `gh/gpt-4.1` Copilot model with matching `gpt-4.1` Atuin AI client ID. ([pending](https://github.com/edlundin/homelab/commit/pending))

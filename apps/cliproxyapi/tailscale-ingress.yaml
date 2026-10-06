@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cliproxyapi
+  namespace: cliproxyapi
+  labels:
+    app.kubernetes.io/name: cliproxyapi
+spec:
+  ingressClassName: tailscale
+  tls:
+    - hosts:
+        - ai
+  rules:
+    - http:
+        paths:
+          - path: /omc
+            pathType: Prefix
+            backend:
+              service:
+                name: cliproxyapi
+                port:
+                  number: 8080
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cliproxyapi
+                port:
+                  number: 8317
