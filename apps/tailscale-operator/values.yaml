@@ -22,5 +22,5 @@ operatorConfig:
 proxyConfig:
   image:
     repository: tailscale/tailscale
-    tag: "v1.102.5"
+    tag: "v1.104.1"
   defaultProxyClass: "worker-only"
