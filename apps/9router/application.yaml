@@ -11,8 +11,7 @@ spec:
     repoURL: https://github.com/edlundin/homelab.git
     targetRevision: HEAD
     path: apps/9router
-    directory:
-      include: "{deployment.yaml,service.yaml,service-account.yaml,pvc.yaml,ingress.yaml,tailscale-ingress.yaml,external-secret-tls.yaml,network-policy.yaml,initial-password-sealed.yaml}"
+    kustomize: {}
   destination:
     server: https://kubernetes.default.svc
     namespace: 9router

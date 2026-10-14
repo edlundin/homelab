@@ -13,4 +13,4 @@ resources:
 images:
   - name: decolua/9router
     newName: docker.io/decolua/9router
-    newTag: 0.5.95
+    newTag: 0.5.99

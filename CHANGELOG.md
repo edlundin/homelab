@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-14
+
+- **fix**: Render 9router with Kustomize so Argo CD consumes Image Updater's image pins, and update the pin to 0.5.99. ([pending])
+
 ## 2026-10-06
 
 - **revert**: Remove the CLIProxyAPI gateway and Oh My CPA dashboard deployment and routes. ([pending](https://github.com/edlundin/homelab/commit/pending))

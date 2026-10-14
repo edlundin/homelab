@@ -2,8 +2,9 @@
 
 The single 9router replica stores its database on a Longhorn volume. It is served at
 `https://aiproxy.oisd.dev` through Traefik and at
-`https://aiproxy.ison-mirfak.ts.net` through Tailscale ingress. The image is pinned
-to `decolua/9router:0.5.95`.
+`https://aiproxy.ison-mirfak.ts.net` through Tailscale ingress. Argo CD renders this
+application with Kustomize. The image is pinned to `docker.io/decolua/9router:0.5.99`
+in `kustomization.yaml`, where Argo CD Image Updater writes stable `0.5.x` updates.
 
 The initial dashboard password is generated during manifest creation and stored in
 the `9router-initial-password` SealedSecret. Retrieve it from the live Secret:
