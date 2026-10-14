@@ -18,6 +18,8 @@ spec:
           port: 8317
         - protocol: TCP
           port: 8080
+        - protocol: TCP
+          port: 8081
     - from:
         - namespaceSelector:
             matchLabels:
@@ -25,6 +27,8 @@ spec:
       ports:
         - protocol: TCP
           port: 8080
+        - protocol: TCP
+          port: 8081
         - protocol: TCP
           port: 8317
   egress:

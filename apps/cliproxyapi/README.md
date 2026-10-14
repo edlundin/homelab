@@ -6,14 +6,17 @@ The ArgoCD root application discovers `application.yaml` automatically.
 
 ## Access
 
-- Dashboard: `https://cpa.oisd.dev/omc/`
-- Tailscale dashboard: `https://cpa.ison-mirfak.ts.net/omc/`
+- Dashboard: `https://ai.oisd.dev/omc/` and `https://ai.ison-mirfak.ts.net/omc/`
+- `/` redirects to `/omc/` on both AI hostnames.
+- Existing `cpa.oisd.dev` and `cpa.ison-mirfak.ts.net` dashboard aliases remain available.
 - OpenAI-compatible API bases: `https://ai.oisd.dev/v1` and
   `https://ai.ison-mirfak.ts.net/v1`
 - Gemini-compatible routes: `/v1beta/…` on either AI hostname.
 
 The Traefik hostnames need the same DNS routing as other `*.oisd.dev` applications.
-Separate Tailscale ingresses expose the dashboard at `cpa` and inference paths at `ai`.
+The `ai` Tailscale ingress routes `/omc` to the dashboard and `/v1` and `/v1beta`
+to inference. A small non-root nginx sidecar redirects exact `/` requests to `/omc/`
+and returns 404 for unmatched paths, never forwarding them to CPA.
 Sign in with the management key, then configure providers and OAuth in Oh My CPA.
 No upstream provider credentials are preconfigured.
 
@@ -32,7 +35,7 @@ required to decrypt Oh My CPA's database; do not regenerate it on upgrades.
 
 ## Persistence and security
 
-Both containers share one pod and a 2 Gi Longhorn PVC, with one replica and `Recreate`
+The gateway, dashboard and root-redirect containers share one pod and a 2 Gi Longhorn PVC, with one replica and `Recreate`
 rollouts. Both run as UID/GID 10001 without a Kubernetes service-account token.
 The PVC contains mutable `config.yaml`, OAuth credentials in `auths/`, logs, the plugin
 directory (plugins are initially disabled), and Oh My CPA's SQLite data under `omc/`.
@@ -45,12 +48,11 @@ the dashboard; modifying the bootstrap ConfigMap does not overwrite live configu
 
 Oh My CPA reaches CPA over loopback. Upstream `MANAGEMENT_PASSWORD` enables remote
 management regardless of `management.allow-remote`; that flag is not a security
-boundary in this deployment. Traefik exposes only `/omc`, `/omc/…`, `/v1/…` and
-`/v1beta/…`, never CPA's `/v0/management` or `/v8/management`. NetworkPolicy limits
-inbound traffic to Traefik and Tailscale proxies. The AI ingresses route only
-`/v1/…` and `/v1beta/…`; the dashboard remains on the separate `cpa` hostname.
-Do not add a catch-all
-route or expose port 8317 directly. Oh My CPA authenticates its dashboard with the
+boundary in this deployment. Traefik exposes the root redirect, dashboard and inference paths,
+never CPA's `/v0/management` or `/v8/management`. NetworkPolicy limits
+inbound traffic to Traefik and Tailscale proxies. Unmatched tailnet paths reach
+only the redirect sidecar, which returns 404. Do not add a catch-all route to CPA
+or expose port 8317 directly. Oh My CPA authenticates its dashboard with the
 management key and uses secure cookies for its configured HTTPS public URL.
 
 Only Oh My CPA should consume this CPA instance's destructive usage queue. Do not

@@ -7,11 +7,23 @@ metadata:
     app.kubernetes.io/name: cliproxyapi
 spec:
   ingressClassName: tailscale
-  defaultBackend:
-    service:
-      name: cliproxyapi
-      port:
-        number: 8080
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cliproxyapi
+                port:
+                  number: 8081
+          - path: /omc
+            pathType: Prefix
+            backend:
+              service:
+                name: cliproxyapi
+                port:
+                  number: 8080
   tls:
     - hosts:
         - cpa
@@ -27,14 +39,28 @@ spec:
   rules:
     - http:
         paths:
-          - path: /v1/
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cliproxyapi
+                port:
+                  number: 8081
+          - path: /omc
+            pathType: Prefix
+            backend:
+              service:
+                name: cliproxyapi
+                port:
+                  number: 8080
+          - path: /v1
             pathType: Prefix
             backend:
               service:
                 name: cliproxyapi
                 port:
                   number: 8317
-          - path: /v1beta/
+          - path: /v1beta
             pathType: Prefix
             backend:
               service:

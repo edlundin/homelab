@@ -4,6 +4,14 @@ metadata:
   name: cliproxyapi-bootstrap
   namespace: cliproxyapi
 data:
+  redirect.conf: |
+    server {
+      listen 8081;
+      server_name _;
+      absolute_redirect off;
+      location = / { return 302 /omc/; }
+      location / { return 404; }
+    }
   config.yaml: |
     config-version: 8
     server:

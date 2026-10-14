@@ -7,7 +7,15 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`cpa.oisd.dev`) && (Path(`/omc`) || PathPrefix(`/omc/`))
+    - match: (Host(`ai.oisd.dev`) || Host(`cpa.oisd.dev`)) && Path(`/`)
+      kind: Rule
+      services:
+        - name: cliproxyapi
+          port: 8081
+      middlewares:
+        - name: default-chain
+          namespace: traefik
+    - match: (Host(`ai.oisd.dev`) || Host(`cpa.oisd.dev`)) && (Path(`/omc`) || PathPrefix(`/omc/`))
       kind: Rule
       services:
         - name: cliproxyapi
@@ -16,7 +24,7 @@ spec:
         - name: default-chain
           namespace: traefik
     # Explicit inference paths only: never expose /v0/management or /v8/management.
-    - match: Host(`ai.oisd.dev`) && (PathPrefix(`/v1/`) || PathPrefix(`/v1beta/`))
+    - match: Host(`ai.oisd.dev`) && (Path(`/v1`) || PathPrefix(`/v1/`) || Path(`/v1beta`) || PathPrefix(`/v1beta/`))
       kind: Rule
       services:
         - name: cliproxyapi

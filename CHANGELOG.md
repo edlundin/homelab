@@ -2,6 +2,8 @@
 
 ## 2026-10-14
 
+- **fix**: Redirect AI hostname roots to Oh My CPA, serve the dashboard under /omc, and route /v1 and /v1beta to CLIProxyAPI on public and tailnet endpoints. ([pending])
+
 - **feat**: Add persistent CLIProxyAPI and Oh My CPA with protected dashboard access, inference endpoints at ai.oisd.dev and ai.ison-mirfak.ts.net, and automatic image updates. ([pending])
 
 - **fix**: Render 9router with Kustomize so Argo CD consumes Image Updater's image pins, and update the pin to 0.5.99. ([pending])
