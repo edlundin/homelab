@@ -1,0 +1,46 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cliproxyapi
+  namespace: cliproxyapi
+  labels:
+    app.kubernetes.io/name: cliproxyapi
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: cliproxyapi
+      port:
+        number: 8080
+  tls:
+    - hosts:
+        - cpa
+---
+# Path allowlists keep CPA management endpoints off the tailnet ingress.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cliproxyapi-ai
+  namespace: cliproxyapi
+spec:
+  ingressClassName: tailscale
+  rules:
+    - http:
+        paths:
+          - path: /v1/
+            pathType: Prefix
+            backend:
+              service:
+                name: cliproxyapi
+                port:
+                  number: 8317
+          - path: /v1beta/
+            pathType: Prefix
+            backend:
+              service:
+                name: cliproxyapi
+                port:
+                  number: 8317
+  tls:
+    - hosts:
+        - ai

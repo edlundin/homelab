@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cliproxyapi-bootstrap
+  namespace: cliproxyapi
+data:
+  config.yaml: |
+    config-version: 8
+    server:
+      host: ""
+      port: 8317
+    management:
+      # MANAGEMENT_PASSWORD overrides this flag upstream. Ingress path allowlists
+      # and NetworkPolicy are the external management boundary.
+      allow-remote: false
+      secret-key: ""
+      disable-control-panel: true
+    oauth:
+      auth-dir: /data/auths
+    observability:
+      usage:
+        usage-statistics-enabled: true
+        redis-usage-queue-retention-seconds: 60
+    plugins:
+      enabled: false
+      dir: /data/plugins

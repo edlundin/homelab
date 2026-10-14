@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cliproxyapi
+  namespace: cliproxyapi
+spec:
+  selector:
+    app.kubernetes.io/name: cliproxyapi
+  ports:
+    - name: api
+      port: 8317
+      targetPort: api
+    - name: dashboard
+      port: 8080
+      targetPort: dashboard

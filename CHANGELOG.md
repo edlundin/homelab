@@ -2,6 +2,8 @@
 
 ## 2026-10-14
 
+- **feat**: Add persistent CLIProxyAPI and Oh My CPA with protected dashboard access, inference endpoints at ai.oisd.dev and ai.ison-mirfak.ts.net, and automatic image updates. ([pending])
+
 - **fix**: Render 9router with Kustomize so Argo CD consumes Image Updater's image pins, and update the pin to 0.5.99. ([pending])
 
 ## 2026-10-06

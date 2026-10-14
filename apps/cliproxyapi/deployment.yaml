@@ -1,0 +1,166 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cliproxyapi
+  namespace: cliproxyapi
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cliproxyapi
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cliproxyapi
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: initialize-data
+          image: busybox:1.37.0
+          command:
+            - sh
+            - -ec
+            - |
+              mkdir -p /data/auths /data/plugins /data/logs /data/omc
+              # Bootstrap once; CPA and OMC own subsequent configuration edits.
+              if [ ! -f /data/config.yaml ]; then
+                umask 077
+                cp /bootstrap/config.yaml /data/config.yaml.tmp
+                printf '\naccess:\n  api-keys:\n    - "%s"\n' "$CLIENT_API_KEY" >> /data/config.yaml.tmp
+                mv /data/config.yaml.tmp /data/config.yaml
+              fi
+          env:
+            - name: CLIENT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cliproxyapi-credentials
+                  key: client-api-key
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: bootstrap
+              mountPath: /bootstrap
+              readOnly: true
+      containers:
+        - name: cliproxyapi
+          image: eceasy/cli-proxy-api:v8.0.28
+          command: ["/CLIProxyAPI/CLIProxyAPI"]
+          args: ["-config", "/data/config.yaml"]
+          ports:
+            - name: api
+              containerPort: 8317
+          env:
+            - name: TZ
+              value: UTC
+            - name: HOME
+              value: /data
+            - name: MANAGEMENT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cliproxyapi-credentials
+                  key: management-key
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          startupProbe:
+            tcpSocket:
+              port: api
+            periodSeconds: 5
+            failureThreshold: 24
+          readinessProbe:
+            tcpSocket:
+              port: api
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: api
+            periodSeconds: 30
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: data
+              mountPath: /CLIProxyAPI/logs
+              subPath: logs
+        - name: oh-my-cpa
+          image: wiziscool/oh-my-cpa:0.2.9
+          ports:
+            - name: dashboard
+              containerPort: 8080
+          env:
+            - name: TZ
+              value: UTC
+            - name: OMCPA_CPA_BASE_URL
+              value: http://127.0.0.1:8317
+            - name: OMCPA_CPA_MANAGEMENT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cliproxyapi-credentials
+                  key: management-key
+            - name: OMCPA_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cliproxyapi-credentials
+                  key: master-key
+            - name: OMCPA_DATA_DIR
+              value: /data
+            - name: OMCPA_PUBLIC_URL
+              value: https://cpa.oisd.dev/omc
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /omc/api/healthz
+              port: dashboard
+            periodSeconds: 5
+            failureThreshold: 24
+          readinessProbe:
+            httpGet:
+              path: /omc/api/healthz
+              port: dashboard
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /omc/api/healthz
+              port: dashboard
+            periodSeconds: 30
+          volumeMounts:
+            - name: data
+              mountPath: /data
+              subPath: omc
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: cliproxyapi-data
+        - name: bootstrap
+          configMap:
+            name: cliproxyapi-bootstrap
