@@ -5,6 +5,7 @@ resources:
   - credentials-sealed.yaml
   - pvc.yaml
   - deployment.yaml
+  - pod-disruption-budget.yaml
   - service.yaml
   - ingress.yaml
   - tailscale-ingress.yaml

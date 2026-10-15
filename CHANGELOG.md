@@ -2,6 +2,7 @@
 
 ## 2026-10-15
 
+- **fix**: Protect CLIProxyAPI's healthy replica from voluntary eviction and document planned node maintenance. ([pending])
 - **fix**: Disable the ai.oisd.dev root redirect while preserving dashboard, inference, and other hostname routes. ([pending])
 
 - **chore**: Remove Digarr and 9router applications and their automatic image updates; Atuin AI requires a replacement backend. ([pending])

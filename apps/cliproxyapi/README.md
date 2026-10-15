@@ -41,6 +41,11 @@ required to decrypt Oh My CPA's database; do not regenerate it on upgrades.
 
 The gateway, dashboard and root-redirect containers share one pod and a 2 Gi Longhorn PVC, with one replica and `Recreate`
 rollouts. Both run as UID/GID 10001 without a Kubernetes service-account token.
+The PodDisruptionBudget preserves one healthy pod during voluntary evictions,
+including descheduler balancing. With one replica, draining its node requires a
+planned interruption and an explicit temporary adjustment of the budget. Unhealthy
+pods may still be evicted. The budget does not prevent node failures or downtime
+during the deployment's `Recreate` rollouts.
 The PVC contains mutable `config.yaml`, OAuth credentials in `auths/`, logs, the plugin
 directory (plugins are initially disabled), and Oh My CPA's SQLite data under `omc/`.
 Back up the complete PVC together with the sealed credentials and the cluster's
