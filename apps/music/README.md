@@ -14,6 +14,12 @@ Internal service URLs are:
 - slskd: `http://slskd.music.svc.cluster.local:5030`
 - SoulSync: `http://soulsync.music.svc.cluster.local:8008`
 
+Navidrome and slskd each have a PodDisruptionBudget preserving one healthy replica
+during voluntary eviction to protect streams and transfers. Draining their nodes
+requires a planned interruption and an explicit temporary budget adjustment.
+Unhealthy pods may still be evicted; node failures and deployment updates are not
+prevented. SoulSync has no disruption budget.
+
 ## One-time setup
 
 1. Open Navidrome at <https://navidrome.ison-mirfak.ts.net> and create its

@@ -5,6 +5,11 @@ Actual runs as one replica with the complete server data directory mounted at
 job group, which includes the weekly backup job. The server uses the same image
 digest and upload limits as the previous Docker Compose instance.
 
+A PodDisruptionBudget preserves one healthy replica during voluntary evictions.
+Node drains require a planned interruption and an explicit temporary budget
+adjustment. Unhealthy pods may still be evicted; node failures and deployment
+updates are not prevented.
+
 ## Migration status
 
 On 2026-10-02, a stopped-server archive of the VM's

@@ -5,6 +5,7 @@ resources:
   - persistent-volume-claims.yaml
   - slskd-sealed-secret.yaml
   - deployments.yaml
+  - pod-disruption-budgets.yaml
   - services.yaml
   - ingresses.yaml
   - network-policy.yaml

@@ -6,6 +6,11 @@ requires the proxies to occupy different `topology.kubernetes.io/zone` values.
 Both physical hosts must carry that label. The worker-only default class remains
 in use for other proxies.
 
+The `ingress-two-hosts` PodDisruptionBudget preserves one healthy proxy during
+voluntary evictions, allowing one of the two proxies to be drained at a time.
+Unhealthy proxies may still be evicted. This budget does not cover the separate
+singleton Tailscale proxies or protect against node failures and workload updates.
+
 The live node mapping is `sarasate` → zone `sarasate` and `spinoza` → zone
 `nietzsche`. These labels were applied to the nodes; retain them when rebuilding
 or replacing a node. Terraform already configures Spinoza's `nietzsche` label.

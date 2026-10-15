@@ -22,6 +22,9 @@ auth:
 
 # Primary PostgreSQL configuration
 primary:
+    pdb:
+        minAvailable: 1
+        maxUnavailable: ""
     # Persistence settings
     persistence:
         enabled: true

@@ -5,6 +5,7 @@ resources:
   - service-account.yaml
   - pvc.yaml
   - deployment.yaml
+  - pod-disruption-budget.yaml
   - service.yaml
   - tailscale-ingress.yaml
   - network-policy.yaml

@@ -7,6 +7,9 @@ This directory contains the PostgreSQL deployment configuration using the Bitnam
 - **Chart**: Bitnami PostgreSQL
 - **PostgreSQL**: 18.6, pinned by image digest in `values.yaml`
 - **Architecture**: Standalone (single primary instance)
+- **Voluntary disruptions**: The chart's PodDisruptionBudget preserves the primary
+  with `minAvailable: 1`. Node drains require a planned interruption and an explicit
+  temporary budget adjustment; this does not protect against node failures or updates.
 - **Namespace**: `postgres`
 - **Default Database**: `postgres` (with `postgres` user)
 - **Additional Databases**: `n8n`, `digarr`, and `tandoor`; Atuin creates an

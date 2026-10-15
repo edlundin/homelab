@@ -18,6 +18,10 @@ This folder manages the deployment of Redis in the homelab Kubernetes cluster us
 - To update configuration, edit `values.yaml` and sync the ArgoCD application.
 - Passwords/secrets should be managed via Kubernetes secrets referenced in `values.yaml`.
 
+The master's chart-managed PodDisruptionBudget preserves one replica during voluntary
+evictions. As Redis is standalone, node drains require a planned interruption and an
+explicit temporary budget adjustment. Node failures and workload updates remain possible.
+
 ## References
 - [Bitnami Redis Helm Chart](https://artifacthub.io/packages/helm/bitnami/redis)
 - [ArgoCD Documentation](https://argo-cd.readthedocs.io/)

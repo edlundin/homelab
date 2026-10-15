@@ -7,6 +7,9 @@ auth:
   existingSecretPasswordKey: password
 
 master:
+  pdb:
+    minAvailable: 1
+    maxUnavailable: ""
   # kubectl top measured 38Mi and 18m CPU for redis; 64Mi and 25m cover it.
   resources:
     requests:

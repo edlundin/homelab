@@ -2,6 +2,7 @@
 
 ## 2026-10-15
 
+- **fix**: Preserve PostgreSQL, Redis, Navidrome, slskd, Actual Budget, and one shared Tailscale ingress proxy during voluntary evictions. ([pending])
 - **fix**: Protect CLIProxyAPI's healthy replica from voluntary eviction and document planned node maintenance. ([pending])
 - **fix**: Disable the ai.oisd.dev root redirect while preserving dashboard, inference, and other hostname routes. ([pending])
 
