@@ -7,7 +7,7 @@ The ArgoCD root application discovers `application.yaml` automatically.
 ## Access
 
 - Dashboard: `https://ai.oisd.dev/omc/` and `https://ai.ison-mirfak.ts.net/omc/`
-- `/` redirects to `/omc/` on both AI hostnames.
+- Only `GET /` redirects to `/omc/` on both AI hostnames; other methods on `/` return 404.
 - Existing `cpa.oisd.dev` and `cpa.ison-mirfak.ts.net` dashboard aliases remain available.
 - OpenAI-compatible API bases: `https://ai.oisd.dev/v1` and
   `https://ai.ison-mirfak.ts.net/v1`
@@ -18,7 +18,7 @@ The ArgoCD root application discovers `application.yaml` automatically.
 
 The Traefik hostnames need the same DNS routing as other `*.oisd.dev` applications.
 The `ai` Tailscale ingress routes `/omc` to the dashboard and `/v1`, `/v1beta`
-and `/backend-api/codex/responses` to inference. A small non-root nginx sidecar redirects exact `/` requests to `/omc/`
+and `/backend-api/codex/responses` to inference. A small non-root nginx sidecar redirects only exact `GET /` requests to `/omc/`
 and returns 404 for unmatched paths, never forwarding them to CPA.
 Sign in with the management key, then configure providers and OAuth in Oh My CPA.
 No upstream provider credentials are preconfigured.

@@ -9,7 +9,10 @@ data:
       listen 8081;
       server_name _;
       absolute_redirect off;
-      location = / { return 302 /omc/; }
+      location = / {
+        if ($request_method = GET) { return 302 /omc/; }
+        return 404;
+      }
       location / { return 404; }
     }
   config.yaml: |

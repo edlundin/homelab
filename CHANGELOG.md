@@ -2,6 +2,7 @@
 
 ## 2026-10-15
 
+- **fix**: Restrict CLIProxyAPI root dashboard redirects to GET requests; return 404 for other methods. ([pending])
 - **fix**: Route Pi CLIProxyAPI inference through the public and tailnet AI ingresses. ([pending])
 
 ## 2026-10-14
