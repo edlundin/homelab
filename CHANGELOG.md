@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-15
+
+- **fix**: Route Pi CLIProxyAPI inference through the public and tailnet AI ingresses. ([pending])
+
 ## 2026-10-14
 
 - **fix**: Redirect AI hostname roots to Oh My CPA, serve the dashboard under /omc, and route /v1 and /v1beta to CLIProxyAPI on public and tailnet endpoints. ([pending])

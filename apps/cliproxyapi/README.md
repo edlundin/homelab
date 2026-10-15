@@ -12,10 +12,13 @@ The ArgoCD root application discovers `application.yaml` automatically.
 - OpenAI-compatible API bases: `https://ai.oisd.dev/v1` and
   `https://ai.ison-mirfak.ts.net/v1`
 - Gemini-compatible routes: `/v1beta/…` on either AI hostname.
+- Pi's CLIProxyAPI extension uses `/backend-api/codex/responses` on either AI
+  hostname. Configure its base URL as `https://ai.oisd.dev` (or
+  `https://ai.ison-mirfak.ts.net`) and authenticate with a client API key.
 
 The Traefik hostnames need the same DNS routing as other `*.oisd.dev` applications.
-The `ai` Tailscale ingress routes `/omc` to the dashboard and `/v1` and `/v1beta`
-to inference. A small non-root nginx sidecar redirects exact `/` requests to `/omc/`
+The `ai` Tailscale ingress routes `/omc` to the dashboard and `/v1`, `/v1beta`
+and `/backend-api/codex/responses` to inference. A small non-root nginx sidecar redirects exact `/` requests to `/omc/`
 and returns 404 for unmatched paths, never forwarding them to CPA.
 Sign in with the management key, then configure providers and OAuth in Oh My CPA.
 No upstream provider credentials are preconfigured.

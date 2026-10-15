@@ -24,7 +24,7 @@ spec:
         - name: default-chain
           namespace: traefik
     # Explicit inference paths only: never expose /v0/management or /v8/management.
-    - match: Host(`ai.oisd.dev`) && (Path(`/v1`) || PathPrefix(`/v1/`) || Path(`/v1beta`) || PathPrefix(`/v1beta/`))
+    - match: Host(`ai.oisd.dev`) && (Path(`/v1`) || PathPrefix(`/v1/`) || Path(`/v1beta`) || PathPrefix(`/v1beta/`) || Path(`/backend-api/codex/responses`))
       kind: Rule
       services:
         - name: cliproxyapi

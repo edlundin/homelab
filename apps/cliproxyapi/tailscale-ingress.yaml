@@ -67,6 +67,13 @@ spec:
                 name: cliproxyapi
                 port:
                   number: 8317
+          - path: /backend-api/codex/responses
+            pathType: Prefix
+            backend:
+              service:
+                name: cliproxyapi
+                port:
+                  number: 8317
   tls:
     - hosts:
         - ai
