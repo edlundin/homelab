@@ -2,6 +2,8 @@
 
 ## 2026-10-15
 
+- **chore**: Remove Digarr and 9router applications and their automatic image updates; Atuin AI requires a replacement backend. ([pending])
+
 - **fix**: Restrict CLIProxyAPI root dashboard redirects to GET requests; return 404 for other methods. ([pending])
 - **fix**: Route Pi CLIProxyAPI inference through the public and tailnet AI ingresses. ([pending])
 
