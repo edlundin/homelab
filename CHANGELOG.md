@@ -2,6 +2,8 @@
 
 ## 2026-10-15
 
+- **fix**: Disable the ai.oisd.dev root redirect while preserving dashboard, inference, and other hostname routes. ([pending])
+
 - **chore**: Remove Digarr and 9router applications and their automatic image updates; Atuin AI requires a replacement backend. ([pending])
 
 - **fix**: Restrict CLIProxyAPI root dashboard redirects to GET requests; return 404 for other methods. ([pending])

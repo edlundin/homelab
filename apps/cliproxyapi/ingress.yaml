@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: (Host(`ai.oisd.dev`) || Host(`cpa.oisd.dev`)) && Path(`/`)
+    - match: Host(`cpa.oisd.dev`) && Path(`/`)
       kind: Rule
       services:
         - name: cliproxyapi
