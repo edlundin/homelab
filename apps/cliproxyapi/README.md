@@ -7,8 +7,9 @@ The ArgoCD root application discovers `application.yaml` automatically.
 ## Access
 
 - Dashboard: `https://ai.oisd.dev/omc/` and `https://ai.ison-mirfak.ts.net/omc/`
-- On both AI hostnames and the `cpa.ison-mirfak.ts.net` dashboard alias, only
-  `GET /` redirects to `/omc/`; other methods return 404.
+- `ai.oisd.dev/` has no root redirect and returns 404. On the Tailscale AI hostname
+  and the `cpa.ison-mirfak.ts.net` dashboard alias, only `GET /` redirects to
+  `/omc/`; other methods return 404.
 - The existing `cpa.ison-mirfak.ts.net` dashboard alias remains available.
 - OpenAI-compatible API bases: `https://ai.oisd.dev/v1` and
   `https://ai.ison-mirfak.ts.net/v1`
@@ -57,7 +58,7 @@ the dashboard; modifying the bootstrap ConfigMap does not overwrite live configu
 
 Oh My CPA reaches CPA over loopback. Upstream `MANAGEMENT_PASSWORD` enables remote
 management regardless of `management.allow-remote`; that flag is not a security
-boundary in this deployment. Traefik exposes the root redirect, dashboard and inference paths,
+boundary in this deployment. Traefik exposes only the dashboard and inference paths,
 never CPA's `/v0/management` or `/v8/management`. NetworkPolicy limits
 inbound traffic to Traefik and Tailscale proxies. Unmatched tailnet paths reach
 only the redirect sidecar, which returns 404. Do not add a catch-all route to CPA

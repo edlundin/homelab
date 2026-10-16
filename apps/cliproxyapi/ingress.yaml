@@ -7,14 +7,6 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`ai.oisd.dev`) && Path(`/`)
-      kind: Rule
-      services:
-        - name: cliproxyapi
-          port: 8081
-      middlewares:
-        - name: default-chain
-          namespace: traefik
     - match: Host(`ai.oisd.dev`) && (Path(`/omc`) || PathPrefix(`/omc/`))
       kind: Rule
       services:
