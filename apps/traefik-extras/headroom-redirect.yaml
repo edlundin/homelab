@@ -1,0 +1,29 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: headroom-redirect
+  namespace: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`headroom.oisd.dev`)
+      kind: Rule
+      services:
+        - name: noop@internal
+          kind: TraefikService
+      middlewares:
+        - name: headroom-redirect
+  tls:
+    secretName: wildcard-tls-oisd
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: headroom-redirect
+  namespace: traefik
+spec:
+  redirectRegex:
+    regex: '^https?://headroom\.oisd\.dev/(.*)$'
+    replacement: 'https://headroom.ison-mirfak.ts.net/${1}'
+    permanent: false

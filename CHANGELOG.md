@@ -2,7 +2,7 @@
 
 ## 2026-10-16
 
-- **fix**: Remove the redirect from headroom.oisd.dev to headroom.ison-mirfak.ts.net. ([pending])
+- **revert**: Restore the redirect from headroom.oisd.dev to headroom.ison-mirfak.ts.net. ([pending])
 
 - **fix**: Remove the ai.oisd.dev root redirect while preserving dashboard, inference, and Tailscale routes. ([pending])
 
