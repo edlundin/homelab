@@ -2,6 +2,8 @@
 
 ## 2026-10-16
 
+- **fix**: Remove the redirect from headroom.oisd.dev to headroom.ison-mirfak.ts.net. ([pending])
+
 - **fix**: Remove the ai.oisd.dev root redirect while preserving dashboard, inference, and Tailscale routes. ([pending])
 
 - **feat**: Redirect headroom.oisd.dev to its Tailscale hostname while preserving paths and query strings. ([pending])
