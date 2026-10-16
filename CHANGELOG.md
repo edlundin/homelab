@@ -2,7 +2,8 @@
 
 ## 2026-10-16
 
-- **fix**: Restore the GET-only AI root dashboard redirect and remove the unused cpa.oisd.dev hostname. ([pending])
+- **feat**: Redirect headroom.oisd.dev to its Tailscale hostname while preserving paths and query strings. ([pending])
+- **fix**: Restore the GET-only AI root dashboard redirect and remove the unused cpa.oisd.dev hostname. ([a5f5983](https://github.com/edlundin/homelab/commit/a5f5983))
 
 ## 2026-10-15
 
