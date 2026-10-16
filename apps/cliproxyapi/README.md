@@ -7,9 +7,9 @@ The ArgoCD root application discovers `application.yaml` automatically.
 ## Access
 
 - Dashboard: `https://ai.oisd.dev/omc/` and `https://ai.ison-mirfak.ts.net/omc/`
-- `ai.oisd.dev/` has no root redirect and returns 404. On the Tailscale AI hostname
-  and CPA dashboard aliases, only `GET /` redirects to `/omc/`; other methods return 404.
-- Existing `cpa.oisd.dev` and `cpa.ison-mirfak.ts.net` dashboard aliases remain available.
+- On both AI hostnames and the `cpa.ison-mirfak.ts.net` dashboard alias, only
+  `GET /` redirects to `/omc/`; other methods return 404.
+- The existing `cpa.ison-mirfak.ts.net` dashboard alias remains available.
 - OpenAI-compatible API bases: `https://ai.oisd.dev/v1` and
   `https://ai.ison-mirfak.ts.net/v1`
 - Gemini-compatible routes: `/v1beta/…` on either AI hostname.

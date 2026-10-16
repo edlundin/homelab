@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`cpa.oisd.dev`) && Path(`/`)
+    - match: Host(`ai.oisd.dev`) && Path(`/`)
       kind: Rule
       services:
         - name: cliproxyapi
@@ -15,7 +15,7 @@ spec:
       middlewares:
         - name: default-chain
           namespace: traefik
-    - match: (Host(`ai.oisd.dev`) || Host(`cpa.oisd.dev`)) && (Path(`/omc`) || PathPrefix(`/omc/`))
+    - match: Host(`ai.oisd.dev`) && (Path(`/omc`) || PathPrefix(`/omc/`))
       kind: Rule
       services:
         - name: cliproxyapi

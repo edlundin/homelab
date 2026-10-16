@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-16
+
+- **fix**: Restore the GET-only AI root dashboard redirect and remove the unused cpa.oisd.dev hostname. ([pending])
+
 ## 2026-10-15
 
 - **fix**: Preserve PostgreSQL, Redis, Navidrome, slskd, Actual Budget, and one shared Tailscale ingress proxy during voluntary evictions. ([pending])
