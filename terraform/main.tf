@@ -371,8 +371,7 @@ resource "proxmox_virtual_environment_file" "k3s_node_user_data" {
       - path: /etc/rancher/k3s/resolv.conf
         permissions: "0644"
         content: |
-          nameserver ${local.dns_servers[0]}
-          nameserver ${local.dns_servers[1]}
+          nameserver 100.100.100.100
           options timeout:2 attempts:2
       - path: /etc/rancher/k3s/config.yaml
         permissions: "0644"

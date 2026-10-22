@@ -2,6 +2,7 @@
 
 ## 2026-10-22
 
+- **fix**: Use Tailscale DNS through the K3s resolver file to restore external DNS resolution for cluster workloads. ([pending])
 - **fix**: Raise Oh My CPA's memory limit from 512 MiB to 1 GiB to address startup OOM kills. ([pending])
 
 ## 2026-10-16
