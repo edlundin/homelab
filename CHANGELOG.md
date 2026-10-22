@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-22
+
+- **fix**: Raise Oh My CPA's memory limit from 512 MiB to 1 GiB to address startup OOM kills. ([pending])
+
 ## 2026-10-16
 
 - **revert**: Restore the redirect from headroom.oisd.dev to headroom.ison-mirfak.ts.net. ([pending])
