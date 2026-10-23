@@ -13,14 +13,19 @@ The ArgoCD root application discovers `application.yaml` automatically.
 - The existing `cpa.ison-mirfak.ts.net` dashboard alias remains available.
 - OpenAI-compatible API bases: `https://ai.oisd.dev/v1` and
   `https://ai.ison-mirfak.ts.net/v1`
+- Management API routes: `/v0/management` and `/v8/management` on either AI
+  hostname, authenticated with the management key. For T3's CLIProxyAPI hub, use
+  the AI hostname's base URL without `/v1` and the management key. Endpoint
+  availability and T3 compatibility depend on the deployed CPA version.
 - Gemini-compatible routes: `/v1beta/…` on either AI hostname.
 - Pi's CLIProxyAPI extension uses `/backend-api/codex/responses` on either AI
   hostname. Configure its base URL as `https://ai.oisd.dev` (or
   `https://ai.ison-mirfak.ts.net`) and authenticate with a client API key.
 
 The Traefik hostnames need the same DNS routing as other `*.oisd.dev` applications.
-The `ai` Tailscale ingress routes `/omc` to the dashboard and `/v1`, `/v1beta`
-and `/backend-api/codex/responses` to inference. A small non-root nginx sidecar redirects only exact `GET /` requests to `/omc/`
+The `ai` Tailscale ingress routes `/omc` to the dashboard, `/v0/management` and
+`/v8/management` to CPA management, and `/v1`, `/v1beta` and
+`/backend-api/codex/responses` to inference. A small non-root nginx sidecar redirects only exact `GET /` requests to `/omc/`
 and returns 404 for unmatched paths, never forwarding them to CPA.
 Sign in with the management key, then configure providers and OAuth in Oh My CPA.
 No upstream provider credentials are preconfigured.
@@ -58,9 +63,11 @@ the dashboard; modifying the bootstrap ConfigMap does not overwrite live configu
 
 Oh My CPA reaches CPA over loopback. Upstream `MANAGEMENT_PASSWORD` enables remote
 management regardless of `management.allow-remote`; that flag is not a security
-boundary in this deployment. Traefik exposes only the dashboard and inference paths,
-never CPA's `/v0/management` or `/v8/management`. NetworkPolicy limits
-inbound traffic to Traefik and Tailscale proxies. Unmatched tailnet paths reach
+boundary in this deployment. Both AI ingresses expose the dashboard, explicit inference
+paths, and CPA's `/v0/management` and `/v8/management` routes. Management access
+requires the management key; the Traefik route does not itself enforce tailnet-only
+access, so its reachability depends on the surrounding network configuration.
+NetworkPolicy limits inbound traffic to Traefik and Tailscale proxies. Unmatched tailnet paths reach
 only the redirect sidecar, which returns 404. Do not add a catch-all route to CPA
 or expose port 8317 directly. Oh My CPA authenticates its dashboard with the
 management key and uses secure cookies for its configured HTTPS public URL.

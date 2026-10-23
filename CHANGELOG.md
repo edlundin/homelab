@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-23
+
+- **fix**: Allow authenticated CLIProxyAPI management routes on both AI ingresses. ([pending])
+
 ## 2026-10-22
 
 - **fix**: Use Tailscale DNS through the K3s resolver file to restore external DNS resolution for cluster workloads. ([pending])

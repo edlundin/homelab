@@ -28,7 +28,7 @@ spec:
     - hosts:
         - cpa
 ---
-# Path allowlists keep CPA management endpoints off the tailnet ingress.
+# Explicit AI routes include management endpoints protected by CPA's management key.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -53,6 +53,20 @@ spec:
                 name: cliproxyapi
                 port:
                   number: 8080
+          - path: /v0/management
+            pathType: Prefix
+            backend:
+              service:
+                name: cliproxyapi
+                port:
+                  number: 8317
+          - path: /v8/management
+            pathType: Prefix
+            backend:
+              service:
+                name: cliproxyapi
+                port:
+                  number: 8317
           - path: /v1
             pathType: Prefix
             backend:

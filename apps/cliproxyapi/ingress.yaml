@@ -15,7 +15,15 @@ spec:
       middlewares:
         - name: default-chain
           namespace: traefik
-    # Explicit inference paths only: never expose /v0/management or /v8/management.
+    # Management routes require CPA's management key; keep other paths restricted.
+    - match: Host(`ai.oisd.dev`) && (Path(`/v0/management`) || PathPrefix(`/v0/management/`) || Path(`/v8/management`) || PathPrefix(`/v8/management/`))
+      kind: Rule
+      services:
+        - name: cliproxyapi
+          port: 8317
+      middlewares:
+        - name: default-chain
+          namespace: traefik
     - match: Host(`ai.oisd.dev`) && (Path(`/v1`) || PathPrefix(`/v1/`) || Path(`/v1beta`) || PathPrefix(`/v1beta/`) || Path(`/backend-api/codex/responses`))
       kind: Rule
       services:
