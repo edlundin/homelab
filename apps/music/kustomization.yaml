@@ -18,4 +18,4 @@ images:
     newTag: 0.26.2
   - name: boulderbadgedad/soulsync
     newName: docker.io/boulderbadgedad/soulsync
-    newTag: 3.5.9
+    newTag: 3.6.0
