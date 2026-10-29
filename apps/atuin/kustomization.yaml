@@ -21,7 +21,7 @@ resources:
 images:
   - name: ghcr.io/atuinsh/atuin
     newName: ghcr.io/atuinsh/atuin
-    newTag: 18.24.2
+    newTag: 18.24.3
   - name: postgres
     newName: docker.io/postgres
     newTag: 18-alpine
