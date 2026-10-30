@@ -3,6 +3,13 @@ kind: IngressRoute
 metadata:
   name: atuin-ai
   namespace: atuin
+  annotations:
+    # Probe the unauthenticated authentication boundary, not AI inference.
+    gatus.home-operations.com/endpoint: |
+      name: Atuin AI (authentication)
+      group: AI & Automation
+      conditions:
+        - "[STATUS] == 401"
   labels:
     app.kubernetes.io/name: atuin
     app.kubernetes.io/component: ai-gateway

@@ -3,6 +3,13 @@ kind: IngressRoute
 metadata:
   name: atuin
   namespace: atuin
+  annotations:
+    gatus.home-operations.com/endpoint: |
+      name: Atuin
+      group: Applications
+      path: /healthz
+      conditions:
+        - "[STATUS] == 200"
   labels:
     app.kubernetes.io/name: atuin
 spec:

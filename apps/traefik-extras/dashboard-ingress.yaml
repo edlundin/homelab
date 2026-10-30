@@ -5,6 +5,13 @@ kind: IngressRoute
 metadata:
   name: traefik-dashboard
   namespace: traefik
+  annotations:
+    # Probe the Basic Auth boundary without storing dashboard credentials.
+    gatus.home-operations.com/endpoint: |
+      name: Traefik dashboard (authentication)
+      group: Infrastructure
+      conditions:
+        - "[STATUS] == 401"
 spec:
   entryPoints:
     - websecure

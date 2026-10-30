@@ -16,6 +16,12 @@ kind: IngressRoute
 metadata:
   name: qbittorrent-ingress
   namespace: traefik
+  annotations:
+    gatus.home-operations.com/endpoint: |
+      name: qBittorrent
+      group: Media
+      conditions:
+        - "[STATUS] == 200"
 spec:
   entryPoints:
     - websecure

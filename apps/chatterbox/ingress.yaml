@@ -3,6 +3,13 @@ kind: IngressRoute
 metadata:
   name: chatterbox
   namespace: chatterbox
+  annotations:
+    gatus.home-operations.com/endpoint: |
+      name: Chatterbox TTS
+      group: AI & Automation
+      path: /api/ui/initial-data
+      conditions:
+        - "[STATUS] == 200"
 spec:
   entryPoints:
     - websecure

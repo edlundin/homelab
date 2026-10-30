@@ -12,7 +12,7 @@ This directory contains the PostgreSQL deployment configuration using the Bitnam
   temporary budget adjustment; this does not protect against node failures or updates.
 - **Namespace**: `postgres`
 - **Default Database**: `postgres` (with `postgres` user)
-- **Additional Databases**: `n8n`, `digarr`, and `tandoor`; Atuin creates an
+- **Additional Databases**: `digarr` and `tandoor`; Atuin creates an
   isolated `atuin` role and database on this service when its Argo CD
   application is first synced
 
@@ -21,7 +21,9 @@ This directory contains the PostgreSQL deployment configuration using the Bitnam
 - **Deployment**: Managed by the Bitnami PostgreSQL Helm chart (see `application.yaml`)
 - **Configuration**: All custom settings are in `values.yaml`
 - **Secrets**: Passwords stored in `.secrets.yaml` (seal with kubeseal before committing)
-- **Init Scripts**: Automatically creates n8n database and user on first deployment
+- **Retired apps**: n8n bootstrap scripts and environment variables have been removed.
+  Its database is deleted operationally after the application is uninstalled;
+  removing Helm bootstrap configuration alone does not delete existing data.
 - **ArgoCD**: The `application.yaml` defines a multi-source ArgoCD Application
 
 ## Files
@@ -39,12 +41,6 @@ This directory contains the PostgreSQL deployment configuration using the Bitnam
 - **User**: `postgres`
 - **Password**: Stored in `postgres-password` secret (key: `postgres-password`)
 
-### n8n Database
-- **Database**: `n8n`
-- **User**: `n8n`
-- **Password**: Stored in `postgres-n8n-credentials` secret (key: `password`)
-- **Auto-created**: Yes (via init script in `values.yaml`)
-
 ## Setup Instructions
 
 ### 1. Generate Passwords
@@ -57,9 +53,6 @@ openssl rand -hex 32
 
 # Generate replication password
 openssl rand -hex 32
-
-# Generate n8n user password
-openssl rand -hex 32
 ```
 
 ### 2. Update .secrets.yaml
@@ -70,11 +63,6 @@ Edit `apps/postgres/.secrets.yaml` and replace all `PLACEHOLDER_*` values with a
 stringData:
   postgres-password: "your-generated-postgres-password"
   replication-password: "your-generated-replication-password"
----
-stringData:
-  password: "your-generated-n8n-password"
-  database: "n8n"
-  username: "n8n"
 ```
 
 ### 3. Seal Secrets
@@ -108,9 +96,6 @@ kubectl logs -n postgres -l app.kubernetes.io/name=postgresql
 
 # Verify databases
 kubectl exec -it -n postgres $(kubectl get pod -n postgres -l app.kubernetes.io/name=postgresql -o jsonpath='{.items[0].metadata.name}') -- psql -U postgres -c '\l'
-
-# Verify n8n user can connect
-kubectl exec -it -n postgres $(kubectl get pod -n postgres -l app.kubernetes.io/name=postgresql -o jsonpath='{.items[0].metadata.name}') -- psql -U n8n -d n8n -c '\dt'
 ```
 
 ## Connection Information
@@ -124,21 +109,11 @@ kubectl exec -it -n postgres $(kubectl get pod -n postgres -l app.kubernetes.io/
 - **Username**: `postgres`
 - **Password**: From secret `postgres-password` (key: `postgres-password`)
 
-#### n8n user
-- **Host**: `postgres-postgresql.postgres.svc.cluster.local`
-- **Port**: `5432`
-- **Database**: `n8n`
-- **Username**: `n8n`
-- **Password**: From secret `postgres-n8n-credentials` (key: `password`)
-
 ### Connection String Examples
 
 ```bash
 # postgres user
 postgresql://postgres:${PASSWORD}@postgres-postgresql.postgres.svc.cluster.local:5432/postgres
-
-# n8n user
-postgresql://n8n:${PASSWORD}@postgres-postgresql.postgres.svc.cluster.local:5432/n8n
 ```
 
 ## Storage
@@ -187,11 +162,6 @@ kubectl logs -n postgres -l app.kubernetes.io/name=postgresql --tail=100
 ### Connect to PostgreSQL shell
 ```bash
 kubectl exec -it -n postgres $(kubectl get pod -n postgres -l app.kubernetes.io/name=postgresql -o jsonpath='{.items[0].metadata.name}') -- psql -U postgres
-```
-
-### Check init script execution
-```bash
-kubectl logs -n postgres -l app.kubernetes.io/name=postgresql | grep "n8n database"
 ```
 
 ### Reset database (DANGER: Deletes all data!)

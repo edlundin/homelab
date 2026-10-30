@@ -2,6 +2,8 @@
 
 ## 2026-10-30
 
+- **chore**: Uninstall n8n and remove its image updates and database bootstrap; remove Headroom, AdGuard Home, and Clawdbot routes. ([pending])
+- **feat**: Group known Gatus apps, use explicit health paths, and check expected HTTP 401 responses for Atuin AI and Traefik authentication endpoints. ([pending])
 - **feat**: Automatically discover Traefik IngressRoutes in Gatus while keeping Services and standard Ingresses opt-in. ([pending])
 - **fix**: Delay Gatus startup briefly so initial discovery is loaded rather than missed by its second-resolution configuration watcher. ([pending])
 - **fix**: Use sibling read-only Gatus configuration mounts so the container runtime can start the status page. ([pending])

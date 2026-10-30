@@ -15,6 +15,12 @@ kind: IngressRoute
 metadata:
   name: s3-ingress
   namespace: traefik
+  annotations:
+    gatus.home-operations.com/endpoint: |
+      name: Garage Web UI
+      group: Storage
+      conditions:
+        - "[STATUS] == 200"
 spec:
   entryPoints:
     - websecure

@@ -3,6 +3,13 @@ kind: IngressRoute
 metadata:
   name: pulse
   namespace: pulse
+  annotations:
+    gatus.home-operations.com/endpoint: |
+      name: Pulse (HTTPS)
+      group: Monitoring
+      path: /api/health
+      conditions:
+        - "[STATUS] == 200"
 spec:
   entryPoints:
     - websecure

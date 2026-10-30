@@ -77,6 +77,25 @@ and ingress checks are intentional. Set
 an automatically discovered IngressRoute. Removing the annotation only removes
 checks for opt-in resource kinds. HTTPRoute discovery is not enabled.
 
+## Known app groups and probes
+
+Known Traefik routes carry readable endpoint names and one of these groups:
+**Infrastructure**, **Monitoring**, **Applications**, **AI & Automation**,
+**Media**, or **Storage**. Future routes are still discovered automatically;
+add an endpoint annotation to assign their display name and group.
+
+Argo CD, Atuin, Pulse, Gatus, Qdrant, Chatterbox, and Oh My CPA use explicit,
+verified health/readiness paths. The Oh My CPA probe checks dashboard health,
+not successful inference through CLIProxyAPI. Pulse and Gatus retain
+separate internal and HTTPS checks, with distinct display names.
+
+Atuin AI and the Traefik dashboard expect HTTP 401 without credentials and are
+named as authentication checks. They verify that the authentication boundary
+responds, not that authenticated requests or AI inference work. Unexpected HTTP
+200, gateway errors, and timeouts still fail those checks. Other apps expect HTTP
+200. No credentials are embedded in annotations and TLS validation stays on.
+Changing annotations updates discovery without restarting application workloads.
+
 ## Automatic image updates
 
 Argo CD Image Updater manages both images through the `homelab-services`

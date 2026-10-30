@@ -3,6 +3,13 @@ kind: IngressRoute
 metadata:
   name: gatus
   namespace: gatus
+  annotations:
+    gatus.home-operations.com/endpoint: |
+      name: Gatus (HTTPS)
+      group: Monitoring
+      path: /health
+      conditions:
+        - "[STATUS] == 200"
 spec:
   entryPoints:
     - websecure

@@ -15,6 +15,12 @@ kind: IngressRoute
 metadata:
   name: actual-budget-ingress
   namespace: traefik
+  annotations:
+    gatus.home-operations.com/endpoint: |
+      name: Actual Budget
+      group: Applications
+      conditions:
+        - "[STATUS] == 200"
 spec:
   entryPoints:
     - websecure
