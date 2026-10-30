@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gatus-config
+  namespace: gatus
+data:
+  config.yaml: |
+    storage:
+      type: sqlite
+      path: /data/gatus.db
+    ui:
+      title: Homelab Status
+      header: Homelab
+      dashboard-heading: Service status
+      dashboard-subheading: Availability checks from inside the k3s cluster
+      dark-mode: true
+      default-sort-by: group
+    # Gatus requires at least one endpoint, even before discovery has completed
+    # or after the last opted-in resource is removed.
+    endpoints:
+      - name: Gatus
+        group: Monitoring
+        url: http://127.0.0.1:8080/health
+        interval: 1m
+        conditions:
+          - "[STATUS] == 200"

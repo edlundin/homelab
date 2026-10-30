@@ -3,6 +3,14 @@ kind: Service
 metadata:
   name: pulse
   namespace: pulse
+  annotations:
+    gatus.home-operations.com/enabled: "true"
+    gatus.home-operations.com/endpoint: |
+      name: Pulse
+      group: Monitoring
+      url: http://pulse.pulse.svc.cluster.local:7655/api/health
+      conditions:
+        - "[STATUS] == 200"
   labels:
     app: pulse
 spec:

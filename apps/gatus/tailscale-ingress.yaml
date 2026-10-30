@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gatus
+  namespace: gatus
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: gatus
+      port:
+        number: 8080
+  tls:
+    - hosts:
+        - gatus

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-30
+
+- **feat**: Add Gatus with annotation-based service discovery, persistent status history, Pulse health monitoring, and HTTPS access through gatus.oisd.dev and Tailscale. ([pending])
+
 ## 2026-10-23
 
 - **fix**: Allow authenticated CLIProxyAPI management routes on both AI ingresses. ([pending])
