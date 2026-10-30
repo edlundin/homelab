@@ -81,7 +81,7 @@ spec:
           args:
             - --enable-service
             - --enable-ingress
-            - --enable-ingressroute
+            - --auto-ingressroute
             - --prefix-service=svc/
             - --prefix-ingress=ing/
             - --prefix-ingressroute=route/

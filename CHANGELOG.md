@@ -2,6 +2,7 @@
 
 ## 2026-10-30
 
+- **feat**: Automatically discover Traefik IngressRoutes in Gatus while keeping Services and standard Ingresses opt-in. ([pending])
 - **fix**: Delay Gatus startup briefly so initial discovery is loaded rather than missed by its second-resolution configuration watcher. ([pending])
 - **fix**: Use sibling read-only Gatus configuration mounts so the container runtime can start the status page. ([pending])
 - **feat**: Keep Gatus and its discovery sidecar on stable releases through Argo CD Image Updater Git write-back. ([pending])

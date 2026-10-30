@@ -2,7 +2,8 @@
 
 [Gatus](https://github.com/TwiN/gatus) provides a dark-mode service status page.
 [gatus-sidecar](https://github.com/home-operations/gatus-sidecar) watches the
-Kubernetes API and generates checks from opted-in resources, without restarts.
+Kubernetes API and automatically generates checks from Traefik IngressRoutes,
+plus opted-in Services and standard Ingresses, without restarts.
 Pulse remains the infrastructure dashboard; its Service is the first opted-in check.
 
 ## Deployment and access
@@ -25,12 +26,18 @@ the normal GitOps workflow to deploy; local edits alone do not change the cluste
 
 Checks run **inside the cluster**, not from an external uptime vantage point.
 The local Gatus check keeps the configuration valid before discovery completes
-and when no resources opt in; it does not prove external accessibility.
+and when no endpoints are discovered; it does not prove external accessibility.
 
-## Opt in a service or route
+## Discovery and annotations
 
-Add these annotations to a Service, networking.k8s.io Ingress, or Traefik
-IngressRoute in its Git manifest:
+Traefik IngressRoutes are discovered automatically. Standard networking.k8s.io
+Ingresses and Services remain opt-in, so internal infrastructure and Tailscale
+routes do not produce duplicate checks. Apps exposed only through Tailscale
+need an explicit opt-in. Protected routes may need a health-check URL override
+or appropriate success conditions.
+
+Add these annotations to opt in a Service or standard Ingress, or to customize
+an automatically discovered Traefik IngressRoute:
 
 ```yaml
 metadata:
@@ -65,8 +72,10 @@ disable TLS validation to mask connectivity problems.
 
 Per-kind prefixes prevent collisions when a Service and route share a name.
 Do not opt in multiple resources for the same check unless separate internal
-and ingress checks are intentional. Remove the annotation or set it to
-`"false"` to remove a check. HTTPRoute discovery is not enabled.
+and ingress checks are intentional. Set
+`gatus.home-operations.com/enabled: "false"` to exclude any resource, including
+an automatically discovered IngressRoute. Removing the annotation only removes
+checks for opt-in resource kinds. HTTPRoute discovery is not enabled.
 
 ## Automatic image updates
 
@@ -111,6 +120,6 @@ kubie exec OISD gatus kubectl logs deployment/gatus -c gatus
 kubie exec OISD gatus kubectl get ingress gatus
 ```
 
-Confirm that the page lists Gatus and Pulse, and that annotation updates change
-the generated checks without a rollout. Deployment readiness alone does not
+Confirm that the page lists Gatus, Pulse, and the Traefik routes, and that
+annotation updates change the generated checks without a rollout. Deployment readiness alone does not
 establish that discovery or target health checks work.
