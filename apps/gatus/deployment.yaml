@@ -32,6 +32,11 @@ spec:
           env:
             - name: GATUS_CONFIG_PATH
               value: /etc/gatus
+            # Gatus compares config mtimes at one-second resolution. Initial
+            # discovery took ~100ms; allow two seconds to load its first write
+            # at startup rather than miss a write in Gatus's startup second.
+            - name: GATUS_DELAY_START_SECONDS
+              value: "2"
           ports:
             - name: http
               containerPort: 8080

@@ -83,7 +83,10 @@ Base config is mounted under `/etc/gatus/base`; the sidecar writes
 at `/etc/gatus/generated` in Gatus. Gatus recursively merges YAML from
 `GATUS_CONFIG_PATH=/etc/gatus` and hot-reloads changes. Sibling mounts avoid
 creating nested mountpoints inside a read-only volume and exclude the image's
-example configuration.
+example configuration. Gatus delays startup by two seconds to allow initial
+discovery (observed at about 100ms) to finish before loading configuration.
+This mitigates its second-resolution config-mtime startup race; it is not a
+discovery-readiness gate. Check sidecar logs and the status API after deployment.
 
 The sidecar has only get/list/watch access to Services, Ingresses,
 IngressClasses, and IngressRoutes. Only it receives a projected API token;
