@@ -2,6 +2,7 @@
 
 ## 2026-10-30
 
+- **feat**: Keep Gatus and its discovery sidecar on stable releases through Argo CD Image Updater Git write-back. ([pending])
 - **feat**: Add Gatus with annotation-based service discovery, persistent status history, Pulse health monitoring, and HTTPS access through gatus.oisd.dev and Tailscale. ([pending])
 
 ## 2026-10-23

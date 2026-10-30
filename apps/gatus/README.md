@@ -68,6 +68,14 @@ Do not opt in multiple resources for the same check unless separate internal
 and ingress checks are intentional. Remove the annotation or set it to
 `"false"` to remove a check. HTTPRoute discovery is not enabled.
 
+## Automatic image updates
+
+Argo CD Image Updater manages both images through the `homelab-services`
+ImageUpdater resource. It selects stable semver releases within Gatus 5.x and
+sidecar 0.x, writes the image pins to `apps/gatus/kustomization.yaml` on `master`,
+and Argo CD automatically syncs those commits. Prereleases are excluded; major
+version changes require updating the constraints deliberately.
+
 ## Configuration and security
 
 Base config is mounted under `/config/base`; the sidecar writes

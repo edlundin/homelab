@@ -11,3 +11,8 @@ resources:
   - ingress.yaml
   - external-secret-tls.yaml
   - network-policy.yaml
+images:
+  - name: ghcr.io/twin/gatus
+    newTag: v5.38.0
+  - name: ghcr.io/home-operations/gatus-sidecar
+    newTag: 0.6.0
