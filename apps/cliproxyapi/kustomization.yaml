@@ -17,4 +17,4 @@ images:
     newTag: v8.0.48
   - name: wiziscool/oh-my-cpa
     newName: docker.io/wiziscool/oh-my-cpa
-    newTag: 0.3.17
+    newTag: 0.3.18
