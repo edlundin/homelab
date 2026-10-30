@@ -31,7 +31,7 @@ spec:
           image: ghcr.io/twin/gatus:v5.38.0
           env:
             - name: GATUS_CONFIG_PATH
-              value: /config
+              value: /etc/gatus
           ports:
             - name: http
               containerPort: 8080
@@ -63,11 +63,11 @@ spec:
               drop: [ALL]
           volumeMounts:
             - name: generated-config
-              mountPath: /config
+              mountPath: /etc/gatus/generated
               readOnly: true
             # Mount the directory rather than subPath so ConfigMap updates reload.
             - name: base-config
-              mountPath: /config/base
+              mountPath: /etc/gatus/base
               readOnly: true
             - name: data
               mountPath: /data

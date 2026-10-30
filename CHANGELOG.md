@@ -2,6 +2,7 @@
 
 ## 2026-10-30
 
+- **fix**: Use sibling read-only Gatus configuration mounts so the container runtime can start the status page. ([pending])
 - **feat**: Keep Gatus and its discovery sidecar on stable releases through Argo CD Image Updater Git write-back. ([pending])
 - **feat**: Add Gatus with annotation-based service discovery, persistent status history, Pulse health monitoring, and HTTPS access through gatus.oisd.dev and Tailscale. ([pending])
 

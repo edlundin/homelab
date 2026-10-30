@@ -78,10 +78,12 @@ version changes require updating the constraints deliberately.
 
 ## Configuration and security
 
-Base config is mounted under `/config/base`; the sidecar writes
-`/config/gatus-sidecar.yaml` atomically into a shared emptyDir. Gatus recursively
-merges YAML from `GATUS_CONFIG_PATH=/config` and hot-reloads changes. Its static
-configuration and generated configuration are read-only in the Gatus container.
+Base config is mounted under `/etc/gatus/base`; the sidecar writes
+`/config/gatus-sidecar.yaml` atomically into a shared emptyDir mounted read-only
+at `/etc/gatus/generated` in Gatus. Gatus recursively merges YAML from
+`GATUS_CONFIG_PATH=/etc/gatus` and hot-reloads changes. Sibling mounts avoid
+creating nested mountpoints inside a read-only volume and exclude the image's
+example configuration.
 
 The sidecar has only get/list/watch access to Services, Ingresses,
 IngressClasses, and IngressRoutes. Only it receives a projected API token;
