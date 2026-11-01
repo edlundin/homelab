@@ -6,7 +6,9 @@ The ArgoCD root application discovers `application.yaml` automatically.
 
 ## Access
 
-- Dashboard: `https://ai.oisd.dev/omc/` and `https://ai.ison-mirfak.ts.net/omc/`
+- Dashboard: `https://ai.oisd.dev/omc/` and `https://ai.ison-mirfak.ts.net/omc/`.
+  `OMCPA_BASE_PATH=/omc` mounts the dashboard and its assets and API under this
+  prefix. `OMCPA_PUBLIC_URL` alone does not configure the mount path.
 - `ai.oisd.dev/` has no root redirect and returns 404. On the Tailscale AI hostname
   and the `cpa.ison-mirfak.ts.net` dashboard alias, only `GET /` redirects to
   `/omc/`; other methods return 404.

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-01
+
+- **fix**: Configure Oh My CPA's `/omc` base path so dashboard assets and API requests use the routed prefix. ([pending])
+
 ## 2026-10-30
 
 - **chore**: Uninstall n8n and remove its image updates and database bootstrap; remove Headroom, AdGuard Home, and Clawdbot routes. ([pending])

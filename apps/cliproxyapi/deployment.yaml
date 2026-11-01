@@ -150,6 +150,8 @@ spec:
                   key: master-key
             - name: OMCPA_DATA_DIR
               value: /data
+            - name: OMCPA_BASE_PATH
+              value: /omc
             - name: OMCPA_PUBLIC_URL
               value: https://ai.oisd.dev/omc
           securityContext:
