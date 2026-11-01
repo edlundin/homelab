@@ -20,9 +20,8 @@ data:
           fallthrough
         }
         prometheus :9153
-        # Use the node resolver. CoreDNS runs with dnsPolicy: Default,
-        # so /etc/resolv.conf comes from the node, not cluster DNS.
-        forward . /etc/resolv.conf
+        # Use AdGuard directly; the node's Tailscale resolver can return SERVFAIL.
+        forward . 192.168.2.1
         cache 30
         loop
         reload

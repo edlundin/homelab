@@ -11,17 +11,12 @@ These are deployed as a separate application to avoid conflicts with the multi-s
 
 ## Cluster DNS
 
-CoreDNS forwards external queries through its `/etc/resolv.conf`. With
-`dnsPolicy: Default`, K3s supplies that file from the node's configured
-`resolv-conf: /etc/rancher/k3s/resolv.conf`. Both Sarasate and Spinoza use:
+CoreDNS forwards external queries directly to AdGuard at `192.168.2.1`, avoiding
+intermittent `SERVFAIL` responses from the node's Tailscale resolver. The
+`ison-mirfak.ts.net` zone still uses `100.100.100.100` through
+`coredns-custom.yaml`. No public DNS resolver is configured in CoreDNS.
 
-```conf
-nameserver 100.100.100.100
-options timeout:2 attempts:2
-```
-
-This uses the node's Tailscale DNS resolver instead of contacting upstream DNS
-servers at their public addresses. Tailscale must be running on both nodes.
-Terraform maintains Spinoza's initial resolver file; Sarasate is managed outside
-Terraform. After changing an existing node's file, recreate its CoreDNS pod so
-the container receives the updated resolver configuration.
+Apply `coredns.yaml` directly with Kubie if DNS failure prevents ArgoCD from
+resolving GitHub. CoreDNS reloads the mounted ConfigMap automatically; check
+resolution through both replicas after applying. Commit and push the same change
+when authorized so ArgoCD's desired configuration matches the live fix.

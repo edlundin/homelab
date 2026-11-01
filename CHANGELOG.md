@@ -2,6 +2,7 @@
 
 ## 2026-11-01
 
+- **fix**: Forward cluster external DNS to AdGuard at `192.168.2.1` while retaining Tailscale resolution for tailnet names. ([pending])
 - **fix**: Configure Oh My CPA's `/omc` base path so dashboard assets and API requests use the routed prefix. ([pending])
 
 ## 2026-10-30
