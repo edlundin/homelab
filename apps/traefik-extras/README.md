@@ -9,6 +9,12 @@ This application contains additional Traefik resources that are not part of the 
 
 These are deployed as a separate application to avoid conflicts with the multi-source Helm deployment.
 
+`external-endpoints/wirebos-s3.yaml` routes only `/wirebos-core` and its child
+paths on `https://s3.oisd.dev` to Garage's S3 API on port 3900. WireBOS uses
+path-style signing, bucket `wirebos-core`, and region `garage`. The existing
+Garage web UI remains on port 3909 for every other path. Bucket credentials
+must stay in private operational configuration, never in these manifests.
+
 ## Cluster DNS
 
 CoreDNS forwards external queries directly to AdGuard at `192.168.2.1`, avoiding

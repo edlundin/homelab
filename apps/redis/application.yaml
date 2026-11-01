@@ -23,7 +23,7 @@ spec:
       targetRevision: HEAD
       path: apps/redis
       directory:
-        include: "{redis-secrets-sealed.yaml}"
+        include: "{redis-secrets-sealed.yaml,wirebos-service.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: redis

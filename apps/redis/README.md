@@ -22,6 +22,16 @@ The master's chart-managed PodDisruptionBudget preserves one replica during volu
 evictions. As Redis is standalone, node drains require a planned interruption and an
 explicit temporary budget adjustment. Node failures and workload updates remain possible.
 
+## WireBOS access
+
+`wirebos-service.yaml` exposes the existing master only on the tailnet as
+`wirebos-redis:6379`; authentication still uses `redis-password`. WireBOS keeps
+PostgreSQL on its own host. Its current release uses Redis database 0 and fixed
+`bull:bull.job-worker.*` / `bull:bull.scenario.*` queue keys, not a configurable
+Redis database or ACL user. Reserve those names for this single WireBOS instance;
+other applications must not reuse them. Keep the shared Redis eviction policy
+at `noeviction` for BullMQ. Never flush this shared database during WireBOS work.
+
 ## References
 - [Bitnami Redis Helm Chart](https://artifacthub.io/packages/helm/bitnami/redis)
 - [ArgoCD Documentation](https://argo-cd.readthedocs.io/)

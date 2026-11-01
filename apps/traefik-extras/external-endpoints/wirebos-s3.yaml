@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wirebos-s3-external
+  namespace: traefik
+spec:
+  type: ExternalName
+  externalName: nietzsche-s3.ison-mirfak.ts.net
+  ports:
+    - name: s3
+      port: 3900
+      protocol: TCP
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: wirebos-s3
+  namespace: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    # Path-style S3 signing keeps the existing Garage web UI on all other paths.
+    - match: Host(`s3.oisd.dev`) && (Path(`/wirebos-core`) || PathPrefix(`/wirebos-core/`))
+      kind: Rule
+      services:
+        - name: wirebos-s3-external
+          port: 3900
+          scheme: http
+  tls:
+    secretName: wildcard-tls-oisd
