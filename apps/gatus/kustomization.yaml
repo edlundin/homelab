@@ -14,5 +14,7 @@ resources:
 images:
   - name: ghcr.io/twin/gatus
     newTag: v5.38.0
+    newName: ghcr.io/twin/gatus
   - name: ghcr.io/home-operations/gatus-sidecar
-    newTag: 0.6.0
+    newTag: 0.6.1
+    newName: ghcr.io/home-operations/gatus-sidecar
