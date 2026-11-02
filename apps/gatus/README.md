@@ -16,7 +16,7 @@ the normal GitOps workflow to deploy; local edits alone do not change the cluste
 - Traefik URL: `https://gatus.oisd.dev`
 - Private URL: `https://gatus.ison-mirfak.ts.net` (after Tailscale provisions it)
 - Internal URL: `http://gatus.gatus.svc.cluster.local:8080`
-- Traefik uses the shared security-header/rate-limit middleware and wildcard TLS
+- Traefik uses the shared security-header middleware and wildcard TLS
   certificate copied from its namespace by External Secrets. DNS for
   `gatus.oisd.dev` must resolve to the Traefik ingress address.
 - No application login: anyone who can reach the Traefik route can view the status
