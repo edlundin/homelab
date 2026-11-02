@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sure
+  namespace: argocd
+  annotations:
+    # argocd-extras (wave 3) enables Kustomize's Helm support first.
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/edlundin/homelab.git
+    targetRevision: HEAD
+    path: apps/sure
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: sure
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

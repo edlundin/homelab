@@ -1,0 +1,27 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: sure
+  namespace: sure
+  labels:
+    app.kubernetes.io/name: sure
+  annotations:
+    gatus.home-operations.com/endpoint: |
+      name: Sure
+      group: Applications
+      path: /up
+      conditions:
+        - "[STATUS] == 200"
+spec:
+  entryPoints: [websecure]
+  routes:
+    - match: Host(`sure.oisd.dev`)
+      kind: Rule
+      services:
+        - name: sure
+          port: 80
+      middlewares:
+        - name: default-chain
+          namespace: traefik
+  tls:
+    secretName: wildcard-tls-oisd

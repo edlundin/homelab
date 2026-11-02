@@ -2,6 +2,7 @@
 
 ## 2026-11-02
 
+- **feat**: Add Sure with invite-only signup, shared PostgreSQL and Redis, persistent attachments, and HTTPS access at sure.oisd.dev and sure.ison-mirfak.ts.net. ([pending])
 - **feat**: Expose Redis to WireBOS over Tailscale and route the `wirebos-core` S3 bucket to Garage while preserving its web UI. ([pending])
 
 ## 2026-11-01

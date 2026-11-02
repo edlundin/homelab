@@ -1,0 +1,113 @@
+fullnameOverride: sure
+image:
+  tag: "0.7.6"
+
+# Reuse the homelab services instead of installing database operators.
+cnpg:
+  enabled: false
+  cluster:
+    enabled: false
+redisOperator:
+  enabled: false
+  managed:
+    enabled: false
+redisSimple:
+  enabled: false
+
+rails:
+  existingSecret: sure-secrets
+  encryptionEnv:
+    enabled: true
+  settings:
+    SELF_HOSTED: "true"
+    # Protect the first (super-admin) signup as well as subsequent registrations.
+    ONBOARDING_STATE: invite_only
+  extraEnv:
+    APP_DOMAIN: sure.oisd.dev
+    RAILS_FORCE_SSL: "true"
+    RAILS_ASSUME_SSL: "true"
+    EXCHANGE_RATE_PROVIDER: yahoo_finance
+    SECURITIES_PROVIDER: yahoo_finance
+  extraEnvVars:
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: sure-db
+          key: DATABASE_URL
+    - name: REDIS_URL
+      valueFrom:
+        secretKeyRef:
+          name: sure-redis
+          key: REDIS_URL
+    - name: INITIAL_INVITE_CODE
+      valueFrom:
+        secretKeyRef:
+          name: sure-secrets
+          key: INITIAL_INVITE_CODE
+
+# Start with upstream requests and bounded headroom for a trial; tune from usage.
+web:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  extraVolumeMounts:
+    - name: storage
+      mountPath: /rails/storage
+  extraVolumes:
+    - name: storage
+      persistentVolumeClaim:
+        claimName: sure-storage
+worker:
+  # Do not start schedulers against a fresh database before web has migrated it.
+  args:
+    - |
+      until bundle exec rails db:abort_if_pending_migrations; do
+        echo "Waiting for database migrations..."
+        sleep 5
+      done
+      exec bundle exec sidekiq -C config/sidekiq.yml
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  extraVolumeMounts:
+    - name: storage
+      mountPath: /rails/storage
+  extraVolumes:
+    - name: storage
+      persistentVolumeClaim:
+        claimName: sure-storage
+
+# Helm post-install hooks become Argo CD PostSync hooks, which would run too late
+# for a fresh database. Prepare it before the web container can become healthy.
+migrations:
+  strategy: initContainer
+  initContainer:
+    command: [bash, -lc]
+    args: |
+      set -e
+      bundle exec rails db:prepare
+      bundle exec rails runner '
+        if User.none? && !InviteCode.exists?(token: ENV.fetch("INITIAL_INVITE_CODE"))
+          InviteCode.transaction do
+            InviteCode.create!.update!(token: ENV.fetch("INITIAL_INVITE_CODE"))
+          end
+        end
+      '
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: "1"
+        memory: 1Gi
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
