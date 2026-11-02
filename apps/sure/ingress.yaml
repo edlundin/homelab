@@ -15,6 +15,16 @@ metadata:
 spec:
   entryPoints: [websecure]
   routes:
+    # Rails preloads 200 assets on the login page. Keep these public files out
+    # of the dynamic route's rate-limit bucket while preserving secure headers.
+    - match: Host(`sure.oisd.dev`) && (PathPrefix(`/assets/`) || Path(`/logo-pwa.png`))
+      kind: Rule
+      services:
+        - name: sure
+          port: 80
+      middlewares:
+        - name: secure-headers
+          namespace: traefik
     - match: Host(`sure.oisd.dev`)
       kind: Rule
       services:

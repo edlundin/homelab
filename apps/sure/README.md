@@ -6,6 +6,10 @@ with one Rails web pod and one Sidekiq worker.
 - https://sure.oisd.dev — Traefik with the existing wildcard certificate.
 - https://sure.ison-mirfak.ts.net — Tailscale HTTPS ingress.
 
+Traefik keeps security headers on all routes. Public `/assets/` files and
+`/logo-pwa.png` bypass rate limiting so Rails' module preloads do not exhaust the
+request bucket and break images or JavaScript. Dynamic routes remain rate-limited.
+
 ## First login
 
 Registration is **invite-only**, including the first account, which becomes the

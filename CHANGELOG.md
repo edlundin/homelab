@@ -2,7 +2,8 @@
 
 ## 2026-11-03
 
-- **fix**: Restore Argo CD's required ConfigMap labels so its API and web UI remain accessible with Helm rendering enabled. ([pending])
+- **fix**: Exempt Sure's public static assets from rate limiting to prevent broken images and JavaScript-driven dialogs, while retaining security headers and dynamic-route limits. ([pending])
+- **fix**: Restore Argo CD's required ConfigMap labels so its API and web UI remain accessible with Helm rendering enabled. ([ef8bf28](https://github.com/edlundin/homelab/commit/ef8bf28603529051f47f56a1fa69daa9956deff0))
 
 ## 2026-11-02
 
