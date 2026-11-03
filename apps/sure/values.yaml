@@ -57,10 +57,23 @@ web:
   extraVolumeMounts:
     - name: storage
       mountPath: /rails/storage
+    - name: local-initializers
+      mountPath: /rails/config/initializers/historical_pea_exclusions.rb
+      subPath: historical_pea_exclusions.rb
+      readOnly: true
+    - name: pea-exclusions
+      mountPath: /etc/sure/pea-exclusions
+      readOnly: true
   extraVolumes:
     - name: storage
       persistentVolumeClaim:
         claimName: sure-storage
+    - name: local-initializers
+      configMap:
+        name: sure-local-initializers
+    - name: pea-exclusions
+      secret:
+        secretName: sure-pea-exclusions
 worker:
   # Do not start schedulers against a fresh database before web has migrated it.
   args:
@@ -80,10 +93,23 @@ worker:
   extraVolumeMounts:
     - name: storage
       mountPath: /rails/storage
+    - name: local-initializers
+      mountPath: /rails/config/initializers/historical_pea_exclusions.rb
+      subPath: historical_pea_exclusions.rb
+      readOnly: true
+    - name: pea-exclusions
+      mountPath: /etc/sure/pea-exclusions
+      readOnly: true
   extraVolumes:
     - name: storage
       persistentVolumeClaim:
         claimName: sure-storage
+    - name: local-initializers
+      configMap:
+        name: sure-local-initializers
+    - name: pea-exclusions
+      secret:
+        secretName: sure-pea-exclusions
 
 # Helm post-install hooks become Argo CD PostSync hooks, which would run too late
 # for a fresh database. Prepare it before the web container can become healthy.

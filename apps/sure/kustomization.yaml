@@ -12,6 +12,7 @@ resources:
   - namespace.yaml
   - service-account.yaml
   - sure-secrets-sealed.yaml
+  - pea-exclusions-sealed.yaml
   - postgres-sure-credentials-sealed.yaml
   - database-bootstrap-job.yaml
   - external-secret-postgres.yaml
@@ -21,6 +22,14 @@ resources:
   - ingress.yaml
   - tailscale-ingress.yaml
   - network-policy.yaml
+configMapGenerator:
+  - name: sure-local-initializers
+    namespace: sure
+    files:
+      - initializers/historical_pea_exclusions.rb
+    options:
+      annotations:
+        argocd.argoproj.io/sync-wave: "-1"
 patches:
   # The chart omits metadata.namespace even when Helm's namespace is set.
   - target:

@@ -50,6 +50,38 @@ hostname; use password login on the unrelated Tailscale hostname.
 - NetworkPolicies permit ingress from Traefik/Tailscale and egress to DNS,
   PostgreSQL, Redis, and public HTTPS APIs, excluding private networks.
 
+## Historical Trade Republic PEA exclusions
+
+The mounted `initializers/historical_pea_exclusions.rb` extension prevents replay
+of export-verified historical PEA executions into the ordinary Portfolio and
+Cash ledgers. It intercepts only `TradeRepublicAccount::ActivitiesProcessor`'s
+private `timeline_events` method in Sure 0.7.6. The original image is unchanged.
+
+`pea-exclusions-sealed.yaml` holds the connection UUID and historical event IDs;
+never put the decrypted configuration or financial exports in Git. Both web and
+worker pods mount the initializer and Secret read-only. The filter uses exact
+IDs and one connection, not instrument names/ISINs, so ordinary trades in the
+same funds, other connections, and Crypto processing are preserved.
+
+This is **not automatic PEA discovery or future PEA sync support**. Only the
+reviewed historical events are excluded. New PEA activity still needs deliberate
+reconciliation until upstream supports PEA routing. The filter does not itself
+delete ledger records or create transfers; those are separate, backed-up data
+corrections. Keep normal Cash-to-Portfolio transfers for ordinary brokerage
+activity, and record actual Cash-to-PEA contributions separately.
+
+Kustomize's ConfigMap hash rolls out initializer changes. Changes to the Secret's
+ID list require restarting **both** web and worker pods because configuration is
+validated and loaded at boot. Invalid configuration prevents startup rather than
+silently importing the excluded history. Before upgrading Sure, recheck the
+processor hook and event semantics; the compatibility guard only checks method
+existence/arity, not upstream routing behavior. Once a correct upstream routing
+implementation is verified, remove this extension and its exclusion Secret.
+
+```sh
+ruby apps/sure/tests/historical_pea_exclusions_test.rb
+```
+
 ## Rendering and deployment
 
 Kustomize fetches the pinned chart; its `charts/` cache is ignored. Small patches
