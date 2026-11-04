@@ -16,6 +16,16 @@ kind: IngressRoute
 metadata:
   name: wirebos-s3
   namespace: traefik
+  annotations:
+    # Unsigned requests are rejected by Garage; this verifies that the S3 API
+    # answers through Traefik, not that authenticated bucket access works.
+    gatus.home-operations.com/endpoint: |
+      name: Garage S3 API (WireBOS)
+      group: Storage
+      url: https://s3.oisd.dev/wirebos-core
+      conditions:
+        - "[STATUS] == 403"
+        - "[BODY] == pat(*<Code>AccessDenied</Code>*)"
 spec:
   entryPoints:
     - websecure
