@@ -24,6 +24,29 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       initContainers:
+        # One-time copy from the oversized v1 volume. Remove together with the
+        # legacy-data volume once cliproxyapi-data-v2 is confirmed healthy.
+        - name: migrate-data
+          image: busybox:1.37.0
+          command:
+            - sh
+            - -ec
+            - |
+              [ -f /data/.migrated-from-v1 ] && exit 0
+              # Restart-safe: clear any partial copy before retrying.
+              find /data -mindepth 1 -maxdepth 1 ! -name lost+found -exec rm -rf {} +
+              tar -C /legacy -cf - --exclude=./lost+found . | tar -C /data -xf -
+              touch /data/.migrated-from-v1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: legacy-data
+              mountPath: /legacy
+              readOnly: true
         - name: initialize-data
           image: busybox:1.37.0
           command:
@@ -195,7 +218,11 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
+            claimName: cliproxyapi-data-v2
+        - name: legacy-data
+          persistentVolumeClaim:
             claimName: cliproxyapi-data
+            readOnly: true
         - name: bootstrap
           configMap:
             name: cliproxyapi-bootstrap

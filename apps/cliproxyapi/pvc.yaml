@@ -1,15 +1,16 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: cliproxyapi-data
+  name: cliproxyapi-data-v2
   namespace: cliproxyapi
   annotations:
-      argocd.argoproj.io/sync-options: Prune=false,Delete=false
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
 spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: longhorn
-  volumeName: pvc-f6b89755-c0c1-4a88-9679-c4106f3c3b83
   resources:
     requests:
-      storage: 8Gi
+      # Data is ~350 MB: config, auths, and the oh-my-cpa DB plus one
+      # pre-migration backup of similar size.
+      storage: 2Gi
