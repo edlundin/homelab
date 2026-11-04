@@ -48,6 +48,12 @@ spec:
           port: 80
         - protocol: TCP
           port: 443
+    # AdGuard Home dashboard/DoH (4043) and DoT (853) on tailnet hosts.
+    - ports:
+        - protocol: TCP
+          port: 4043
+        - protocol: TCP
+          port: 853
     - to:
         - namespaceSelector:
             matchLabels:

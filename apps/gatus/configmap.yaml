@@ -24,3 +24,81 @@ data:
         interval: 1m
         conditions:
           - "[STATUS] == 200"
+      - name: AdGuard Home dashboard (Soteria)
+        group: DNS
+        url: https://soteria.ison-mirfak.ts.net:4043/login.html
+        interval: 1m
+        conditions:
+          - "[STATUS] == 200"
+          - "[CERTIFICATE_EXPIRATION] > 168h"
+      # DoH query (RFC 8484 wire format) for www.example.com A. Gatus DNS
+      # endpoints only speak plain DNS, so DoH is probed over HTTP.
+      - name: AdGuard Home DoH (Soteria)
+        group: DNS
+        url: https://soteria.ison-mirfak.ts.net:4043/dns-query?dns=AAABAAABAAAAAAAAA3d3dwdleGFtcGxlA2NvbQAAAQAB
+        interval: 1m
+        headers:
+          Accept: application/dns-message
+        conditions:
+          - "[STATUS] == 200"
+          - "len([BODY]) > 0"
+      # TLS handshake only; Gatus cannot send DNS queries over DoT.
+      - name: AdGuard Home DoT (Soteria)
+        group: DNS
+        url: tls://soteria.ison-mirfak.ts.net:853
+        interval: 1m
+        conditions:
+          - "[CONNECTED] == true"
+          - "[CERTIFICATE_EXPIRATION] > 168h"
+      - name: AdGuard Home dashboard (Peirce)
+        group: DNS
+        url: https://peirce.ison-mirfak.ts.net:4043/login.html
+        interval: 1m
+        conditions:
+          - "[STATUS] == 200"
+          - "[CERTIFICATE_EXPIRATION] > 168h"
+      # DoH query (RFC 8484 wire format) for www.example.com A. Gatus DNS
+      # endpoints only speak plain DNS, so DoH is probed over HTTP.
+      - name: AdGuard Home DoH (Peirce)
+        group: DNS
+        url: https://peirce.ison-mirfak.ts.net:4043/dns-query?dns=AAABAAABAAAAAAAAA3d3dwdleGFtcGxlA2NvbQAAAQAB
+        interval: 1m
+        headers:
+          Accept: application/dns-message
+        conditions:
+          - "[STATUS] == 200"
+          - "len([BODY]) > 0"
+      # TLS handshake only; Gatus cannot send DNS queries over DoT.
+      - name: AdGuard Home DoT (Peirce)
+        group: DNS
+        url: tls://peirce.ison-mirfak.ts.net:853
+        interval: 1m
+        conditions:
+          - "[CONNECTED] == true"
+          - "[CERTIFICATE_EXPIRATION] > 168h"
+      - name: AdGuard Home dashboard (Sarasate)
+        group: DNS
+        url: https://sarasate.ison-mirfak.ts.net:4043/login.html
+        interval: 1m
+        conditions:
+          - "[STATUS] == 200"
+          - "[CERTIFICATE_EXPIRATION] > 168h"
+      # DoH query (RFC 8484 wire format) for www.example.com A. Gatus DNS
+      # endpoints only speak plain DNS, so DoH is probed over HTTP.
+      - name: AdGuard Home DoH (Sarasate)
+        group: DNS
+        url: https://sarasate.ison-mirfak.ts.net:4043/dns-query?dns=AAABAAABAAAAAAAAA3d3dwdleGFtcGxlA2NvbQAAAQAB
+        interval: 1m
+        headers:
+          Accept: application/dns-message
+        conditions:
+          - "[STATUS] == 200"
+          - "len([BODY]) > 0"
+      # TLS handshake only; Gatus cannot send DNS queries over DoT.
+      - name: AdGuard Home DoT (Sarasate)
+        group: DNS
+        url: tls://sarasate.ison-mirfak.ts.net:853
+        interval: 1m
+        conditions:
+          - "[CONNECTED] == true"
+          - "[CERTIFICATE_EXPIRATION] > 168h"
