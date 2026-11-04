@@ -38,6 +38,13 @@ spec:
                 printf '\naccess:\n  api-keys:\n    - "%s"\n' "$CLIENT_API_KEY" >> /data/config.yaml.tmp
                 mv /data/config.yaml.tmp /data/config.yaml
               fi
+              # OMC writes a full encrypted DB copy before each migration and never
+              # prunes them. Longhorn backs up this volume to S3, so keep only the newest.
+              if [ -d /data/omc/backups ]; then
+                ls -1t /data/omc/backups/*.db.enc 2>/dev/null | tail -n +2 | while read -r f; do
+                  rm -f "$f" "$f.sha256"
+                done
+              fi
           env:
             - name: CLIENT_API_KEY
               valueFrom:
@@ -161,10 +168,10 @@ spec:
           resources:
             requests:
               cpu: 100m
-              memory: 128Mi
+              memory: 256Mi
             limits:
               cpu: "1"
-              memory: 1Gi
+              memory: 2Gi
           startupProbe:
             httpGet:
               path: /omc/api/healthz

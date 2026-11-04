@@ -28,6 +28,11 @@ spec:
           # Based on 10 healthy V1 volumes, each currently single-replica;
           # one engine upgrade per node limits concurrent exposure.
           concurrentAutomaticEngineUpgradePerNodeLimit: 1
+          # Without this, a Recreate Deployment stays stuck behind a Terminating
+          # pod and its RWO attachment until the dead node returns.
+          nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
+          # Reclaim space held by snapshots when the filesystem is trimmed.
+          removeSnapshotsDuringFilesystemTrim: true
 
         ingress:
           enabled: true
