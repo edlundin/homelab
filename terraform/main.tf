@@ -380,6 +380,11 @@ resource "proxmox_virtual_environment_file" "k3s_node_user_data" {
           node-name: ${local.k3s_node.name}
           node-label:
             - topology.kubernetes.io/zone=${local.k3s_node.zone}
+          # Default GC starts at 85%, the same point where Longhorn's 15%
+          # minimum-free setting blocks the disk, so prune images earlier.
+          kubelet-arg:
+            - image-gc-high-threshold=70
+            - image-gc-low-threshold=60
 
     package_update: true
     package_upgrade: true
