@@ -19,8 +19,15 @@ metadata:
     gatus.home-operations.com/endpoint: |
       name: WireBOS
       group: Applications
+      # The root path returns 404; a plain GET on /graphql returns 400.
+      url: https://api.bos.oisd.dev/graphql
+      method: POST
+      headers:
+        Content-Type: application/json
+      body: '{"query":"{__typename}"}'
       conditions:
         - "[STATUS] == 200"
+        - "[BODY].data.__typename == Query"
 spec:
   entryPoints:
     - websecure
