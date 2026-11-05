@@ -25,7 +25,7 @@ images:
   - name: postgres
     newName: docker.io/postgres
     newTag: 18-alpine
-    digest: sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5
+    digest: sha256:eaef288f54a90a909e49f0121d5d047a5e974e922699de4249625cf7cde34f36
   - name: ghcr.io/atuinsh/atuin-ai-server
     newName: ghcr.io/atuinsh/atuin-ai-server
     newTag: latest
