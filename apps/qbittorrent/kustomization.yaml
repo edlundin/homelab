@@ -11,4 +11,4 @@ images:
   - name: docker.io/linuxserver/qbittorrent
     newName: docker.io/linuxserver/qbittorrent
     newTag: latest
-    digest: sha256:05c1454f9a32967affc1f34f67f8cc0cc57dd805dca45489fe797095a6286556
+    digest: sha256:3d4c4545d51a690a0df15a2ff99038823a88a9822df8e794526447b9afbd7384
