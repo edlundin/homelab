@@ -1,0 +1,95 @@
+# T3 Code on each workstation, proxied through Traefik instead of per-host
+# Tailscale Serve. T3 Code listens on port 3773 on all host interfaces.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: t3code-hypatia
+  namespace: traefik
+spec:
+  type: ExternalName
+  externalName: hypatia.ison-mirfak.ts.net
+  ports:
+    - name: http
+      port: 3773
+      protocol: TCP
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: t3code-hypatia
+  namespace: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`t3.hypatia.oisd.dev`)
+      kind: Rule
+      services:
+        - name: t3code-hypatia
+          port: 3773
+          scheme: http
+  tls:
+    secretName: wildcard-tls-hypatia-oisd
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: t3code-sarasate
+  namespace: traefik
+spec:
+  type: ExternalName
+  externalName: sarasate.ison-mirfak.ts.net
+  ports:
+    - name: http
+      port: 3773
+      protocol: TCP
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: t3code-sarasate
+  namespace: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`t3.sarasate.oisd.dev`)
+      kind: Rule
+      services:
+        - name: t3code-sarasate
+          port: 3773
+          scheme: http
+  tls:
+    secretName: wildcard-tls-sarasate-oisd
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: t3code-seneca
+  namespace: traefik
+spec:
+  type: ExternalName
+  externalName: seneca.ison-mirfak.ts.net
+  ports:
+    - name: http
+      port: 3773
+      protocol: TCP
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: t3code-seneca
+  namespace: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`t3.seneca.oisd.dev`)
+      kind: Rule
+      services:
+        - name: t3code-seneca
+          port: 3773
+          scheme: http
+  tls:
+    secretName: wildcard-tls-seneca-oisd

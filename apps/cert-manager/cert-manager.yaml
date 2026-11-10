@@ -47,6 +47,51 @@ spec:
     - "*.s3.oisd.dev"
 
 ---
+# Certificate for per-host services under hypatia.oisd.dev (T3 Code, Rex)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-hypatia-oisd-cert
+  namespace: traefik
+spec:
+  secretName: wildcard-tls-hypatia-oisd
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - "*.hypatia.oisd.dev"
+
+---
+# Certificate for per-host services under sarasate.oisd.dev (T3 Code, Rex)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-sarasate-oisd-cert
+  namespace: traefik
+spec:
+  secretName: wildcard-tls-sarasate-oisd
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - "*.sarasate.oisd.dev"
+
+---
+# Certificate for per-host services under seneca.oisd.dev (T3 Code, Rex)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-seneca-oisd-cert
+  namespace: traefik
+spec:
+  secretName: wildcard-tls-seneca-oisd
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - "*.seneca.oisd.dev"
+
+---
 # ClusterIssuer for Let's Encrypt production with Cloudflare DNS
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -72,6 +117,9 @@ spec:
             - "*.bos.oisd.dev"
             - "s3.oisd.dev"
             - "*.s3.oisd.dev"
+            - "*.hypatia.oisd.dev"
+            - "*.sarasate.oisd.dev"
+            - "*.seneca.oisd.dev"
 
 ---
 # ClusterIssuer for Let's Encrypt staging (for testing)
@@ -99,3 +147,6 @@ spec:
             - "*.bos.oisd.dev"
             - "s3.oisd.dev"
             - "*.s3.oisd.dev"
+            - "*.hypatia.oisd.dev"
+            - "*.sarasate.oisd.dev"
+            - "*.seneca.oisd.dev"

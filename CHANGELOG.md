@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-10
+
+- **feat**: Route T3 Code at t3.<host>.oisd.dev and Rex at rex.<host>.oisd.dev for hypatia, sarasate and seneca through Traefik, with per-host wildcard certificates. ([pending])
+
 ## 2026-11-03
 
 - **fix**: Add a connection-scoped historical PEA event filter to Sure so reviewed executions do not replay into ordinary Trade Republic Portfolio and Cash ledgers. ([pending])

@@ -1,0 +1,126 @@
+# Rex servers run their own embedded Tailscale nodes and serve HTTPS on 443
+# with a *.ts.net certificate, so Traefik must send the node name as SNI.
+# Requests reach Rex from the Traefik proxy, not from the original client.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rex-hypatia
+  namespace: traefik
+spec:
+  type: ExternalName
+  externalName: hypatia-rex.ison-mirfak.ts.net
+  ports:
+    - name: https
+      port: 443
+      protocol: TCP
+---
+apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: rex-hypatia
+  namespace: traefik
+spec:
+  serverName: hypatia-rex.ison-mirfak.ts.net
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: rex-hypatia
+  namespace: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`rex.hypatia.oisd.dev`)
+      kind: Rule
+      services:
+        - name: rex-hypatia
+          port: 443
+          scheme: https
+          serversTransport: rex-hypatia
+          passHostHeader: false
+  tls:
+    secretName: wildcard-tls-hypatia-oisd
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rex-sarasate
+  namespace: traefik
+spec:
+  type: ExternalName
+  externalName: rex-sarasate.ison-mirfak.ts.net
+  ports:
+    - name: https
+      port: 443
+      protocol: TCP
+---
+apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: rex-sarasate
+  namespace: traefik
+spec:
+  serverName: rex-sarasate.ison-mirfak.ts.net
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: rex-sarasate
+  namespace: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`rex.sarasate.oisd.dev`)
+      kind: Rule
+      services:
+        - name: rex-sarasate
+          port: 443
+          scheme: https
+          serversTransport: rex-sarasate
+          passHostHeader: false
+  tls:
+    secretName: wildcard-tls-sarasate-oisd
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rex-seneca
+  namespace: traefik
+spec:
+  type: ExternalName
+  externalName: rex-seneca.ison-mirfak.ts.net
+  ports:
+    - name: https
+      port: 443
+      protocol: TCP
+---
+apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: rex-seneca
+  namespace: traefik
+spec:
+  serverName: rex-seneca.ison-mirfak.ts.net
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: rex-seneca
+  namespace: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`rex.seneca.oisd.dev`)
+      kind: Rule
+      services:
+        - name: rex-seneca
+          port: 443
+          scheme: https
+          serversTransport: rex-seneca
+          passHostHeader: false
+  tls:
+    secretName: wildcard-tls-seneca-oisd
