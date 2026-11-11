@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-11
+
+- **chore**: Remove the unused Serena project configuration. ([pending])
+
 ## 2026-11-10
 
 - **feat**: Route T3 Code at t3.<host>.oisd.dev and Rex at rex.<host>.oisd.dev for hypatia, sarasate and seneca through Traefik, with per-host wildcard certificates. ([pending])
