@@ -2,7 +2,7 @@ config:
   logLevel: info
 image:
   repository: quay.io/argoprojlabs/argocd-image-updater
-  tag: v1.4.0
+  tag: v1.5.0
 
 # Check once a day instead of every 2m. The interval counts from controller start,
 # not wall-clock time, so a pod restart shifts the daily check.
