@@ -21,11 +21,11 @@ resources:
 images:
   - name: ghcr.io/atuinsh/atuin
     newName: ghcr.io/atuinsh/atuin
-    newTag: 18.24.6
+    newTag: 18.24.7
   - name: postgres
     newName: docker.io/postgres
     newTag: 18-alpine
-    digest: sha256:9ba53c7d41ea093baf5c1ba635ba5434c4f979880527d49bb7d9237d3193085b
+    digest: sha256:1018733457011bf88d81db98cf43aac6d5150afc18787dbe204771fedf80ff95
   - name: ghcr.io/atuinsh/atuin-ai-server
     newName: ghcr.io/atuinsh/atuin-ai-server
     newTag: latest
