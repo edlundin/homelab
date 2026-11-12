@@ -32,7 +32,8 @@ This SearXNG instance is deployed on the K3s cluster and accessible at:
 
 - Privacy-focused search with no user tracking
 - Aggregates results from multiple search engines
-- Google-backed search autocomplete
+- Google-backed search autocomplete, advertised to browsers through OpenSearch (`/opensearch.xml`) as suggestions at `/autocompleter`
+- `server.method: GET`, so browsers can import the search engine and its suggestions
 - Per-client rate limiting through SearXNG's Valkey-backed limiter
 - Health checks for reliability
 - TLS termination with wildcard certificate

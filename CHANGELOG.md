@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-12
+
+- **fix**: Serve SearXNG searches with the GET method so browsers import search.oisd.dev and its autocomplete suggestions through OpenSearch. ([pending])
+
 ## 2026-11-11
 
 - **chore**: Remove the unused Serena project configuration. ([pending])
