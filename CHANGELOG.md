@@ -2,6 +2,7 @@
 
 ## 2026-11-13
 
+- **fix**: Stop routing the Rex servers through Traefik, so Rex access depends only on the Tailscale `tag:rex-client` rule; the matching Gatus checks go away with the routes. ([pending])
 - **feat**: Monitor the public DoH endpoint doh.oisd.dev in Gatus (expected 404 without a ClientID, certificate valid for more than 7 days). ([pending])
 - **docs**: Document the public DoH fallback at doh.oisd.dev: OCI Network Load Balancer over peirce and soteria, Caddy ClientID allow list, certbot DNS-01 certificates, adguardhome-sync, exit-node reply routing and Apple DNS profiles. ([pending])
 - **feat**: Describe the doh.oisd.dev OCI Network Load Balancer, its backends, DNS health check and NSG in a separate `terraform/oci` module, with one-time imports of the console-created resources. ([pending])
