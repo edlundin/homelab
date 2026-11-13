@@ -2,6 +2,7 @@
 
 ## 2026-11-13
 
+- **docs**: Document the public DoH fallback at doh.oisd.dev: OCI Network Load Balancer over peirce and soteria, Caddy ClientID allow list, certbot DNS-01 certificates, adguardhome-sync, exit-node reply routing and Apple DNS profiles. ([pending])
 - **feat**: Describe the doh.oisd.dev OCI Network Load Balancer, its backends, DNS health check and NSG in a separate `terraform/oci` module, with one-time imports of the console-created resources. ([pending])
 - **fix**: Point Terraform-managed VMs and containers at Sarasate's AdGuard, with soteria and peirce over Tailscale as fallbacks, instead of the Oracle public IPs that do not accept plain DNS. ([pending])
 
