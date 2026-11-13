@@ -39,7 +39,9 @@ locals {
   debian_13_genericcloud_sha_algorithm = "sha512"
   debian_13_genericcloud_url           = "https://cloud.debian.org/images/cloud/trixie/20260316-2418/debian-13-genericcloud-amd64-20260316-2418.qcow2"
 
-  dns_servers = ["141.253.110.131", "141.145.216.51"]
+  # Sarasate's AdGuard on the LAN first, then soteria and peirce over Tailscale.
+  # The Oracle public IPs do not accept plain DNS (port 53 is closed there).
+  dns_servers = ["192.168.2.1", "100.101.130.116", "100.64.26.122"]
 
   swap_size       = 512
   network_gateway = "192.168.2.254"
