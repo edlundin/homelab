@@ -102,3 +102,15 @@ data:
         conditions:
           - "[CONNECTED] == true"
           - "[CERTIFICATE_EXPIRATION] > 168h"
+      # Public DoH through the OCI Network Load Balancer (docs/doh.md). Caddy
+      # answers 404 to requests without an allow-listed ClientID, so a 404 with
+      # a valid certificate proves the load balancer, the Cloudflare record, a
+      # healthy backend's Caddy and the shared certificate. Backend AdGuard
+      # health is covered by the per-host checks above.
+      - name: Public DoH (doh.oisd.dev)
+        group: DNS
+        url: https://doh.oisd.dev/
+        interval: 1m
+        conditions:
+          - "[STATUS] == 404"
+          - "[CERTIFICATE_EXPIRATION] > 168h"
