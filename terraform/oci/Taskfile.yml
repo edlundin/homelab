@@ -1,0 +1,35 @@
+version: "3"
+
+# Auth comes from ~/.oci/config; OCIDs from a local, git-ignored terraform.tfvars.
+tasks:
+  default:
+    desc: List available Terraform commands
+    cmds:
+      - task --list
+
+  init:
+    desc: Initialize Terraform
+    cmds:
+      - terraform init
+
+  fmt:
+    desc: Check Terraform formatting
+    cmds:
+      - terraform fmt -check
+
+  validate:
+    desc: Validate Terraform configuration
+    deps: [fmt]
+    cmds:
+      - terraform validate -no-color
+
+  plan:
+    desc: Create a Terraform execution plan
+    deps: [validate]
+    cmds:
+      - terraform plan
+
+  apply:
+    desc: Apply the Terraform configuration
+    cmds:
+      - terraform apply
