@@ -14,7 +14,7 @@ resources:
 images:
   - name: eceasy/cli-proxy-api
     newName: docker.io/eceasy/cli-proxy-api
-    newTag: v8.0.80
+    newTag: v8.1.0
   - name: wiziscool/oh-my-cpa
     newName: docker.io/wiziscool/oh-my-cpa
-    newTag: 0.4.9
+    newTag: 0.4.10
