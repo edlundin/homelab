@@ -29,4 +29,4 @@ images:
   - name: ghcr.io/atuinsh/atuin-ai-server
     newName: ghcr.io/atuinsh/atuin-ai-server
     newTag: latest
-    digest: sha256:a5bc26c7364245f11d0f935ec39ccfd0bf89de6ebb61cf52a6fe209fbc8d2868
+    digest: sha256:4bc7c47b2fd932f11727697a6480ca4af7efc2b6ff68ed135e554fbb974adfe8
