@@ -1,0 +1,55 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-api-prefix
+  namespace: itsaplan
+spec:
+  stripPrefix:
+    prefixes: [/api]
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: itsaplan
+  namespace: itsaplan
+  labels:
+    app.kubernetes.io/name: itsaplan
+  annotations:
+    gatus.home-operations.com/endpoint: |
+      name: It's a Plan
+      group: Applications
+      path: /login
+      conditions:
+        - "[STATUS] == 200"
+spec:
+  entryPoints: [websecure]
+  routes:
+    # API_URL is https://plan.oisd.dev/api: the api receives paths without /api.
+    - match: Host(`plan.oisd.dev`) && (Path(`/api`) || PathPrefix(`/api/`))
+      kind: Rule
+      services:
+        - name: itsaplan-api
+          port: 3000
+      middlewares:
+        - name: default-chain
+          namespace: traefik
+        - name: strip-api-prefix
+    # OAuth discovery documents for MCP clients, served by the api unchanged.
+    - match: Host(`plan.oisd.dev`) && (PathPrefix(`/.well-known/oauth-authorization-server`) || PathPrefix(`/.well-known/oauth-protected-resource`) || PathPrefix(`/.well-known/openid-configuration`))
+      kind: Rule
+      services:
+        - name: itsaplan-api
+          port: 3000
+      middlewares:
+        - name: default-chain
+          namespace: traefik
+    - match: Host(`plan.oisd.dev`)
+      kind: Rule
+      services:
+        - name: itsaplan-web
+          port: 3001
+      middlewares:
+        - name: default-chain
+          namespace: traefik
+  tls:
+    secretName: wildcard-tls-oisd

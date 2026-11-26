@@ -1,0 +1,2 @@
+# Kustomize's downloaded Helm chart cache; fetch from the pinned repository.
+charts/

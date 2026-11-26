@@ -1,0 +1,58 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+helmCharts:
+  - name: itsaplan
+    repo: oci://ghcr.io/croffasia/charts
+    version: 1.13.0
+    releaseName: itsaplan
+    namespace: itsaplan
+    valuesFile: values.yaml
+resources:
+  - namespace.yaml
+  - service-account.yaml
+  - itsaplan-secrets-sealed.yaml
+  - postgres-itsaplan-credentials-sealed.yaml
+  - database-bootstrap-job.yaml
+  - external-secret-tls.yaml
+  - ingress.yaml
+  - network-policy.yaml
+patches:
+  # The chart renders its Secret from plaintext values; the SealedSecret of the
+  # same name replaces it.
+  - target:
+      kind: Secret
+      name: itsaplan
+    patch: |-
+      $patch: delete
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: itsaplan
+  # The chart omits metadata.namespace.
+  - target:
+      labelSelector: app.kubernetes.io/instance=itsaplan
+    patch: |-
+      - op: add
+        path: /metadata/namespace
+        value: itsaplan
+  # Chart 1.13.0 sets serviceAccountName only when it creates the account itself.
+  - target:
+      kind: Deployment
+      labelSelector: app.kubernetes.io/instance=itsaplan
+    patch: |-
+      - op: add
+        path: /spec/template/spec/serviceAccountName
+        value: itsaplan
+      - op: add
+        path: /spec/template/spec/automountServiceAccountToken
+        value: false
+  - target:
+      kind: Job
+      name: itsaplan-minio-init
+    patch: |-
+      - op: add
+        path: /spec/template/spec/serviceAccountName
+        value: itsaplan
+      - op: add
+        path: /spec/template/spec/automountServiceAccountToken
+        value: false

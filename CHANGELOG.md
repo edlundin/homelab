@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-26
+
+- **feat**: Add It's a Plan 1.13.0 at plan.oisd.dev, with its api under /api on the same host, a dedicated database on the shared PostgreSQL, sealed secrets and RustFS attachments on Longhorn. ([pending])
+
 ## 2026-11-13
 
 - **fix**: Stop routing the Rex servers through Traefik, so Rex access depends only on the Tailscale `tag:rex-client` rule; the matching Gatus checks go away with the routes. ([pending])
