@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-27
+
+- **feat**: Add Plane Community Edition v1.5.1 at plane.oisd.dev, with a dedicated database on the shared PostgreSQL, sealed secrets, and Valkey, RabbitMQ and MinIO uploads on Longhorn. ([pending])
+
 ## 2026-11-26
 
 - **feat**: Add It's a Plan 1.13.0 at plan.oisd.dev, with its api under /api on the same host, a dedicated database on the shared PostgreSQL, sealed secrets and RustFS attachments on Longhorn. ([pending])

@@ -1,0 +1,75 @@
+planeVersion: v1.5.1
+
+# Release-version tags never get the chart's per-render timestamp annotation,
+# which would otherwise leave Argo CD permanently out of sync.
+rolloutOnUpgrade: never
+
+ingress:
+  # ingress.yaml routes Plane through Traefik with the shared middleware chain and
+  # wildcard certificate. appHost still drives WEB_URL and CORS_ALLOWED_ORIGINS.
+  enabled: false
+  appHost: plane.oisd.dev
+
+ssl:
+  # Traefik terminates TLS with wildcard-tls-oisd, so WEB_URL must be https.
+  externalTermination: true
+
+serviceAccount:
+  create: false
+  name: plane
+
+# All Secrets come from SealedSecrets; the chart renders none of its own, and
+# ignores the env.* database, storage and upload-limit values they replace.
+external_secrets:
+  # DATABASE_URL, REDIS_URL, AMQP_URL, SECRET_KEY and LIVE_SERVER_SECRET_KEY.
+  # SECRET_KEY encrypts instance settings (SMTP, OAuth secrets): never rotate it.
+  # Shared by the app and live workloads so the signing keys always agree.
+  app_env_existingSecret: plane
+  live_env_existingSecret: plane
+  doc_store_existingSecret: plane-doc-store
+  rabbitmq_existingSecret: plane-rabbitmq
+
+env:
+  requireExplicitSecrets: true
+
+# The shared PostgreSQL 18 service hosts the plane database (see README).
+postgres:
+  local_setup: false
+
+redis:
+  local_setup: true
+  storageClass: longhorn
+  volumeSize: 1Gi
+
+rabbitmq:
+  local_setup: true
+  storageClass: longhorn
+  volumeSize: 1Gi
+
+minio:
+  local_setup: true
+  storageClass: longhorn
+  volumeSize: 10Gi
+
+# Initial estimates for one gunicorn/Celery process each (the chart's 50Mi requests
+# understate the Django processes); revisit with `kubectl top pods -n plane`.
+api:
+  memoryRequest: 512Mi
+  cpuRequest: 100m
+  memoryLimit: 1500Mi
+  cpuLimit: "1"
+worker:
+  memoryRequest: 512Mi
+  cpuRequest: 50m
+  memoryLimit: 1500Mi
+beatworker:
+  memoryRequest: 192Mi
+  memoryLimit: 512Mi
+web:
+  memoryRequest: 128Mi
+space:
+  memoryRequest: 128Mi
+admin:
+  memoryRequest: 128Mi
+live:
+  memoryRequest: 128Mi
