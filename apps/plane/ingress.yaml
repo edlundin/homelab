@@ -27,7 +27,7 @@ metadata:
 spec:
   entryPoints: [websecure]
   routes:
-    - match: Host(`ticket.oisd.dev`) && PathPrefix(`/spaces`)
+    - match: Host(`plane.oisd.dev`) && PathPrefix(`/spaces`)
       kind: Rule
       services:
         - name: plane-space
@@ -36,20 +36,20 @@ spec:
         - name: default-chain
           namespace: traefik
         - name: body-limit
-    - match: Host(`ticket.oisd.dev`) && PathPrefix(`/god-mode`)
+    - match: Host(`plane.oisd.dev`) && PathPrefix(`/god-mode`)
       kind: Rule
       services:
         - name: plane-admin
           port: 3000
       middlewares: *middlewares
-    - match: Host(`ticket.oisd.dev`) && (PathPrefix(`/api`) || PathPrefix(`/auth`) || PathPrefix(`/static/`))
+    - match: Host(`plane.oisd.dev`) && (PathPrefix(`/api`) || PathPrefix(`/auth`) || PathPrefix(`/static/`))
       kind: Rule
       services:
         - name: plane-api
           port: 8000
       middlewares: *middlewares
     # Collaborative editing websocket.
-    - match: Host(`ticket.oisd.dev`) && PathPrefix(`/live`)
+    - match: Host(`plane.oisd.dev`) && PathPrefix(`/live`)
       kind: Rule
       services:
         - name: plane-live
@@ -59,13 +59,13 @@ spec:
     # The chart's `download` bucket policy also grants anonymous ListBucket, and S3
     # lists at the bucket root. Route only object keys, plus the presigned POST that
     # browser uploads send to the root; other root requests fall through to web.
-    - match: Host(`ticket.oisd.dev`) && (PathRegexp(`^/uploads/.+`) || ((Path(`/uploads`) || Path(`/uploads/`)) && Method(`POST`)))
+    - match: Host(`plane.oisd.dev`) && (PathRegexp(`^/uploads/.+`) || ((Path(`/uploads`) || Path(`/uploads/`)) && Method(`POST`)))
       kind: Rule
       services:
         - name: plane-minio
           port: 9000
       middlewares: *middlewares
-    - match: Host(`ticket.oisd.dev`)
+    - match: Host(`plane.oisd.dev`)
       kind: Rule
       services:
         - name: plane-web

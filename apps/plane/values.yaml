@@ -8,7 +8,7 @@ ingress:
   # ingress.yaml routes Plane through Traefik with the shared middleware chain and
   # wildcard certificate. appHost still drives WEB_URL and CORS_ALLOWED_ORIGINS.
   enabled: false
-  appHost: ticket.oisd.dev
+  appHost: plane.oisd.dev
 
 ssl:
   # Traefik terminates TLS with wildcard-tls-oisd, so WEB_URL must be https.

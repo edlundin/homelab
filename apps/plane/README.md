@@ -5,12 +5,12 @@ upstream Helm chart (`plane-ce` 1.9.2 from `https://helm.plane.so/`) through
 Kustomize: api, worker, beat-worker, web, space, admin and live, one replica each,
 with the chart's Valkey, RabbitMQ and MinIO.
 
-- https://ticket.oisd.dev — Traefik with the existing wildcard certificate.
-- https://ticket.oisd.dev/god-mode — instance administration.
+- https://plane.oisd.dev — Traefik with the existing wildcard certificate.
+- https://plane.oisd.dev/god-mode — instance administration.
 
 ## First login
 
-Open https://ticket.oisd.dev/god-mode right after the first deployment and create
+Open https://plane.oisd.dev/god-mode right after the first deployment and create
 the instance admin before anyone else can reach it. Then configure sign-up,
 SMTP and telemetry there.
 
@@ -24,7 +24,7 @@ and a 20 MiB body limit: `/spaces` → space, `/god-mode` → admin,
 The chart makes the bucket public-read with MinIO's `download` policy, which also
 allows anonymous listing; keeping other bucket-root requests away from MinIO
 prevents enumerating upload keys. `ingress.appHost` and `ssl.externalTermination` still make
-the chart set `WEB_URL=https://ticket.oisd.dev` and the CORS origins.
+the chart set `WEB_URL=https://plane.oisd.dev` and the CORS origins.
 
 ## Dependencies and data
 
