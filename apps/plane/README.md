@@ -19,8 +19,11 @@ SMTP and telemetry there.
 The chart's IngressRoute is disabled (`ingress.enabled: false`); `ingress.yaml`
 reproduces its routes on `websecure` with the shared `default-chain` middleware
 and a 20 MiB body limit: `/spaces` → space, `/god-mode` → admin,
-`/api`, `/auth` and `/static/` → api, `/live` → live (websocket), `/uploads` → MinIO,
-everything else → web. `ingress.appHost` and `ssl.externalTermination` still make
+`/api`, `/auth` and `/static/` → api, `/live` → live (websocket), object keys under
+`/uploads/` and presigned POSTs to the bucket root → MinIO, everything else → web.
+The chart makes the bucket public-read with MinIO's `download` policy, which also
+allows anonymous listing; keeping other bucket-root requests away from MinIO
+prevents enumerating upload keys. `ingress.appHost` and `ssl.externalTermination` still make
 the chart set `WEB_URL=https://plane.oisd.dev` and the CORS origins.
 
 ## Dependencies and data

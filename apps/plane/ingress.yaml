@@ -56,7 +56,10 @@ spec:
           port: 3000
       middlewares: *middlewares
     # Uploaded assets, served by MinIO from the `uploads` bucket (AWS_S3_BUCKET_NAME).
-    - match: Host(`plane.oisd.dev`) && PathPrefix(`/uploads`)
+    # The chart's `download` bucket policy also grants anonymous ListBucket, and S3
+    # lists at the bucket root. Route only object keys, plus the presigned POST that
+    # browser uploads send to the root; other root requests fall through to web.
+    - match: Host(`plane.oisd.dev`) && (PathRegexp(`^/uploads/.+`) || ((Path(`/uploads`) || Path(`/uploads/`)) && Method(`POST`)))
       kind: Rule
       services:
         - name: plane-minio

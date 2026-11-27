@@ -2,6 +2,7 @@
 
 ## 2026-11-27
 
+- **fix**: Stop anonymous listing of Plane's uploads bucket through plane.oisd.dev while keeping object downloads and browser uploads. ([pending])
 - **feat**: Add Plane Community Edition v1.5.1 at plane.oisd.dev, with a dedicated database on the shared PostgreSQL, sealed secrets, and Valkey, RabbitMQ and MinIO uploads on Longhorn. ([pending])
 
 ## 2026-11-26
